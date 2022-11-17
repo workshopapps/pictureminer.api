@@ -11,7 +11,7 @@ import (
 
 func Auth(r *gin.Engine, validate *validator.Validate, ApiVersion string, logger *utility.Logger) *gin.Engine {
 
-	auth := user.Controller{Validate: validate}
+	auth := user.Controller{Validate: validate, Logger: logger}
 
 	authUrl := r.Group(fmt.Sprintf("/api/%v", ApiVersion))
 	{
