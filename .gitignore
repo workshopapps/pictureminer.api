@@ -15,4 +15,4 @@
 # vendor/
 config.yaml
 
-.env
+example.env
