@@ -28,7 +28,7 @@ func Setup(validate *validator.Validate, logger *utility.Logger) *gin.Engine {
 		c.JSON(http.StatusNotFound, gin.H{
 			"name":    "Not Found",
 			"message": "Page not found.",
-			"code":    400,
+			"code":    404,
 			"status":  http.StatusNotFound,
 		})
 	})
