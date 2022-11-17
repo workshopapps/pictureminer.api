@@ -15,7 +15,7 @@
 
 **step 4: pull latest work " git pull "**
 
-### you can start working N/B: "once your done making your feature please pull again before commiting"
+> you can start working N/B: "once your done making your feature please pull again before commiting"
 
 **step 5: " git add . && git commit -m "Your commit message" "**
 
