@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/workshopapps/pictureminer.api/internal/config"
 	"log"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/workshopapps/pictureminer.api/internal/config"
-	mdb "github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongo"
+	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/s3"
 	"github.com/workshopapps/pictureminer.api/utility"
 
@@ -16,7 +16,7 @@ import (
 func init() {
 	config.Setup()
 	// redis.SetupRedis() uncomment when you need redis
-	mdb.ConnectToDB()
+	mongodb.ConnectToDB()
 
 	s3.ConnectAws()
 }
