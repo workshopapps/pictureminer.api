@@ -10,7 +10,6 @@ import (
 )
 
 func Health(r *gin.Engine, validate *validator.Validate, ApiVersion string, logger *utility.Logger) *gin.Engine {
-
 	health := health.Controller{Validate: validate, Logger: logger}
 
 	authUrl := r.Group(fmt.Sprintf("/api/%v", ApiVersion))
