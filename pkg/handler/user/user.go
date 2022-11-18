@@ -46,6 +46,7 @@ func (base *Controller) Signup(c *gin.Context) {
 		return
 	}
 	User.Password = string(harsh)
+	User.Token = utility.CreateToken()
 
 	userCollection.InsertOne(context.Background(), User)
 	c.JSON(200, User)
