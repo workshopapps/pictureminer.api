@@ -1,11 +1,22 @@
-package models
+package model
 
-import "time"
+import (
+	"time"
+)
+
+//type User struct {
+//	ID         primitive.ObjectID `bson:"_id"`
+//	First_name *string            `bson:"first_name" validate:"required, min=5, max=100"`
+//	Last_name  *string            `bson:"last_name" validate:"required, min=5, max=150"`
+//	Email      *string            `bson:"email" validate:"email, required"`
+//	Username   *string            `bson:"username" validate:"min=8"`
+//	Password   *string            `bson:"password" validate:"required, min=8"`
+//}
 
 type UserStruct struct {
-	UserName string     `bson:"userName" json:"userName"`
-	Email    string     `bson:"email" json:"email"`
-	Password string     `bson:"password" json:"password"`
+	UserName string     `bson:"userName" json:"userName" validate:"required, min=4, max=100"`
+	Email    string     `bson:"email" json:"email" validate:"email, required"`
+	Password string     `bson:"password" json:"password" validate:"required, min 8"`
 	Request  []Requests `bson:"request" json:"request"`
 }
 type Requests struct {
@@ -13,3 +24,4 @@ type Requests struct {
 	DateCreated  time.Time `json:"dateCreated" bson:"dateCreated"`
 	RequestsText string    `json:"requestsText" bson:"requestsText"`
 }
+
