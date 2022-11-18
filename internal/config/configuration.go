@@ -11,6 +11,7 @@ type Configuration struct {
 	Server  ServerConfiguration
 	Mongodb MongodbConfiguration
 	Redis   RedisConfiguration
+	S3      S3StorageConfiguration
 }
 
 // Setup initialize configuration
@@ -19,12 +20,12 @@ var (
 	Config *Configuration
 )
 
-//Params = getConfig.Params
+// Params = getConfig.Params
 func Setup() {
 	var configuration *Configuration
 	logger := utility.NewLogger()
 
-	viper.SetConfigName("config")
+	viper.SetConfigName("config-sample")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 
