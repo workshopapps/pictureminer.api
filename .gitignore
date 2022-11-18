@@ -15,4 +15,9 @@
 # vendor/
 config.yaml
 
+<<<<<<< HEAD
 example.env
+=======
+.env
+logs/
+>>>>>>> e8168da4216a502374cedd40e23930a549d8ec23

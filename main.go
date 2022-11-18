@@ -1,6 +1,7 @@
 package main
 
 import (
+<<<<<<< HEAD
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -19,14 +20,26 @@ var (
 	ctx         context.Context
 	mongoClient *mongo.Client
 	db          *mongo.Database
+=======
+	"log"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/workshopapps/pictureminer.api/internal/config"
+	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
+	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/s3"
+	"github.com/workshopapps/pictureminer.api/utility"
+
+	// "github.com/workshopapps/pictureminer.api/pkg/repository/storage/redis"
+	"github.com/workshopapps/pictureminer.api/pkg/router"
+>>>>>>> e8168da4216a502374cedd40e23930a549d8ec23
 )
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println(err)
-	}
+	config.Setup()
+	// redis.SetupRedis() uncomment when you need redis
+	mongodb.ConnectToDB()
 
+<<<<<<< HEAD
 	ctx = context.TODO()
 	uri := os.Getenv("MONGODB_URI")
 	if uri == "" {
@@ -66,6 +79,20 @@ func main() {
 	// router.Run()
 	port := os.Getenv("PORT")
 	log.Fatal(server.Run(":" + port))
+=======
+	s3.ConnectAws()
+}
+
+func main() {
+	//Load config
+	logger := utility.NewLogger()
+	getConfig := config.GetConfig()
+	validatorRef := validator.New()
+	r := router.Setup(validatorRef, logger)
+
+	logger.Info("Server is starting at 127.0.0.1:%s", getConfig.Server.Port)
+	log.Fatal(r.Run(":" + getConfig.Server.Port))
+>>>>>>> e8168da4216a502374cedd40e23930a549d8ec23
 }
 
 func SignUp(c *gin.Context) {
