@@ -44,11 +44,10 @@ func ConnectAws() *session.Session {
 	return s3session
 }
 
-func UploadImage(file multipart.File, header *multipart.FileHeader) (string, error) {
+func UploadImage(file multipart.File, filename string) (string, error) {
 	uploader := s3manager.NewUploader(s3session)
 	MyBucket = config.GetConfig().S3.BucketName
 
-	filename := header.Filename
 	//upload to the s3 bucket
 	_, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(MyBucket),
