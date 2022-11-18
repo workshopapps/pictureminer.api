@@ -12,9 +12,9 @@ import (
 	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
-// "github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongo"
 func (base *Controller) CreateUser(c *gin.Context) {
 
 	rd := utility.BuildSuccessResponse(http.StatusCreated, "user created successfully", gin.H{"user": "user object"})
@@ -24,23 +24,22 @@ func (base *Controller) CreateUser(c *gin.Context) {
 
 // getting database collections
 func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
-	collection := client.Database("pixminer").Collection(collectionName)
+	collection := client.Database("ImageCollection").Collection(collectionName)
 	return collection
 }
 
-//func isPasswordValid(userPassword, providedPassword string) (bool, string) {
-//err := bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(providedPassword))
+func passwordIsValid(userPassword, providedPassword string) (bool, string) {
+	err := bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(providedPassword))
 
-//check := true
-//msg := ""
+	check := true
+	msg := ""
 
-//if err != nil {
-//check = false
-//msg = "invalid username or password"
-//}
-
-//return check, msg
-//}
+	if err != nil {
+		check = false
+		msg = "invalid email or password"
+	}
+	return check, msg
+}
 
 func (base *Controller) Login(c *gin.Context) {
 
@@ -63,6 +62,17 @@ func (base *Controller) Login(c *gin.Context) {
 		return
 
 	}
+
+	//isValid, msg := passwordIsValid(*profile.Password, user.Password)
+
+	//if isValid != true {
+	//c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
+	//return
+	//} else {
+	//rd := utility.BuildSuccessResponse(http.StatusOK, "user logged successfully", gin.H{"user": user.Email})
+	//c.JSON(http.StatusOK, rd)
+
+	//}
 
 	if user.Email == *profile.Email && user.Password == *profile.Password {
 		rd := utility.BuildSuccessResponse(http.StatusOK, "user logged successfully", gin.H{"user": user.Email})
