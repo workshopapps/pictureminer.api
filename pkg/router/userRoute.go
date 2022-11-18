@@ -16,7 +16,7 @@ func Signup(r *gin.Engine, validate *validator.Validate, ApiVersion string, logg
 	//	authUrl.POST("/health", health.Post)
 	//	authUrl.GET("/health", health.Get)
 	//}
-	r.POST("/signup", User.Signup)
+	r.POST("/"+"signup", User.Signup)
 
 	return r
 }
