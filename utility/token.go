@@ -1,8 +1,8 @@
 package utility
 
 import (
-	"fmt"
 	"github.com/golang-jwt/jwt/v4"
+	"log"
 	"time"
 )
 
@@ -15,7 +15,7 @@ func CreateToken() *string {
 	// Sign and get the complete encoded token as a string using the secret
 	tokenString, err := token.SignedString([]byte(mysecretekey))
 	if err != nil {
-		fmt.Panic("Error is getting jwt key")
+		log.Panic("Error is getting jwt key")
 	}
 
 	return &tokenString
