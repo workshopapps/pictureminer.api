@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/workshopapps/pictureminer.api/internal/config"
-	mdb "github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongo"
+	mdb "github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/s3"
 	"github.com/workshopapps/pictureminer.api/utility"
 
