@@ -1,0 +1,45 @@
+[2022/11/18 17:33:57 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 17:34:00 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongo.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 17:34:00 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
+[2022/11/18 18:12:32 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 18:12:34 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 18:12:34 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
+[2022/11/18 18:14:46 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 18:14:48 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 18:14:48 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
+[2022/11/18 18:16:27 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 18:16:29 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 18:16:29 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
+[2022/11/18 18:18:33 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 18:18:35 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 18:18:35 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
+[2022/11/18 18:26:48 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 18:26:51 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 18:26:51 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
+[2022/11/18 18:30:04 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 18:30:06 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 18:30:06 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
+[2022/11/18 18:43:42 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 18:43:44 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 18:43:44 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
+[2022/11/18 18:45:13 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 18:45:15 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 18:45:15 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
+[2022/11/18 18:47:52 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 18:47:54 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 18:47:54 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
+[2022/11/18 18:54:27 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 18:54:30 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 18:54:30 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
+[2022/11/18 18:57:18 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 18:57:21 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 18:57:21 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
+[2022/11/18 19:09:39 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 19:09:45 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 19:09:45 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
+[2022/11/18 19:15:30 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 19:15:33 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 19:15:33 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
+[2022/11/18 20:01:52 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/internal/config.Setup:43) configurations loading successfully
+[2022/11/18 20:01:57 WAT] [fileLogs] [INFO] (github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb.ConnectToDB:41) MONGO CONNECTION ESTABLISHED
+[2022/11/18 20:01:57 WAT] [fileLogs] [INFO] (main.main:31) Server is starting at 127.0.0.1:9000
