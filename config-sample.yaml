@@ -6,3 +6,8 @@ Redis:
 server:
   port: "9000"
   secret: "mySecretKey"
+S3:
+  AWSRegion: "us-east-1"
+  AWSAccessKeyID : "AKIA3AKGGBQK5GD2QPDO"
+  AWSSecretAccessKey : "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"
+  BucketName : "mined-pictures"
