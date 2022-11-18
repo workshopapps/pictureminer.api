@@ -3,12 +3,15 @@ package user
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
+
+	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/workshopapps/pictureminer.api/internal/model"
-	DB "github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongo"
+
+	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -45,7 +48,7 @@ func (base *Controller) Login(c *gin.Context) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	userCollection := GetCollection(DB.ConnectToDB(), "users")
+	userCollection := GetCollection(mongodb.ConnectToDB(), "users")
 
 	var user UserLoginField
 	var profile model.User
@@ -81,5 +84,34 @@ func (base *Controller) Login(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid email or password"})
 	}
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "user created successfully", gin.H{"user": "login object"})
+	c.JSON(http.StatusOK, rd)
+}
+
+func (base *Controller) Signup(c *gin.Context) {
+
+	//Database connection
+	mongoClient := mongodb.Connection()
+	imageDB := mongoClient.Database("ImageCollection")
+	userCollection := imageDB.Collection("user")
+
+	//Binding the userdetails to userStruct
+	var User model.UserStruct
+	err := c.Bind(&User)
+	if err != nil {
+		log.Fatal("Unable to bind user signup details")
+	}
+	//	Hashing the password
+	harsh, err := bcrypt.GenerateFromPassword([]byte(User.Password), 10)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to harsh paswword",
+		})
+		return
+	}
+	User.Password = string(harsh)
+
+	userCollection.InsertOne(context.Background(), User)
+	c.JSON(200, User)
 
 }

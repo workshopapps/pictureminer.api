@@ -1,6 +1,6 @@
 module github.com/workshopapps/pictureminer.api
 
-go 1.19
+go 1.17
 
 require (
 	github.com/aws/aws-sdk-go v1.44.140
@@ -9,6 +9,7 @@ require (
 )
 
 require (
+	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/toolkits/file v0.0.0-20160325033739-a5b3c5147e07 // indirect
 )
