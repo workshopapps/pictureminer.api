@@ -54,11 +54,12 @@ func (base *Controller) Login(c *gin.Context) {
 	var profile model.User
 
 	if err := c.BindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error a": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	err := userCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&profile)
+
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusNotFound, "404 Not Found", "User does not exits", err.Error(), fmt.Sprintf("%s does not exist", user.Email))
 		c.JSON(http.StatusUnauthorized, rd)
@@ -66,26 +67,19 @@ func (base *Controller) Login(c *gin.Context) {
 
 	}
 
-	//isValid, msg := passwordIsValid(*profile.Password, user.Password)
+	if user.Email == *profile.Email {
 
-	//if isValid != true {
-	//c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
-	//return
-	//} else {
-	//rd := utility.BuildSuccessResponse(http.StatusOK, "user logged successfully", gin.H{"user": user.Email})
-	//c.JSON(http.StatusOK, rd)
+		isValid, msg := passwordIsValid(*profile.Password, user.Password)
+		if isValid != true {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
+			return
+		}
 
-	//}
-
-	if user.Email == *profile.Email && user.Password == *profile.Password {
 		rd := utility.BuildSuccessResponse(http.StatusOK, "user logged successfully", gin.H{"user": user.Email})
 		c.JSON(http.StatusOK, rd)
 
-	} else {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid email or password"})
 	}
-	rd := utility.BuildSuccessResponse(http.StatusCreated, "user created successfully", gin.H{"user": "login object"})
-	c.JSON(http.StatusOK, rd)
+
 }
 
 func (base *Controller) Signup(c *gin.Context) {
