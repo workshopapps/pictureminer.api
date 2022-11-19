@@ -46,6 +46,9 @@ func ConnectToDB() *mongo.Client {
 	return mongoClient
 }
 
+// 1
+var Client *mongo.Client = ConnectToDB()
+
 // getting database collections
 func GetCollection(client *mongo.Client, databaseName, collectionName string) *mongo.Collection {
 	collection := client.Database(databaseName).Collection(collectionName)
@@ -60,3 +63,9 @@ func CreateUser(context context.Context, User model.UserStruct) {
 	userCollection := imageDB.Collection(constants.UserDatabase)
 	userCollection.InsertOne(context, User)
 }
+
+
+// func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
+// 	collection := client.Database("myGoappDB").Collection("Posts")
+// 	return collection
+// }
