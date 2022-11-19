@@ -2,13 +2,18 @@ package user
 
 import (
 	"context"
+	"fmt"
+
+	"log"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/workshopapps/pictureminer.api/internal/model"
+	usService "github.com/workshopapps/pictureminer.api/service/user"
+
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"github.com/workshopapps/pictureminer.api/utility"
 	"golang.org/x/crypto/bcrypt"
-	"log"
-	"net/http"
 )
 
 func (base *Controller) CreateUser(c *gin.Context) {
@@ -19,9 +24,34 @@ func (base *Controller) CreateUser(c *gin.Context) {
 }
 
 func (base *Controller) Login(c *gin.Context) {
+	var user model.UserLoginField
 
-	rd := utility.BuildSuccessResponse(http.StatusCreated, "user created successfully", gin.H{"user": "login object"})
-	c.JSON(http.StatusOK, rd)
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	profile, err := usService.CheckUserExists(user)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusNotFound, "404 Not Found", "User does not exits", err.Error(), fmt.Sprintf("%s does not exist", user.Email))
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+
+	}
+
+	if user.Email == *profile.Email {
+
+		isValid, msg := usService.PasswordIsValid(*profile.Password, user.Password)
+		if isValid != true {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
+			return
+		}
+
+		rd := utility.BuildSuccessResponse(http.StatusOK, "user logged successfully", gin.H{"user": user.Email})
+		c.JSON(http.StatusOK, rd)
+
+	}
+
 }
 
 func (base *Controller) Signup(c *gin.Context) {
