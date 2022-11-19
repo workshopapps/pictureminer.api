@@ -2,11 +2,12 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/internal/constants"
+	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"github.com/workshopapps/pictureminer.api/utility"
 	"golang.org/x/crypto/bcrypt"
@@ -34,6 +35,7 @@ func (base *Controller) Signup(c *gin.Context) {
 	//Binding the userdetails to userStruct
 	var User model.User
 	err := c.Bind(&User)
+	fmt.Println(User)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind user signup details", err, nil)
 		c.JSON(http.StatusBadRequest, rd)
@@ -61,7 +63,6 @@ func (base *Controller) Signup(c *gin.Context) {
 	userResponse.FirstName = User.FirstName
 	userResponse.LastName = User.LastName
 	userResponse.Email = User.Email
-
 
 	userResponse.TokenType = "bearer"
 	token, err := utility.CreateToken(userResponse.Email)
