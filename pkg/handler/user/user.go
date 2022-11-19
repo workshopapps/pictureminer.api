@@ -2,11 +2,13 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
+	userService "github.com/workshopapps/pictureminer.api/service/user"
 	"github.com/workshopapps/pictureminer.api/utility"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -16,12 +18,6 @@ func (base *Controller) CreateUser(c *gin.Context) {
 	rd := utility.BuildSuccessResponse(http.StatusCreated, "user created successfully", gin.H{"user": "user object"})
 	c.JSON(http.StatusOK, rd)
 
-}
-
-func (base *Controller) Login(c *gin.Context) {
-
-	rd := utility.BuildSuccessResponse(http.StatusCreated, "user created successfully", gin.H{"user": "login object"})
-	c.JSON(http.StatusOK, rd)
 }
 
 func (base *Controller) Signup(c *gin.Context) {
@@ -69,4 +65,35 @@ func (base *Controller) Signup(c *gin.Context) {
 	userCollection.InsertOne(context.Background(), User)
 	object := utility.BuildSuccessResponse(200, "User created successfully", User)
 	c.JSON(200, object)
+}
+
+func (base *Controller) Login(c *gin.Context) {
+	var user model.UserLoginField
+
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	profile, err := userService.CheckUserExists(user)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusNotFound, "404 Not Found", "User does not exits", err.Error(), fmt.Sprintf("%s does not exist", user.Email))
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+
+	}
+
+	if user.Email == profile.Email {
+
+		isValid, msg := userService.PasswordIsValid(profile.Password, user.Password)
+		if isValid != true {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
+			return
+		}
+
+		rd := utility.BuildSuccessResponse(http.StatusOK, "user logged successfully", gin.H{"token_type": profile.TokenType, "username": profile.UserName, "email": profile.Email, "firstname": profile.FirstName, "lastname": profile.LastName, "api_call_count": profile.ApiCallCount})
+		c.JSON(http.StatusOK, rd)
+
+	}
+
 }

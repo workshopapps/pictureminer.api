@@ -24,8 +24,8 @@ func PasswordIsValid(userPassword, providedPassword string) (bool, string) {
 	return check, msg
 }
 
-func CheckUserExists(user model.UserLoginField) (model.User, error) {
-	var profile model.User
+func CheckUserExists(user model.UserLoginField) (model.UserStruct, error) {
+	var profile model.UserStruct
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	userCollection := mongodb.GetCollection(mongodb.ConnectToDB(), constants.UserDatabase, constants.UserCollection)
