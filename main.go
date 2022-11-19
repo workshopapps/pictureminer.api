@@ -11,6 +11,7 @@ import (
 
 	// "github.com/workshopapps/pictureminer.api/pkg/repository/storage/redis"
 	"github.com/workshopapps/pictureminer.api/pkg/router"
+	_"github.com/workshopapps/pictureminer.api/docs"
 )
 
 func init() {
@@ -21,6 +22,13 @@ func init() {
 	s3.ConnectAws()
 }
 
+// @title           Minergram
+// @version         1.0
+// @description     A picture mining service API in Go using Gin framework.
+
+// @host      localhost:9000
+// @BasePath  /
+// @schemes http
 func main() {
 	//Load config
 	logger := utility.NewLogger()

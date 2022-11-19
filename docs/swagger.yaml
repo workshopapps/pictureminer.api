@@ -1,0 +1,11 @@
+basePath: /
+host: localhost:9000
+info:
+  contact: {}
+  description: A picture mining service API in Go using Gin framework.
+  title: Minergram
+  version: "1.0"
+paths: {}
+schemes:
+- http
+swagger: "2.0"
