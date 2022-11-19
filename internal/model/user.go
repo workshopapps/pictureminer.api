@@ -1,31 +1,30 @@
 package model
 
 import (
-	"time"
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type User struct {
-	ID         primitive.ObjectID `bson:"_id"`
-	First_name *string            `bson:"first_name" validate:"required, min=5, max=100"`
-	Last_name  *string            `bson:"last_name" validate:"required, min=5, max=150"`
-	Email      *string            `bson:"email" validate:"email, required"`
-	Username   *string            `bson:"username" validate:"min=8"`
-	Password   *string            `bson:"password" validate:"required, min=8"`
+	ID           primitive.ObjectID `bson:"_id"`
+	Username     string             `bson:"username" json:"username" validate:"required, min=4, max=100"`
+	FirstName    string             `bson:"first_name" json:"first_name"`
+	LastName     string             `bson:"last_name" json:"last_name"`
+	Email        string             `bson:"email" json:"email" validate:"email, required"`
+	Password     string             `bson:"password" json:"password" validate:"required, min 8"`
 }
 
 type UserStruct struct {
-	UserName string     `bson:"userName" json:"userName" validate:"required, min=4, max=100"`
-	Email    string     `bson:"email" json:"email" validate:"email, required"`
-	Password string     `bson:"password" json:"password" validate:"required, min 8"`
-	Token    *string    `bson:"token" json:"token"`
-	Request  []Requests `bson:"request" json:"request"`
-}
-type Requests struct {
-	ImageEncode  string    `json:"imageEncode" bson:"imageEncode"`
-	DateCreated  time.Time `json:"dateCreated" bson:"dateCreated"`
-	RequestsText string    `json:"requestsText" bson:"requestsText"`
+	Token        *string            `bson:"access_token" json:"access_token"`
+	TokenType    string             `bson:"token_type" json:"token_type"`
+	ID           primitive.ObjectID `bson:"_id"`
+	UserName     string             `bson:"userName" json:"userName" validate:"required, min=4, max=100"`
+	FirstName    string             `bson:"firstname" json:"firstname"`
+	LastName     string             `bson:"lastname" json:"lastname"`
+	Email        string             `bson:"email" json:"email" validate:"email, required"`
+	Password     string             `bson:"password" json:"password" validate:"required, min 8"`
+	ApiCallCount int                `bson:"api_call_count" json:"api_call_count"`
+	//DataCreated  time.Time          `bson:"dataCreated" json:"datacreated"`
+	//DateModified time.Time          `bson:"dateModified"json:"datemodified"`
 }
 
 type UserLoginField struct {
