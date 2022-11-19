@@ -6,5 +6,6 @@ type RedisConfiguration struct {
 }
 
 type MongodbConfiguration struct {
-	Url string
+	Url      string
+	Database string
 }
