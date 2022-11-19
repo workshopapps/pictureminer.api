@@ -23,6 +23,7 @@ func Setup(validate *validator.Validate, logger *utility.Logger) *gin.Engine {
 	ApiVersion := "v1"
 	Health(r, validate, ApiVersion, logger)
 	Auth(r, validate, ApiVersion, logger)
+	Signup(r, validate, ApiVersion, logger)
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{
