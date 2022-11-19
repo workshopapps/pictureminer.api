@@ -3,19 +3,16 @@ package user
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/workshopapps/pictureminer.api/internal/constants"
 	"github.com/workshopapps/pictureminer.api/internal/model"
-	"github.com/workshopapps/pictureminer.api/service/password"
+	usService "github.com/workshopapps/pictureminer.api/service/user"
 
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"github.com/workshopapps/pictureminer.api/utility"
-	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,21 +24,14 @@ func (base *Controller) CreateUser(c *gin.Context) {
 }
 
 func (base *Controller) Login(c *gin.Context) {
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	userCollection := mongodb.GetCollection(mongodb.ConnectToDB(), constants.UserDatabase, constants.UserCollection)
-
 	var user model.UserLoginField
-	var profile model.User
 
 	if err := c.BindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := userCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&profile)
-
+	profile, err := usService.CheckUserExists(user)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusNotFound, "404 Not Found", "User does not exits", err.Error(), fmt.Sprintf("%s does not exist", user.Email))
 		c.JSON(http.StatusUnauthorized, rd)
@@ -51,7 +41,7 @@ func (base *Controller) Login(c *gin.Context) {
 
 	if user.Email == *profile.Email {
 
-		isValid, msg := password.PasswordIsValid(*profile.Password, user.Password)
+		isValid, msg := usService.PasswordIsValid(*profile.Password, user.Password)
 		if isValid != true {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
 			return
