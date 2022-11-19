@@ -1,13 +1,17 @@
 mongodb:
-  url: "mongodb+srv://hng:HNG12345@cluster0.fqr9r6m.mongodb.net/?retryWrites=true&w=majority"
+  #url: "mongodb+srv://hng:HNG12345@cluster0.fqr9r6m.mongodb.net/?retryWrites=true&w=majority"
+  url: "mongodb://localhost:27017"
+  database: "pictureminer-api"
 Redis:
   redishost: "localhost"
   Redisport: "6379"
 server:
   port: "9000"
   secret: "mySecretKey"
-S3:
+s3:
   AWSRegion: "us-east-1"
   AWSAccessKeyID : "AKIA3AKGGBQK5GD2QPDO"
   AWSSecretAccessKey : "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"
   BucketName : "mined-pictures"
+python: 
+  microservicehost: "https://yiowpv.deta.dev/api/microservice/content"
