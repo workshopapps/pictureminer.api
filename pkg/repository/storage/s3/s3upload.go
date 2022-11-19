@@ -25,10 +25,11 @@ func Session() (session *session.Session) {
 }
 
 func ConnectAws() *session.Session {
+	var err error
 	AccessKeyID = config.GetConfig().S3.AWSAccessKeyID
 	SecretAccessKey = config.GetConfig().S3.AWSSecretAccessKey
 	MyRegion = config.GetConfig().S3.AWSRegion
-	s3session, err := session.NewSession(
+	s3session, err = session.NewSession(
 		&aws.Config{
 			Region: aws.String(MyRegion),
 			Credentials: credentials.NewStaticCredentials(
@@ -57,7 +58,6 @@ func UploadImage(file multipart.File, filename string) (string, error) {
 	})
 
 	if err != nil {
-
 		return "", err
 	}
 	filepath = "https://" + MyBucket + ".s3.amazonaws.com/" + filename

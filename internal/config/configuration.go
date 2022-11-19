@@ -12,6 +12,7 @@ type Configuration struct {
 	Mongodb MongodbConfiguration
 	Redis   RedisConfiguration
 	S3      S3StorageConfiguration
+	Python  MicroserviceConfiguration
 }
 
 // Setup initialize configuration
