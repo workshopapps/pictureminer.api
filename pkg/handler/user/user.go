@@ -9,12 +9,13 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/workshopapps/pictureminer.api/internal/constants"
 	"github.com/workshopapps/pictureminer.api/internal/model"
+	"github.com/workshopapps/pictureminer.api/service/password"
 
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -25,32 +26,13 @@ func (base *Controller) CreateUser(c *gin.Context) {
 
 }
 
-// getting database collections
-func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
-	collection := client.Database("ImageCollection").Collection(collectionName)
-	return collection
-}
-
-func passwordIsValid(userPassword, providedPassword string) (bool, string) {
-	err := bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(providedPassword))
-
-	check := true
-	msg := ""
-
-	if err != nil {
-		check = false
-		msg = "invalid email or password"
-	}
-	return check, msg
-}
-
 func (base *Controller) Login(c *gin.Context) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	userCollection := GetCollection(mongodb.ConnectToDB(), "users")
+	userCollection := mongodb.GetCollection(mongodb.ConnectToDB(), constants.UserDatabase, constants.UserCollection)
 
-	var user UserLoginField
+	var user model.UserLoginField
 	var profile model.User
 
 	if err := c.BindJSON(&user); err != nil {
@@ -69,7 +51,7 @@ func (base *Controller) Login(c *gin.Context) {
 
 	if user.Email == *profile.Email {
 
-		isValid, msg := passwordIsValid(*profile.Password, user.Password)
+		isValid, msg := password.PasswordIsValid(*profile.Password, user.Password)
 		if isValid != true {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
 			return
