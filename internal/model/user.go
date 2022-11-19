@@ -1,8 +1,9 @@
 package model
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type User struct {
@@ -25,4 +26,9 @@ type Requests struct {
 	ImageEncode  string    `json:"imageEncode" bson:"imageEncode"`
 	DateCreated  time.Time `json:"dateCreated" bson:"dateCreated"`
 	RequestsText string    `json:"requestsText" bson:"requestsText"`
+}
+
+type UserLoginField struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }

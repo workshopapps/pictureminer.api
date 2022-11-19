@@ -1,9 +1,10 @@
 package utility
 
 import (
-	"github.com/golang-jwt/jwt/v4"
 	"log"
 	"time"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 func CreateToken() *string {
