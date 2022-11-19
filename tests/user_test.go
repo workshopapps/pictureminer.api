@@ -10,19 +10,19 @@ import (
 	"strings"
 	"testing"
 )
-   
+
 func TestSignUp(t *testing.T) {
 	url := "http://localhost:9000/signup"
 
-	payload := strings.NewReader(`{`+" "+` "user_name":"mikey",`+" "+` "email":"michael@gmail.com", `+" "+` "password": "MyPassword123"`+" "+` }`)
+	payload := strings.NewReader(`{` + " " + ` "user_name":"mikey",` + " " + ` "email":"michael@gmail.com", ` + " " + ` "password": "MyPassword123"` + " " + ` }`)
 
-	client := &http.Client {}
+	client := &http.Client{}
 
 	req, err := http.NewRequest("POST", url, payload)
 
 	if err != nil {
-	fmt.Println(err)
-	return
+		fmt.Println(err)
+		return
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -45,11 +45,11 @@ func TestSignUp(t *testing.T) {
 		return
 	}
 
-	m := make(map[string]any)
-	
+	m := make(map[string]interface{})
+
 	marshalErr := json.Unmarshal(body, &m)
 
-	if marshalErr!= nil {
+	if marshalErr != nil {
 		fmt.Println(marshalErr)
 		t.Error(marshalErr)
 		return
@@ -57,22 +57,21 @@ func TestSignUp(t *testing.T) {
 
 	t.Log(m)
 
-	if m["user_name"] != "mikey"{
+	if m["user_name"] != "mikey" {
 		t.Log("exp:", "mikey")
 		t.Log("got:", m["user_name"])
 		t.Fatal("Usernames don't match")
 	}
 
-	if m["email"] != "michael@gmail.com"{
+	if m["email"] != "michael@gmail.com" {
 		t.Log("exp:", "michael@gmail.com")
 		t.Log("got:", m["email"])
 		t.Fatal("emails don't match")
 	}
 
-	
 	if res.StatusCode != 200 {
 		t.Log("exp:", 200)
 		t.Log("got:", res.StatusCode)
 		t.Fatal("status codes don't match")
-	}	   
+	}
 }
