@@ -11,13 +11,21 @@ import (
 	"net/http"
 )
 
-//var (
-//	ctx         context.Context
-//	mongoClient *mongo.Client
-//	db          *mongo.Database
-//)
+func (base *Controller) CreateUser(c *gin.Context) {
+
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "user created successfully", gin.H{"user": "user object"})
+	c.JSON(http.StatusOK, rd)
+
+}
+
+func (base *Controller) Login(c *gin.Context) {
+
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "user created successfully", gin.H{"user": "login object"})
+	c.JSON(http.StatusOK, rd)
+}
 
 func (base *Controller) Signup(c *gin.Context) {
+
 	//Database connection
 	mongoClient := mongodb.Connection()
 	imageDB := mongoClient.Database("ImageCollection")
@@ -33,22 +41,14 @@ func (base *Controller) Signup(c *gin.Context) {
 	harsh, err := bcrypt.GenerateFromPassword([]byte(User.Password), 10)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to harsh password",
+			"error": "Failed to harsh paswword",
 		})
 		return
 	}
 	User.Password = string(harsh)
-	User.Token = utility.CreateToken()
+	User.Token = utility.CreateToken(&User)
+
 	userCollection.InsertOne(context.Background(), User)
-
-	rd := utility.BuildSuccessResponse(http.StatusCreated, "user created successfully", gin.H{"user": User})
-	c.JSON(http.StatusOK, rd)
-
-}
-
-func (base *Controller) Login(c *gin.Context) {
-
-	rd := utility.BuildSuccessResponse(http.StatusCreated, "user created successfully", gin.H{"user": "login object"})
-	c.JSON(http.StatusOK, rd)
+	c.JSON(200, User)
 
 }
