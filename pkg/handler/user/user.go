@@ -2,13 +2,13 @@ package user
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"github.com/workshopapps/pictureminer.api/utility"
 	"golang.org/x/crypto/bcrypt"
-	"log"
-	"net/http"
 )
 
 func (base *Controller) CreateUser(c *gin.Context) {
@@ -35,19 +35,34 @@ func (base *Controller) Signup(c *gin.Context) {
 	var User model.UserStruct
 	err := c.Bind(&User)
 	if err != nil {
-		log.Fatal("Unable to bind user signup details")
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind user signup details", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validate.Struct(&User)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validate), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
 	}
 	//	Hashing the password
 	harsh, err := bcrypt.GenerateFromPassword([]byte(User.Password), 10)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to harsh paswword",
-		})
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Failed to harsh paswword", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
 	User.Password = string(harsh)
 	User.TokenType = "bearer"
-	User.Token = utility.CreateToken(&User)
+	token, err := utility.CreateToken(User.Email)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", err.Error(), err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+
+	}
+	User.Token = &token
 	User.ApiCallCount = 0
 	//User.ID = ObjectID()
 

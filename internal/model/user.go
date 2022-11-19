@@ -17,3 +17,8 @@ type UserStruct struct {
 	//DataCreated  time.Time          `bson:"dataCreated" json:"datacreated"`
 	//DateModified time.Time          `bson:"dateModified"json:"datemodified"`
 }
+
+type UserLoginField struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
