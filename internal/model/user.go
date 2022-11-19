@@ -18,7 +18,7 @@ type UserStruct struct {
 	UserName string     `bson:"userName" json:"userName" validate:"required, min=4, max=100"`
 	Email    string     `bson:"email" json:"email" validate:"email, required"`
 	Password string     `bson:"password" json:"password" validate:"required, min 8"`
-	Token    string     `bson:"token" json:"token"`
+	Token    *string    `bson:"token" json:"token"`
 	Request  []Requests `bson:"request" json:"request"`
 }
 type Requests struct {
