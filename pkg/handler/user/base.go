@@ -9,8 +9,3 @@ type Controller struct {
 	Validate *validator.Validate
 	Logger   *utility.Logger
 }
-
-type UserLoginField struct {
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
