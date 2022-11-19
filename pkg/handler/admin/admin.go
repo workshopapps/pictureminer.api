@@ -6,9 +6,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	// "github.com/workshopapps/pictureminer.api/internal/model"
+	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/service/ping"
 	"github.com/workshopapps/pictureminer.api/utility"
+	"github.com/workshopapps/pictureminer.api/internal/constants"
 )
 
 type Controller struct {
@@ -16,7 +17,8 @@ type Controller struct {
 	Logger   *utility.Logger
 }
 
-var userCollection *mongo.Collection = database.OpenCollection(database.Client, "user")
+
+var userCollection *mongo.Collection = database.GetCollection(database.Client,constants.UserDatabase , constants.UserCollection)
 var validate = validator.New()
 
 func (base *Controller) GetUsers(c *gin.Context) {
@@ -33,24 +35,23 @@ func (base *Controller) GetUsers(c *gin.Context) {
 
 var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 
-// begin find
-coll := client.Database("sample_restaurants").Collection("restaurants")
-filter := bson.D{{"cuisine", "Italian"}}
 
-cursor, err := coll.Find(context.TODO(), filter)
+filter := bson.D{{"username", ""}}
+
+cursor, err := userCollection.Find(ctx, filter)
 if err != nil {
 	panic(err)
 }
 // end find
 
-var results []Restaurant
-if err = cursor.All(context.TODO(), &results); err != nil {
+var users []model.User
+if err = cursor.All(ctx, &users); err != nil {
 	panic(err)
 }
 
-for _, result := range results {
-	cursor.Decode(&result)
-	output, err := json.MarshalIndent(result, "", "    ")
+for _, user := range users {
+	cursor.Decode(&user)
+	output, err := json.MarshalIndent(user, "", "    ")
 	if err != nil {
 		panic(err)
 	}
