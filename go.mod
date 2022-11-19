@@ -4,10 +4,15 @@ go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.8.1
+	github.com/rs/xid v1.4.0
+	github.com/stretchr/testify v1.8.1
 	go.mongodb.org/mongo-driver v1.11.0
 )
 
-require github.com/toolkits/file v0.0.0-20160325033739-a5b3c5147e07 // indirect
+require (
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/toolkits/file v0.0.0-20160325033739-a5b3c5147e07 // indirect
+)
 
 require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
