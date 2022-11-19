@@ -14,7 +14,7 @@ import (
 func TestSignUp(t *testing.T) {
 	url := "http://localhost:9000/signup"
 
-	payload := strings.NewReader(`{`+" "+` "userName":"mikey",`+" "+` "email":"michael@gmail.com", `+" "+` "password": "MyPassword123"`+" "+` }`)
+	payload := strings.NewReader(`{`+" "+` "user_name":"mikey",`+" "+` "email":"michael@gmail.com", `+" "+` "password": "MyPassword123"`+" "+` }`)
 
 	client := &http.Client {}
 
@@ -57,9 +57,9 @@ func TestSignUp(t *testing.T) {
 
 	t.Log(m)
 
-	if m["userName"] != "mikey"{
+	if m["user_name"] != "mikey"{
 		t.Log("exp:", "mikey")
-		t.Log("got:", m["userName"])
+		t.Log("got:", m["user_name"])
 		t.Fatal("Usernames don't match")
 	}
 
