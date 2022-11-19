@@ -4,6 +4,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+type User struct {
+	ID           primitive.ObjectID `bson:"_id"`
+	Username     string             `bson:"username" json:"username" validate:"required, min=4, max=100"`
+	FirstName    string             `bson:"first_name" json:"first_name"`
+	LastName     string             `bson:"last_name" json:"last_name"`
+	Email        string             `bson:"email" json:"email" validate:"email, required"`
+	Password     string             `bson:"password" json:"password" validate:"required, min 8"`
+}
+
 type UserStruct struct {
 	Token        *string            `bson:"access_token" json:"access_token"`
 	TokenType    string             `bson:"token_type" json:"token_type"`
