@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/workshopapps/pictureminer.api/internal/model"
+	"github.com/workshopapps/pictureminer.api/internal/constants"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"github.com/workshopapps/pictureminer.api/utility"
 	"golang.org/x/crypto/bcrypt"
@@ -28,11 +29,10 @@ func (base *Controller) Signup(c *gin.Context) {
 
 	//Database connection
 	mongoClient := mongodb.Connection()
-	imageDB := mongoClient.Database("ImageCollection")
-	userCollection := imageDB.Collection("user")
+	userCollection := mongodb.GetCollection(mongoClient, constants.UserDatabase, constants.UserCollection)
 
 	//Binding the userdetails to userStruct
-	var User model.UserStruct
+	var User model.User
 	err := c.Bind(&User)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind user signup details", err, nil)
@@ -47,26 +47,33 @@ func (base *Controller) Signup(c *gin.Context) {
 		return
 	}
 	//	Hashing the password
-	harsh, err := bcrypt.GenerateFromPassword([]byte(User.Password), 10)
+	hash, err := bcrypt.GenerateFromPassword([]byte(User.Password), 10)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Failed to harsh paswword", err, nil)
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Failed to hash paswword", err, nil)
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
-	User.Password = string(harsh)
-	User.TokenType = "bearer"
-	token, err := utility.CreateToken(User.Email)
+	User.Password = string(hash)
+	userCollection.InsertOne(context.Background(), User)
+
+	var userResponse model.UserSignUpResponse
+	userResponse.Username = User.Username
+	userResponse.FirstName = User.FirstName
+	userResponse.LastName = User.LastName
+	userResponse.Email = User.Email
+
+
+	userResponse.TokenType = "bearer"
+	token, err := utility.CreateToken(userResponse.Email)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", err.Error(), err, nil)
 		c.JSON(http.StatusBadRequest, rd)
 		return
 
 	}
-	User.Token = &token
-	User.ApiCallCount = 0
-	//User.ID = ObjectID()
+	userResponse.Token = token
+	userResponse.ApiCallCount = 0
 
-	userCollection.InsertOne(context.Background(), User)
-	object := utility.BuildSuccessResponse(200, "User created successfully", User)
+	object := utility.BuildSuccessResponse(200, "User created successfully", userResponse)
 	c.JSON(200, object)
 }
