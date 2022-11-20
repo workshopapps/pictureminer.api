@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	us "github.com/workshopapps/pictureminer.api/pkg/handler/user"
+	os "github.com/workshopapps/pictureminer.api/pkg/handler/health"
 	"github.com/workshopapps/pictureminer.api/utility"
 
 	"github.com/rs/xid"
@@ -24,10 +25,10 @@ type Controller struct {
 
 type User struct {
 	Username  string `json:"username" validate:"required,min=2,max=100"`
-	Password  string `json:"Password" validate:"required,min=6"`
+	FirstName    string             `bson:"first_name" json:"first_name"`
+	LastName     string             `bson:"last_name" json:"last_name"`
 	Email     string `json:"email" validate:"email,required"`
-	User_type string `json:"user_type" validate:"required,eq=ADMIN|eq=USER"`
-	User_id   string `json:"user_id"`
+	Password  string `json:"Password" validate:"required,min=6"`
 }
 
 var RANDOM = xid.New().String()
@@ -37,6 +38,7 @@ func SetUpRouter() *gin.Engine {
 	return router
 }
 
+
 func TestCreateUserHandler(t *testing.T) {
 	var validate *validator.Validate
 	var logger *utility.Logger
@@ -44,18 +46,17 @@ func TestCreateUserHandler(t *testing.T) {
 
 	r := SetUpRouter()
 	r.POST("api/v1/create_user", Auth.CreateUser)
-	var userf User
+	var user User
 
 	// random := xid.New().String()
 
-	userf.Username = "workshopapps" + RANDOM
-	userf.Email = "workshopapps" + RANDOM + "@gmail.com"
-	// user.Username = "lordscoba123"
-	// user.Email = "lordscoba1233@gmail.com"
-	userf.User_type = "USER"
-	userf.Password = "blockchain"
+	user.Username = "workshopapps" + RANDOM
+	user.FirstName = "Christopher"
+	user.LastName = "Nwokoye"
+	user.Email = "workshopapps" + RANDOM + "@gmail.com"
+	user.Password = "blockchain"
 
-	jsonValue, _ := json.Marshal(userf)
+	jsonValue, _ := json.Marshal(user)
 	req, _ := http.NewRequest("POST", "api/v1/create_user", bytes.NewBuffer(jsonValue))
 
 	w := httptest.NewRecorder()
@@ -64,6 +65,8 @@ func TestCreateUserHandler(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 }
 
+
+
 func TestLoginUserHandler(t *testing.T) {
 
 	var validate *validator.Validate
@@ -71,8 +74,8 @@ func TestLoginUserHandler(t *testing.T) {
 	r := SetUpRouter()
 	Auth := us.Controller{Validate: validate, Logger: logger}
 	r.POST("api/v1/login", Auth.Login)
-	var user User
 
+	var user User
 	user.Email = "workshopapps" + RANDOM + "@gmail.com"
 	user.Password = "blockchain"
 
