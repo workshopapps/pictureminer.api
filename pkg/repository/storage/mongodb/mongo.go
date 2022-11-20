@@ -51,12 +51,3 @@ func GetCollection(client *mongo.Client, databaseName, collectionName string) *m
 	collection := client.Database(databaseName).Collection(collectionName)
 	return collection
 }
-
-//creating a user in the data base
-
-func CreateUser(context context.Context, User model.UserStruct) {
-	mongoClient := Connection()
-	imageDB := mongoClient.Database(constants.UserDatabase)
-	userCollection := imageDB.Collection(constants.UserDatabase)
-	userCollection.InsertOne(context, User)
-}
