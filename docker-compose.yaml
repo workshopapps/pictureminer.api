@@ -1,0 +1,10 @@
+version: "3"
+services:
+  picture_api:
+    build:
+      context: .
+    image: picture_api
+    ports:
+      - 9000:9000
+    container_name: picture-api
+    restart: always
