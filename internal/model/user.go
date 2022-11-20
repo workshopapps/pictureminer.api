@@ -25,10 +25,7 @@ type UserStruct struct {
 	ApiCallCount int                `bson:"api_call_count" json:"api_call_count"`
 	//DataCreated  time.Time          `bson:"dataCreated" json:"datacreated"`
 	//DateModified time.Time          `bson:"dateModified"json:"datemodified"`
-<<<<<<< HEAD
 }
-=======
->>>>>>> BE-32-get-all-users
 type UserSignUpResponse struct {
 	Username     string
 	FirstName    string
