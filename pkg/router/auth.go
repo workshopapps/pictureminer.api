@@ -17,6 +17,7 @@ func Auth(r *gin.Engine, validate *validator.Validate, ApiVersion string, logger
 	{
 		authUrl.POST("/create_user", auth.CreateUser)
 		authUrl.POST("/login", auth.Login)
+		authUrl.POST("/signup", auth.Signup)
 	}
 	return r
 }
