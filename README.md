@@ -25,3 +25,31 @@
 
 ### https://buildvirtual.net/how-to-upgrade-go-on-ubuntu/#:~:text=How%20to%20Upgrade%20Go%20on%20Ubuntu%201%20Remove,named%20hello.go%2C%20which%20contains%20the%20following%20lines%3A%20
 
+
+
+## Building Docker Image
+Stop the running app and build docker image:
+    docker build -t <image-name> .
+    
+## View Built Image
+    docker image ls
+
+## Run Docker Image
+    docker run -p port:port <image-name>
+# Check the output at http://localhost:port/ or http://0.0.0.0:port/ or http://127.0.0.1:port/
+
+## Check running containers
+    docker ps
+  
+# Stop the container
+
+## Tag locally before pushing to the Dockerhub
+
+    docker tag <image-name> <dockerhub-username>/<docker-image:version-number>
+
+## Push Image
+    docker login
+
+    docker push <dockerhub-username>/<docker-image:version-number>
+  
+# Check the image in your Dockerhub online at https://hub.docker.com/repository/docker/
