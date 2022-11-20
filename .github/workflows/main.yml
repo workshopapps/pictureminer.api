@@ -1,0 +1,51 @@
+name: cicd
+
+on:
+  push:
+    branches:
+      - "dev"
+
+env:
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: docker login
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}   
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}  
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+
+    - name: docker build images
+      run: |
+        docker build ./ -t root0877/picture_api:$IMAGE_TAG 
+        
+
+    - name: docker push
+      run: |
+        docker push root0877/picture_api:$IMAGE_TAG
+
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v2.0
+      with:
+        version: 'v1.24.0'
+      id: install
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Update kube config
+      run: aws eks update-kubeconfig --name pictureMinerCluster --region us-east-1
+
+    - name: Deploy to EKS
+      run: |
+        kubectl set image deployment/picture-api picture-api=root0877/picture_api:$IMAGE_TAG
+        
