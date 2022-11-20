@@ -24,3 +24,7 @@ type MineImageResponse struct {
 	DateCreated  time.Time `json:"date_created"`
 	DateModified time.Time `json:"date_modified"`
 }
+
+type MineImageUrlRequest struct {
+	Url string `bson:"url" json:"url" validate:"url,required"`
+}

@@ -1,7 +1,7 @@
 package s3
 
 import (
-	"mime/multipart"
+	"io"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -45,7 +45,7 @@ func ConnectAws() *session.Session {
 	return s3session
 }
 
-func UploadImage(file multipart.File, filename string) (string, error) {
+func UploadImage(file io.ReadCloser, filename string) (string, error) {
 	uploader := s3manager.NewUploader(s3session)
 	MyBucket = config.GetConfig().S3.BucketName
 

@@ -1,7 +1,7 @@
 package mineservice
 
 import (
-	"mime/multipart"
+	"io"
 	"strings"
 	"time"
 
@@ -17,13 +17,8 @@ var (
 	imageCollection = "mined_images"
 )
 
-func MineServiceUpload(image multipart.File, filename string) (*model.MineImageResponse, error) {
+func MineServiceUpload(image io.ReadCloser, filename string) (*model.MineImageResponse, error) {
 	hashedImage, err := utility.HashImage(image)
-	if err != nil {
-		return nil, err
-	}
-
-	content, err := microservice.GetImageContent(image, filename)
 	if err != nil {
 		return nil, err
 	}
@@ -32,6 +27,11 @@ func MineServiceUpload(image multipart.File, filename string) (*model.MineImageR
 	ext := str[len(str)-1]
 
 	imagePath, err := s3.UploadImage(image, hashedImage+"."+ext)
+	if err != nil {
+		return nil, err
+	}
+
+	content, err := microservice.GetImageContent(image, filename)
 	if err != nil {
 		return nil, err
 	}
