@@ -2,14 +2,21 @@ package admin
 
 import (
 	"fmt"
-	"net/http"
+	"context"
+	"time"
+	"log"
+	// "net/http"
+	"encoding/json"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/workshopapps/pictureminer.api/internal/model"
-	"github.com/workshopapps/pictureminer.api/service/ping"
+	// "github.com/workshopapps/pictureminer.api/service/ping"
 	"github.com/workshopapps/pictureminer.api/utility"
 	"github.com/workshopapps/pictureminer.api/internal/constants"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/bson"
+	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 )
 
 type Controller struct {
@@ -18,7 +25,7 @@ type Controller struct {
 }
 
 
-var userCollection *mongo.Collection = database.GetCollection(database.Client,constants.UserDatabase , constants.UserCollection)
+var userCollection *mongo.Collection = mongodb.GetCollection(mongodb.Client,constants.UserDatabase , constants.UserCollection)
 var validate = validator.New()
 
 func (base *Controller) GetUsers(c *gin.Context) {
@@ -40,21 +47,25 @@ filter := bson.D{{"username", ""}}
 
 cursor, err := userCollection.Find(ctx, filter)
 if err != nil {
-	panic(err)
+	// panic(err)
+	log.Println(err)
 }
 // end find
 
 var users []model.User
 if err = cursor.All(ctx, &users); err != nil {
-	panic(err)
+	// panic(err)
+	log.Println(err)
 }
 
 for _, user := range users {
 	cursor.Decode(&user)
 	output, err := json.MarshalIndent(user, "", "    ")
 	if err != nil {
-		panic(err)
+		// panic(err)
+		log.Println(err)
 	}
+	defer cancel()
 	fmt.Printf("%s\n", output)
 }
 
