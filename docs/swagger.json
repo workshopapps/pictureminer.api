@@ -1,0 +1,98 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "A picture mining service API in Go using Gin framework.",
+        "title": "Minergram",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:9000",
+    "basePath": "/api/v1/",
+    "paths": {
+        "/api/v1/health": {
+            "get": {
+                "description": "Responds with the server status as JSON.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Checks the status of the server",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utility.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Send a dummy post request to test the status of the server",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Checks the status of the server",
+                "parameters": [
+                    {
+                        "description": "Ping JSON",
+                        "name": "ping",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Ping"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utility.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.Ping": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "utility.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "error": {
+                    "description": "for errors that occur even if request is successful"
+                },
+                "extra": {},
+                "message": {
+                    "type": "string"
+                },
+                "name": {
+                    "description": "name of the error",
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
