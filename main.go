@@ -27,7 +27,7 @@ func init() {
 // @description     A picture mining service API in Go using Gin framework.
 
 // @host      localhost:9000
-// @BasePath  /
+// @BasePath  /api/v1/
 // @schemes http
 func main() {
 	//Load config
