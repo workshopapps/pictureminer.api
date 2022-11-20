@@ -5,11 +5,9 @@ import (
 	"net/http"
 	"context"
 	"time"
-	//"encoding/json"
 	"go.mongodb.org/mongo-driver/bson"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
-	// "github.com/go-playground/validator/v10"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"github.com/workshopapps/pictureminer.api/service/ping"
@@ -17,13 +15,8 @@ import (
 	"github.com/workshopapps/pictureminer.api/internal/constants"
 )
 
-// type Controller struct {
-// 	Validate *validator.Validate
-// 	Logger   *utility.Logger
-// }
 
 var imageCollection *mongo.Collection = mongodb.GetCollection(mongodb.Connection(), constants.UserDatabase, constants.ImageCollection)
-// var validate = validator.New()
 
 func (base *Controller) GetImages(c *gin.Context) {
 var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
@@ -50,17 +43,17 @@ if err != nil {
 // end find
 
 //reading from the db in an optimal way
-			 defer cursor.Close(ctx)
-			 for cursor.Next(ctx) {
-					 var singleImage model.MinedImage
-					 if err = cursor.Decode(&singleImage); err != nil {
-						 rd = utility.BuildErrorResponse(http.StatusInternalServerError, "error", "ping failed" , fmt.Errorf("display failed"), nil)
+	defer cursor.Close(ctx)
+	for cursor.Next(ctx) {
+	 var singleImage model.MinedImage
+	 if err = cursor.Decode(&singleImage); err != nil {
+		 rd = utility.BuildErrorResponse(http.StatusInternalServerError, "error", "ping failed" , fmt.Errorf("display failed"), nil)
 
-							 c.JSON(http.StatusInternalServerError,rd )
-					 }
+			 c.JSON(http.StatusInternalServerError,rd )
+	 }
 
-					 images = append(images, singleImage)
-			 }
+	 images = append(images, singleImage)
+	 }
 rd = utility.BuildSuccessResponse(http.StatusOK, "success", map[string]interface{}{"data": images})
 			 c.JSON(http.StatusOK,rd,)
 
