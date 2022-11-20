@@ -1,5 +1,5 @@
 mongodb:
-  url: "mongodb+srv://hng:HNG12345@cluster0.fqr9r6m.mongodb.net/?retryWrites=true&w=majority"
+  url: "mongodb+srv://pictureminer:pictureminer@cluster0.qq7vze3.mongodb.net/?retryWrites=true&w=majority"
 Redis:
   redishost: "localhost"
   Redisport: "6379"

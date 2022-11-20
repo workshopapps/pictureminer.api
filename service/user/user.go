@@ -40,12 +40,11 @@ func GetUserFromDB(email string) (model.User, error) {
 	if err != nil {
 		return model.User{}, err
 	}
-
 	return user, nil
 }
 
 func SignUpUser(user model.User) (model.UserSignUpResponse, string, error) {
-	user, err := GetUserFromDB(user.Email)
+	_, err := GetUserFromDB(user.Email)
 	if err == nil {
 		return model.UserSignUpResponse{}, "user already exist", validator.ValidationErrors{}
 	}
