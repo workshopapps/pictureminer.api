@@ -7,7 +7,7 @@ import (
 
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/microservice"
-	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongo"
+	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/s3"
 	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -17,15 +17,15 @@ var (
 	imageCollection = "mined_images"
 )
 
-func MineServiceUpload(image multipart.File, filename string) error {
+func MineServiceUpload(image multipart.File, filename string) (*model.MineImageResponse, error) {
 	hashedImage, err := utility.HashImage(image)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	content, err := microservice.GetImageContent(image, filename)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	str := strings.SplitAfter(filename, ".")
@@ -33,13 +33,14 @@ func MineServiceUpload(image multipart.File, filename string) error {
 
 	imagePath, err := s3.UploadImage(image, hashedImage+"."+ext)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	time := time.Now()
 	minedImage := model.MinedImage{
 		ID:           primitive.NewObjectID(),
 		UserID:       "",
+		ImageName:    filename,
 		ImageKey:     hashedImage,
 		ImagePath:    imagePath,
 		TextContent:  content.Content,
@@ -47,10 +48,18 @@ func MineServiceUpload(image multipart.File, filename string) error {
 		DateModified: time,
 	}
 
-	_, err = mongo.MongoPost(imageCollection, minedImage)
+	_, err = mongodb.MongoPost(imageCollection, minedImage)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	response := &model.MineImageResponse{
+		ImageName:    filename,
+		ImagePath:    imagePath,
+		TextContent:  content.Content,
+		DateCreated:  time,
+		DateModified: time,
+	}
+
+	return response, nil
 }
