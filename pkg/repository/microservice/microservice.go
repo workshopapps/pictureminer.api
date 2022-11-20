@@ -13,7 +13,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/internal/model"
 )
 
-func GetImageContent(file multipart.File, filename string) (*model.MicroserviceResponse, error) {
+func GetImageContent(file io.ReadCloser, filename string) (*model.MicroserviceResponse, error) {
 	microserviceHost := config.GetConfig().Python.MicroserviceHost
 
 	req, err := SetupMultipartRequest(file, microserviceHost, "head.jpeg")
@@ -42,7 +42,7 @@ func GetImageContent(file multipart.File, filename string) (*model.MicroserviceR
 	return &content, nil
 }
 
-func SetupMultipartRequest(file multipart.File, microserviceHost, filename string) (*http.Request, error) {
+func SetupMultipartRequest(file io.ReadCloser, microserviceHost, filename string) (*http.Request, error) {
 	defer file.Close()
 
 	body := &bytes.Buffer{}

@@ -4,10 +4,9 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
-	"mime/multipart"
 )
 
-func HashImage(image multipart.File) (string, error) {
+func HashImage(image io.ReadCloser) (string, error) {
 
 	hash := sha256.New()
 	_, err := io.Copy(hash, image)
