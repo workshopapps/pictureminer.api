@@ -27,7 +27,6 @@ func Setup(validate *validator.Validate, logger *utility.Logger) *gin.Engine {
 	MineServiceUpload(r, validate, ApiVersion, logger)
 	Admin(r, validate, ApiVersion, logger)
 	SwaggerDocs(r, ApiVersion)
-	// Signup(r, validate, ApiVersion, logger)
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{
