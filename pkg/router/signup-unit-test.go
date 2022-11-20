@@ -10,7 +10,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
-	"github.com/workshopapps/pictureminer.api/models"
+	"github.com/workshopapps/pictureminer.api/internal/models"
 
 	"go.mongodb.org/mongo-driver/mongo"
 
