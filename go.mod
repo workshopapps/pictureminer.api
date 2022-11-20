@@ -3,6 +3,7 @@ module github.com/workshopapps/pictureminer.api
 go 1.19
 
 require (
+	github.com/go-playground/assert/v2 v2.0.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/rs/xid v1.4.0
 )
