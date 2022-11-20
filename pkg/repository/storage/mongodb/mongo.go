@@ -3,12 +3,11 @@ package mongodb
 import (
 	"context"
 	"fmt"
-	"github.com/workshopapps/pictureminer.api/internal/constants"
-	"github.com/workshopapps/pictureminer.api/internal/model"
 	"log"
 
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/utility"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -46,8 +45,20 @@ func ConnectToDB() *mongo.Client {
 	return mongoClient
 }
 
+// 1
+// var Client *mongo.Client = ConnectToDB()
+
 // getting database collections
 func GetCollection(client *mongo.Client, databaseName, collectionName string) *mongo.Collection {
 	collection := client.Database(databaseName).Collection(collectionName)
 	return collection
+}
+
+func SelectFromCollection(ctx context.Context, database, collection string, filter bson.M) (*mongo.Cursor, error) {
+	modelCollection := GetCollection(mongoclient, database, collection)
+	cursor, err := modelCollection.Find(ctx, filter)
+	if err != nil {
+		return cursor, err
+	}
+	return cursor, nil
 }
