@@ -28,8 +28,8 @@ func TestMineServiceAPI(t *testing.T) {
 	var validate *validator.Validate
 	var logger *utility.Logger
 
-	filePath := "mine.png"
-	fieldName := "mine"
+	filePath := "image.png"
+	fieldName := "image"
 	body := new(bytes.Buffer)
 	writer := multipart.NewWriter(body)
 
