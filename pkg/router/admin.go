@@ -16,7 +16,6 @@ func Admin(r *gin.Engine, validate *validator.Validate, ApiVersion string, logge
 	adminUrl := r.Group(fmt.Sprintf("/api/%v", ApiVersion))
 	{
 		adminUrl.GET("/admin/users", admin.GetUsers)
-		adminUrl.GET("/admin/images", admin.GetImages)
 	}
 	return r
 }
