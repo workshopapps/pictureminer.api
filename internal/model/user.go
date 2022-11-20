@@ -22,10 +22,11 @@ type UserStruct struct {
 	LastName     string             `bson:"lastname" json:"lastname"`
 	Email        string             `bson:"email" json:"email" validate:"required"`
 	Password     string             `bson:"password" json:"password" validate:"required"`
-	ApiCallCount int                `bson:"api_call_count" json:"api_call_count"`
+	ApiCallCount int         `bson:"api_call_count"json:"api_call_count"`
 	//DataCreated  time.Time          `bson:"dataCreated" json:"datacreated"`
 	//DateModified time.Time          `bson:"dateModified"json:"datemodified"`
 }
+
 type UserSignUpResponse struct {
 	Username     string
 	FirstName    string
