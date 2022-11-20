@@ -107,11 +107,11 @@ func getCollection(collection string) *mongo.Collection {
 	database := mongoClient.Database(databaseName)
 	c := database.Collection(collection)
 
-  return 
+	return c
 }
 
 func SelectFromCollection(ctx context.Context, database, collection string, filter bson.M) (*mongo.Cursor, error) {
-	modelCollection := GetCollection(mongoclient, database, collection)
+	modelCollection := GetCollection(mongoClient, database, collection)
 	cursor, err := modelCollection.Find(ctx, filter)
 	if err != nil {
 		return cursor, err
