@@ -22,7 +22,6 @@ type Controller struct {
 	Logger   *utility.Logger
 }
 
-// mongoClient := mongodb.Connection()
 var userCollection *mongo.Collection = mongodb.GetCollection(mongodb.Connection(), constants.UserDatabase, constants.UserCollection)
 var validate = validator.New()
 // var userCollection *mongo.Collection = database.GetCollection(database.Client,constants.UserDatabase , constants.UserCollection)
