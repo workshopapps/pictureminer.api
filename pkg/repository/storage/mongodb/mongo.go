@@ -3,12 +3,11 @@ package mongodb
 import (
 	"context"
 	"fmt"
-	"github.com/workshopapps/pictureminer.api/internal/constants"
-	"github.com/workshopapps/pictureminer.api/internal/model"
 	"log"
 
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/utility"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
