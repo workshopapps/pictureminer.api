@@ -1,5 +1,5 @@
 package model
 
 type MicroserviceResponse struct {
-	Content string `json:"detail"`
+	Content string `json:"text_description"`
 }

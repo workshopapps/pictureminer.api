@@ -10,7 +10,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
-	"github.com/workshopapps/pictureminer.api/models"
+	"github.com/workshopapps/pictureminer.api/model"
 
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -58,7 +58,7 @@ func TestSignup_Handle_Successful(t *testing.T) {
 	mongoClient := startMongoClient(t)
 	defer mongoClient.Close()
 
-	body, err := json.Marshal(models.UserStruct{
+	body, err := json.Marshal(model.UserStruct{
 		UserName: "kdkkdkdkdk",
 		Email:    "jackkd",
 		Password: "©",

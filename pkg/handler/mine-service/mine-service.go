@@ -17,6 +17,8 @@ type Controller struct {
 
 func (base *Controller) Post(c *gin.Context) {
 
+	// TODO:Authorize request via JWT token
+
 	if c.ContentType() != "multipart/form-data" {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "file is not present"})
 		c.JSON(http.StatusBadRequest, rd)
@@ -37,12 +39,13 @@ func (base *Controller) Post(c *gin.Context) {
 		return
 	}
 
-	if err = mineservice.MineServiceUpload(image, filename); err != nil {
+	minedImage, err := mineservice.MineServiceUpload(image, filename)
+	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "server error", nil, err.Error())
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusCreated, "user created successfully", gin.H{"user": "user object"})
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "image successfully mined", minedImage)
 	c.JSON(http.StatusOK, rd)
 }
