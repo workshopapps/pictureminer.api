@@ -1,0 +1,65 @@
+basePath: /api/v1/
+definitions:
+  model.Ping:
+    properties:
+      email:
+        type: string
+    type: object
+  utility.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      error:
+        description: for errors that occur even if request is successful
+      extra: {}
+      message:
+        type: string
+      name:
+        description: name of the error
+        type: string
+      status:
+        type: string
+    type: object
+host: localhost:9000
+info:
+  contact: {}
+  description: A picture mining service API in Go using Gin framework.
+  title: Minergram
+  version: "1.0"
+paths:
+  /api/v1/health:
+    get:
+      description: Responds with the server status as JSON.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utility.Response'
+      summary: Checks the status of the server
+      tags:
+      - health
+    post:
+      description: Send a dummy post request to test the status of the server
+      parameters:
+      - description: Ping JSON
+        in: body
+        name: ping
+        required: true
+        schema:
+          $ref: '#/definitions/model.Ping'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utility.Response'
+      summary: Checks the status of the server
+      tags:
+      - health
+schemes:
+- http
+swagger: "2.0"

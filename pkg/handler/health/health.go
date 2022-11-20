@@ -16,6 +16,14 @@ type Controller struct {
 	Logger   *utility.Logger
 }
 
+// Post             godoc
+// @Summary      Checks the status of the server
+// @Description  Send a dummy post request to test the status of the server
+// @Tags         health
+// @Produce      json
+// @Param        ping  body      model.Ping  true  "Ping JSON"
+// @Success      200   {object}  utility.Response
+// @Router       /api/v1/health [post]
 func (base *Controller) Post(c *gin.Context) {
 	var (
 		req = model.Ping{}
@@ -46,6 +54,13 @@ func (base *Controller) Post(c *gin.Context) {
 
 }
 
+// Get             godoc
+// @Summary      Checks the status of the server
+// @Description  Responds with the server status as JSON.
+// @Tags         health
+// @Produce      json
+// @Success      200  {object}  utility.Response
+// @Router       /api/v1/health [get]
 func (base *Controller) Get(c *gin.Context) {
 	if !ping.ReturnTrue() {
 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "ping failed", fmt.Errorf("ping failed"), nil)
