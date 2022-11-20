@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/rs/xid v1.4.0
 )
 
