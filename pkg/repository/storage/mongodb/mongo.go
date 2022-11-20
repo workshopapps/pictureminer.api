@@ -5,12 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/workshopapps/pictureminer.api/internal/constants"
-	"github.com/workshopapps/pictureminer.api/internal/model"
-	"go.mongodb.org/mongo-driver/bson"
-
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/utility"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -48,18 +45,13 @@ func ConnectToDB() *mongo.Client {
 	return mongoClient
 }
 
+// 1
+// var Client *mongo.Client = ConnectToDB()
+
 // getting database collections
 func GetCollection(client *mongo.Client, databaseName, collectionName string) *mongo.Collection {
 	collection := client.Database(databaseName).Collection(collectionName)
 	return collection
-}
-
-//creating a user in the data base
-
-func CreateUser(context context.Context, User model.User) {
-	imageDB := mongoClient.Database(constants.UserDatabase)
-	userCollection := imageDB.Collection(constants.UserDatabase)
-	userCollection.InsertOne(context, User)
 }
 
 func MongoPost(collection string, data interface{}) (*mongo.InsertOneResult, error) {
@@ -115,5 +107,14 @@ func getCollection(collection string) *mongo.Collection {
 	database := mongoClient.Database(databaseName)
 	c := database.Collection(collection)
 
-	return c
+  return 
+}
+
+func SelectFromCollection(ctx context.Context, database, collection string, filter bson.M) (*mongo.Cursor, error) {
+	modelCollection := GetCollection(mongoclient, database, collection)
+	cursor, err := modelCollection.Find(ctx, filter)
+	if err != nil {
+		return cursor, err
+	}
+	return cursor, nil
 }
