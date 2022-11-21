@@ -1,9 +1,10 @@
 package mineservice
 
 import (
+	"bytes"
 	"errors"
 	"io"
-	"strings"
+	"path/filepath"
 	"time"
 
 	"github.com/workshopapps/pictureminer.api/internal/constants"
@@ -16,21 +17,22 @@ import (
 )
 
 func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string) (*model.MineImageResponse, error) {
-	userIdStr, ok := userId.(string)
+	id, ok := userId.(string)
 	if !ok {
 		return nil, errors.New("invalid userid")
 	}
 
-
-	hashedImage, err := utility.HashImage(image)
+	image, imageCopy, err := duplicateFile(image)
 	if err != nil {
 		return nil, err
 	}
 
-	str := strings.SplitAfter(filename, ".")
-	ext := str[len(str)-1]
+	imageHash, err := utility.HashImage(imageCopy)
+	if err != nil {
+		return nil, err
+	}
 
-	imagePath, err := s3.UploadImage(image, hashedImage+"."+ext)
+	imagePath, err := s3.UploadImage(image, imageHash+"."+filepath.Ext(filename))
 	if err != nil {
 		return nil, err
 	}
@@ -43,9 +45,9 @@ func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string)
 	time := time.Now()
 	minedImage := model.MinedImage{
 		ID:           primitive.NewObjectID(),
-		UserID:       userIdStr,
+		UserID:       id,
 		ImageName:    filename,
-		ImageKey:     hashedImage,
+		ImageKey:     imageHash,
 		ImagePath:    imagePath,
 		TextContent:  content.Content,
 		DateCreated:  time,
@@ -66,4 +68,12 @@ func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string)
 	}
 
 	return response, nil
+}
+
+func duplicateFile(f io.ReadCloser) (io.ReadCloser, io.ReadCloser, error) {
+	contents, err := io.ReadAll(f)
+	if err != nil {
+		return nil, nil, err
+	}
+	return io.NopCloser(bytes.NewReader(contents)), io.NopCloser(bytes.NewReader(contents)), nil
 }
