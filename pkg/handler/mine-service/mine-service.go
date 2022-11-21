@@ -2,6 +2,7 @@ package mineservice
 
 import (
 	"net/http"
+	"path/filepath"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -33,34 +34,33 @@ func (base *Controller) MineImage(c *gin.Context) {
 		return
 	}
 
-	image, fh, err := c.Request.FormFile("image")
-	defer image.Close()
+	image, imageHeader, err := c.Request.FormFile("image")
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not parse file", nil, gin.H{"error": "image size is too large, must be less than 1MB"})
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not parse file", nil, gin.H{"error": err.Error()})
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
+	defer image.Close()
 
-	filename := fh.Filename
-	if !strings.HasSuffix(filename, ".png") && !strings.HasSuffix(filename, ".jpg") && !strings.HasSuffix(filename, ".jpeg") {
+	if !validImageFormat(imageHeader.Filename) {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file", nil, gin.H{"error": "file is not an image"})
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
 
-	
-	minedImage, err := mineservice.MineServiceUpload(userId, image, filename)
+	minedImage, err := mineservice.MineServiceUpload(userId, image, imageHeader.Filename)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "server error", nil, err.Error())
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "undefined error", nil, err.Error())
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusCreated, "image successfully mined", minedImage)
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "mine image successful", minedImage)
 	c.JSON(http.StatusOK, rd)
 }
 
 func (base *Controller) MineImageUrl(c *gin.Context) {
+
 	token := extractToken(c)
 	userId, err := getKey("id", token)
 	if err != nil {
@@ -71,9 +71,9 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 
 	var req model.MineImageUrlRequest
 
-	err = c.ShouldBind(&req)
+	err = c.Bind(&req)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "internal server error", nil, err.Error())
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "Unable to bind url parameter", nil, err.Error())
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
@@ -93,14 +93,11 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 	}
 
 	var image = response.Body
+	defer image.Close()
 
-	defer response.Body.Close()
+	filename := getFileName(req.Url)
 
-	urlSplit := strings.Split(req.Url, "/")[1:]
-	urlSlice := urlSplit[len(urlSplit)-1:]
-	var filename string = urlSlice[0]
-
-	if !strings.HasSuffix(filename, ".png") && !strings.HasSuffix(filename, ".jpg") && !strings.HasSuffix(filename, ".jpeg") {
+	if !validImageFormat(filename) {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file", nil, gin.H{"error": "file is not an image"})
 		c.JSON(http.StatusBadRequest, rd)
 		return
@@ -108,8 +105,8 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 
 	minedImage, err := mineservice.MineServiceUpload(userId, image, filename)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not save image", nil, err.Error())
-		c.JSON(http.StatusBadRequest, rd)
+		rd := utility.BuildErrorResponse(http.StatusServiceUnavailable, "failed", "could not save image", nil, err.Error())
+		c.JSON(http.StatusServiceUnavailable, rd)
 		return
 	}
 
@@ -136,4 +133,13 @@ func getKey(key, token string) (interface{}, error) {
 		return "", err
 	}
 	return claims[key], nil
+}
+
+func validImageFormat(filename string) bool {
+	ext := strings.ToLower(filepath.Ext(filename))
+	return ext == ".png" || ext == ".jpg" || ext == ".jpeg"
+}
+
+func getFileName(url string) string {
+	return url[strings.LastIndex(url, "/"):]
 }
