@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/workshopapps/pictureminer.api/internal/config"
 	"log"
+
+	"github.com/workshopapps/pictureminer.api/internal/config"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
