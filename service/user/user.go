@@ -20,7 +20,7 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 	// check if user already exists
 	_, err := getUserFromDB(user.Email)
 	if err == nil {
-		return model.UserResponse{}, "user already exist", 403, validator.ValidationErrors{}
+		return model.UserResponse{}, "user already exist", 403, err
 	}
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
@@ -32,13 +32,13 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
 	_, err = userCollection.InsertOne(context.TODO(), user)
 	if err != nil {
-		return model.UserResponse{}, "Unable to save user to database", 500, validator.ValidationErrors{}
+		return model.UserResponse{}, "Unable to save user to database", 500, err
 	}
 
 	secretkey := config.GetConfig().Server.Secret
 	token, err := utility.CreateToken("id", user.ID.String(), secretkey)
 	if err != nil {
-		return model.UserResponse{}, fmt.Sprintf("unable to create token: %v", err.Error()), 500, validator.ValidationErrors{}
+		return model.UserResponse{}, fmt.Sprintf("unable to create token: %v", err.Error()), 500, err
 	}
 
 	// build user response
