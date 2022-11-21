@@ -1,10 +1,12 @@
 package mineservice
 
 import (
+	"errors"
 	"io"
 	"strings"
 	"time"
 
+	"github.com/workshopapps/pictureminer.api/internal/constants"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/microservice"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
@@ -13,11 +15,13 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var (
-	imageCollection = "mined_images"
-)
+func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string) (*model.MineImageResponse, error) {
+	userIdStr, ok := userId.(string)
+	if !ok {
+		return nil, errors.New("invalid userid")
+	}
 
-func MineServiceUpload(image io.ReadCloser, filename string) (*model.MineImageResponse, error) {
+
 	hashedImage, err := utility.HashImage(image)
 	if err != nil {
 		return nil, err
@@ -39,7 +43,7 @@ func MineServiceUpload(image io.ReadCloser, filename string) (*model.MineImageRe
 	time := time.Now()
 	minedImage := model.MinedImage{
 		ID:           primitive.NewObjectID(),
-		UserID:       "",
+		UserID:       userIdStr,
 		ImageName:    filename,
 		ImageKey:     hashedImage,
 		ImagePath:    imagePath,
@@ -48,7 +52,7 @@ func MineServiceUpload(image io.ReadCloser, filename string) (*model.MineImageRe
 		DateModified: time,
 	}
 
-	_, err = mongodb.MongoPost(imageCollection, minedImage)
+	_, err = mongodb.MongoPost(constants.ImageCollection, minedImage)
 	if err != nil {
 		return nil, err
 	}

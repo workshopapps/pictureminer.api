@@ -1,6 +1,6 @@
 package constants
 
 const (
-	UserDatabase   = "ImageCollection"
-	UserCollection = "users"
+	UserCollection  = "users"
+	ImageCollection = "mined_images"
 )

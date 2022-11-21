@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	mineservice "github.com/workshopapps/pictureminer.api/service/mine-service"
 	"github.com/workshopapps/pictureminer.api/utility"
@@ -16,9 +17,15 @@ type Controller struct {
 	Logger   *utility.Logger
 }
 
-func (base *Controller) Post(c *gin.Context) {
+func (base *Controller) MineImage(c *gin.Context) {
 
-	// TODO:Authorize request via JWT token
+	token := extractToken(c)
+	userId, err := getKey("id", token)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
 
 	if c.ContentType() != "multipart/form-data" {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "file is not present"})
@@ -28,7 +35,7 @@ func (base *Controller) Post(c *gin.Context) {
 
 	image, fh, err := c.Request.FormFile("image")
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "couldn't parse file", nil, gin.H{"error": "image size is too large, must be less than 1MB"})
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not parse file", nil, gin.H{"error": "image size is too large, must be less than 1MB"})
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
@@ -40,7 +47,7 @@ func (base *Controller) Post(c *gin.Context) {
 		return
 	}
 
-	minedImage, err := mineservice.MineServiceUpload(image, filename)
+	minedImage, err := mineservice.MineServiceUpload(userId, image, filename)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "server error", nil, err.Error())
 		c.JSON(http.StatusBadRequest, rd)
@@ -52,10 +59,17 @@ func (base *Controller) Post(c *gin.Context) {
 }
 
 func (base *Controller) MineImageUrl(c *gin.Context) {
+	token := extractToken(c)
+	userId, err := getKey("id", token)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
 
-	req := model.MineImageUrlRequest{}
+	var req model.MineImageUrlRequest
 
-	err := c.ShouldBind(&req)
+	err = c.ShouldBind(&req)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "internal server error", nil, err.Error())
 		c.JSON(http.StatusBadRequest, rd)
@@ -90,7 +104,7 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 		return
 	}
 
-	minedImage, err := mineservice.MineServiceUpload(image, filename)
+	minedImage, err := mineservice.MineServiceUpload(userId, image, filename)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not save image", nil, err.Error())
 		c.JSON(http.StatusBadRequest, rd)
@@ -99,4 +113,25 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 
 	rd := utility.BuildSuccessResponse(http.StatusCreated, "image successfully mined", minedImage)
 	c.JSON(http.StatusOK, rd)
+}
+
+func extractToken(c *gin.Context) string {
+	token := c.Query("token")
+	if token != "" {
+		return token
+	}
+	token = c.Request.Header.Get("authorization")
+	slice := strings.Split(token, " ")
+	if len(slice) == 2 {
+		return slice[1]
+	}
+	return ""
+}
+
+func getKey(key, token string) (interface{}, error) {
+	claims, err := utility.DecodeToken(token, config.GetConfig().Server.Secret)
+	if err != nil {
+		return "", err
+	}
+	return claims[key], nil
 }

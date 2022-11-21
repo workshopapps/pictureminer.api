@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/constants"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
@@ -15,7 +16,7 @@ func GetUsers() ([]model.User, error) {
 	defer cancel()
 	var users []model.User
 	filter := bson.M{}
-	cursor, err := mongodb.SelectFromCollection(ctx, constants.UserDatabase, constants.UserCollection, filter)
+	cursor, err := mongodb.SelectFromCollection(ctx, config.GetConfig().Mongodb.Database, constants.UserCollection, filter)
 	if err != nil {
 		return []model.User{}, err
 	}

@@ -22,7 +22,7 @@ func (base *Controller) Signup(c *gin.Context) {
 	var User model.User
 	err := c.Bind(&User)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind user signup details", err, nil)
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Unable to bind user signup details", err, nil)
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}

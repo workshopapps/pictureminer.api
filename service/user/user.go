@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 
 	"github.com/go-playground/validator/v10"
@@ -27,14 +28,18 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 	user.ID = primitive.NewObjectID()
 
 	// save to DB
-	userCollection := mongodb.GetCollection(mongodb.Connection(), constants.UserDatabase, constants.UserCollection)
+	database := config.GetConfig().Mongodb.Database
+	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
 	_, err = userCollection.InsertOne(context.TODO(), user)
 	if err != nil {
 		return model.UserResponse{}, "Unable to save user to database", 500, validator.ValidationErrors{}
 	}
 
 	secretkey := config.GetConfig().Server.Secret
-	token, _ := utility.CreateToken("email", user.Email, secretkey)
+	token, err := utility.CreateToken("id", user.ID.String(), secretkey)
+	if err != nil {
+		return model.UserResponse{}, fmt.Sprintf("unable to create token: %v", err.Error()), 500, validator.ValidationErrors{}
+	}
 
 	// build user response
 	userResponse := model.UserResponse{
@@ -57,11 +62,14 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 	}
 
 	if !isValidPassword(user.Password, userLoginObject.Password) {
-		return model.UserResponse{}, "Invalid password", 401, validator.ValidationErrors{}
+		return model.UserResponse{}, "invalid password", 401, validator.ValidationErrors{}
 	}
 
 	secretkey := config.GetConfig().Server.Secret
-	token, _ := utility.CreateToken("email", user.Email, secretkey)
+	token, err := utility.CreateToken("id", user.ID.String(), secretkey)
+	if err != nil {
+		return model.UserResponse{}, fmt.Sprintf("unable to create token: %v", err.Error()), 500, validator.ValidationErrors{}
+	}
 
 	// build user response
 	userResponse := model.UserResponse{
@@ -79,7 +87,8 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 
 func getUserFromDB(email string) (model.User, error) {
 	var user model.User
-	userCollection := mongodb.GetCollection(mongodb.Connection(), constants.UserDatabase, constants.UserCollection)
+	database := config.GetConfig().Mongodb.Database
+	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
 	result := userCollection.FindOne(context.TODO(), bson.M{"email": email})
 	err := result.Err()
 	if err != nil {
