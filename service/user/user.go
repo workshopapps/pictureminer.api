@@ -14,19 +14,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func PasswordIsValid(userPassword, providedPassword string) (bool, string) {
-	err := bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(providedPassword))
-
-	check := true
-	msg := ""
-
-	if err != nil {
-		check = false
-		msg = "invalid email or password"
-	}
-	return check, msg
-}
-
 func GetUserFromDB(email string) (model.User, error) {
 	var user model.User
 	userCollection := mongodb.GetCollection(mongodb.ConnectToDB(), constants.UserDatabase, constants.UserCollection)
@@ -43,10 +30,10 @@ func GetUserFromDB(email string) (model.User, error) {
 	return user, nil
 }
 
-func SignUpUser(user model.User) (model.UserSignUpResponse, string, error) {
+func SignUpUser(user model.User) (model.UserSignUpResponse, string, int, error) {
 	_, err := GetUserFromDB(user.Email)
 	if err == nil {
-		return model.UserSignUpResponse{}, "user already exist", validator.ValidationErrors{}
+		return model.UserSignUpResponse{}, "user already exist", 403, validator.ValidationErrors{}
 	}
 
 	//Database connection
@@ -55,7 +42,7 @@ func SignUpUser(user model.User) (model.UserSignUpResponse, string, error) {
 	//	Hash password
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	if err != nil {
-		return model.UserSignUpResponse{}, "Unable to hash password", err
+		return model.UserSignUpResponse{}, "Unable to hash password", 500, err
 	}
 	user.Password = string(hash)
 	user.ID = primitive.NewObjectID()
@@ -63,7 +50,7 @@ func SignUpUser(user model.User) (model.UserSignUpResponse, string, error) {
 	// save to DB
 	_, err = userCollection.InsertOne(context.TODO(), user)
 	if err != nil {
-		return model.UserSignUpResponse{}, "Unable to save user to database", validator.ValidationErrors{}
+		return model.UserSignUpResponse{}, "Unable to save user to database", 500, validator.ValidationErrors{}
 	}
 
 	// build user response
@@ -76,19 +63,31 @@ func SignUpUser(user model.User) (model.UserSignUpResponse, string, error) {
 	userResponse.TokenType = "bearer"
 	token, err := utility.CreateToken(userResponse.Email)
 	if err != nil {
-		return model.UserSignUpResponse{}, "unable to create access token", err
+		return model.UserSignUpResponse{}, "unable to create access token", 500, err
 
 	}
 	userResponse.Token = token
 	userResponse.ApiCallCount = 0
 
-	return userResponse, "", nil
+	return userResponse, "", 0, nil
 }
 
-func LoginUser(userLoginObject model.UserLoginField) (model.UserSignUpResponse, string, error) {
+func isValidPassword(userPassword, providedPassword string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(providedPassword))
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func LoginUser(userLoginObject model.UserLoginField) (model.UserSignUpResponse, string, int, error) {
 	user, err := GetUserFromDB(userLoginObject.Email)
 	if err != nil {
-		return model.UserSignUpResponse{}, err.Error(), validator.ValidationErrors{}
+		return model.UserSignUpResponse{}, "user does not exist", 404, validator.ValidationErrors{}
+	}
+
+	if !isValidPassword(user.Password, userLoginObject.Password) {
+		return model.UserSignUpResponse{}, "Invalid password", 401, validator.ValidationErrors{}
 	}
 
 	// build user response
@@ -101,11 +100,11 @@ func LoginUser(userLoginObject model.UserLoginField) (model.UserSignUpResponse, 
 	userResponse.TokenType = "bearer"
 	token, err := utility.CreateToken(userResponse.Email)
 	if err != nil {
-		return model.UserSignUpResponse{}, err.Error(), validator.ValidationErrors{}
+		return model.UserSignUpResponse{}, err.Error(), 500, validator.ValidationErrors{}
 
 	}
 	userResponse.Token = token
 	userResponse.ApiCallCount = rand.Intn(10)
 
-	return userResponse, "", nil
+	return userResponse, "", 0, nil
 }
