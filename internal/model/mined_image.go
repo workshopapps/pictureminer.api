@@ -18,11 +18,11 @@ type MinedImage struct {
 }
 
 type MineImageResponse struct {
-	ImageName    string    `json:"image_name"`
-	ImagePath    string    `json:"image_path"`
-	TextContent  string    `json:"text_content"`
-	DateCreated  time.Time `json:"date_created"`
-	DateModified time.Time `json:"date_modified"`
+	ImageName    string    `bson:"image_name" json:"image_name"`
+	ImagePath    string    `bson:"image_path" json:"image_path"`
+	TextContent  string    `bson:"text_content" json:"text_content"`
+	DateCreated  time.Time `bson:"date_created" json:"date_created"`
+	DateModified time.Time `bson:"date_modified" json:"date_modified"`
 }
 
 type MineImageUrlRequest struct {
