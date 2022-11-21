@@ -2,17 +2,21 @@ package mineservice
 
 import (
 	"bytes"
+	"context"
 	"errors"
+	"fmt"
 	"io"
 	"path/filepath"
 	"time"
 
+	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/constants"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/microservice"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/s3"
 	"github.com/workshopapps/pictureminer.api/utility"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -32,7 +36,7 @@ func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string)
 		return nil, err
 	}
 
-	imagePath, err := s3.UploadImage(image, imageHash + filepath.Ext(filename))
+	imagePath, err := s3.UploadImage(image, imageHash+filepath.Ext(filename))
 	if err != nil {
 		return nil, err
 	}
@@ -68,6 +72,26 @@ func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string)
 	}
 
 	return response, nil
+}
+
+func GetMinedImages(userId interface{}) ([]model.MineImageResponse, error) {
+	id, ok := userId.(string)
+	if !ok {
+		return nil, errors.New("invalid userid")
+	}
+
+	ctx := context.TODO()
+	filter := bson.M{"user_id": id}
+	cursor, err := mongodb.SelectFromCollection(ctx, config.GetConfig().Mongodb.Database, constants.ImageCollection, filter)
+	if err != nil {
+		return []model.MineImageResponse{}, err
+	}
+
+	var minedImages []model.MineImageResponse
+	cursor.All(ctx, &minedImages)
+
+	fmt.Println(minedImages, id)
+	return minedImages, nil
 }
 
 func duplicateFile(f io.ReadCloser) (io.ReadCloser, io.ReadCloser, error) {

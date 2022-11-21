@@ -18,7 +18,7 @@ type Controller struct {
 	Logger   *utility.Logger
 }
 
-func (base *Controller) MineImage(c *gin.Context) {
+func (base *Controller) MineImageUpload(c *gin.Context) {
 
 	token := extractToken(c)
 	userId, err := getKey("id", token)
@@ -114,6 +114,27 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 	c.JSON(http.StatusOK, rd)
 }
 
+func (base *Controller) GetMinedImages(c *gin.Context) {
+
+	token := extractToken(c)
+	userId, err := getKey("id", token)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	minedImages, err := mineservice.GetMinedImages(userId)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could get mined images", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	c.JSON(http.StatusOK, minedImages)
+
+}
+
 func extractToken(c *gin.Context) string {
 	token := c.Query("token")
 	if token != "" {
@@ -141,5 +162,5 @@ func validImageFormat(filename string) bool {
 }
 
 func getFileName(url string) string {
-	return url[strings.LastIndex(url, "/"):]
+	return url[strings.LastIndex(url, "/")+1:]
 }
