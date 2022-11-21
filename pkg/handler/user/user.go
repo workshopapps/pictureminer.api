@@ -47,7 +47,7 @@ func (base *Controller) Signup(c *gin.Context) {
 
 func (base *Controller) Login(c *gin.Context) {
 	// bind user login details to User struct
-	var User model.UserLoginField
+	var User model.UserLogin
 	err := c.Bind(&User)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind user login details", err, nil)
