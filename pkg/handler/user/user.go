@@ -34,10 +34,10 @@ func (base *Controller) Signup(c *gin.Context) {
 		return
 	}
 
-	userResponse, msg, err := user.SignUpUser(User)
+	userResponse, msg, code, err := user.SignUpUser(User)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", msg, utility.ValidationResponse(err, base.Validate), nil)
-		c.JSON(http.StatusBadRequest, rd)
+		rd := utility.BuildErrorResponse(code, "error", msg, utility.ValidationResponse(err, base.Validate), nil)
+		c.JSON(code, rd)
 		return
 	}
 
@@ -62,10 +62,10 @@ func (base *Controller) Login(c *gin.Context) {
 		return
 	}
 
-	userResponse, msg, err := user.LoginUser(User)
+	userResponse, msg, code, err := user.LoginUser(User)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", msg, utility.ValidationResponse(err, base.Validate), nil)
-		c.JSON(http.StatusBadRequest, rd)
+		rd := utility.BuildErrorResponse(code, "error", msg, utility.ValidationResponse(err, base.Validate), nil)
+		c.JSON(code, rd)
 		return
 	}
 
