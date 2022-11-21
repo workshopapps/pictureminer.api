@@ -14,7 +14,7 @@ func MineServiceUpload(r *gin.Engine, validate *validator.Validate, ApiVersion s
 
 	authUrl := r.Group(fmt.Sprintf("/api/%v", ApiVersion))
 	{
-		authUrl.POST("/mine-service", mineservice.Post)
+		authUrl.POST("/mine-service", mineservice.MineImage)
 		authUrl.POST("/mine-service/url", mineservice.MineImageUrl)
 	}
 	return r
