@@ -34,6 +34,7 @@ func (base *Controller) MineImage(c *gin.Context) {
 	}
 
 	image, fh, err := c.Request.FormFile("image")
+	defer image.Close()
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not parse file", nil, gin.H{"error": "image size is too large, must be less than 1MB"})
 		c.JSON(http.StatusBadRequest, rd)
@@ -47,6 +48,7 @@ func (base *Controller) MineImage(c *gin.Context) {
 		return
 	}
 
+	
 	minedImage, err := mineservice.MineServiceUpload(userId, image, filename)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "server error", nil, err.Error())
