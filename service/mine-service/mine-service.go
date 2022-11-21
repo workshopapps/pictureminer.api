@@ -27,12 +27,12 @@ func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string)
 		return nil, err
 	}
 
-	imageHash, err := utility.HashImage(imageCopy)
+	imageHash, err := utility.HashFile(imageCopy)
 	if err != nil {
 		return nil, err
 	}
 
-	imagePath, err := s3.UploadImage(image, imageHash+"."+filepath.Ext(filename))
+	imagePath, err := s3.UploadImage(image, imageHash + filepath.Ext(filename))
 	if err != nil {
 		return nil, err
 	}

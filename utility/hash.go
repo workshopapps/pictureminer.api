@@ -6,16 +6,13 @@ import (
 	"io"
 )
 
-func HashImage(image io.ReadCloser) (string, error) {
+func HashFile(file io.ReadCloser) (string, error) {
 
 	hash := sha256.New()
-	_, err := io.Copy(hash, image)
+	_, err := io.Copy(hash, file)
 	if err != nil {
 		return "", err
 	}
 
-	h := hash.Sum(nil)
-	sha := fmt.Sprintf("%x", h)
-
-	return sha, nil
+	return fmt.Sprintf("%x", hash.Sum(nil)), nil
 }
