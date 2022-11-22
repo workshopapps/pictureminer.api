@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - "dev"
+  pull_request:
+    branches:
+      - "dev"
 
 env:
   IMAGE_TAG: ${{ github.sha }}
@@ -22,30 +25,29 @@ jobs:
 
     - name: docker build images
       run: |
-        docker build ./ -t root0877/picture_api:$IMAGE_TAG 
+        docker build ./ -t root0877/picture_api:latest 
         
 
     - name: docker push
       run: |
-        docker push root0877/picture_api:$IMAGE_TAG
+        docker push root0877/picture_api:latest
 
-    - name: Install kubectl
-      uses: azure/setup-kubectl@v2.0
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: appleboy/ssh-action@master
       with:
-        version: 'v1.24.0'
-      id: install
-
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
-
-    - name: Update kube config
-      run: aws eks update-kubeconfig --name pictureMinerCluster --region us-east-1
-
-    - name: Deploy to EKS
-      run: |
-        kubectl set image deployment/picture-api picture-api=root0877/picture_api:$IMAGE_TAG
-        
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PASSWORD }}
+        script: |
+          cd ~/pictureminer.web
+          # pull git updates
+          git pull origin dev
+          # rm local images cache
+          sudo docker stop picture-api && sudo docker rm picture-api
+          sudo docker rmi --force root0877/picture_api:latest || true
+          # pull images from remote
+          sudo docker-compose up -d --force-recreate
