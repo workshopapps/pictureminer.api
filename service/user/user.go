@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 
@@ -20,7 +21,7 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 	// check if user already exists
 	_, err := getUserFromDB(user.Email)
 	if err == nil {
-		return model.UserResponse{}, "user already exist", 403, err
+		return model.UserResponse{}, "user already exist", 403, errors.New("user already exist")
 	}
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)

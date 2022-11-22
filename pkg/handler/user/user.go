@@ -36,12 +36,12 @@ func (base *Controller) Signup(c *gin.Context) {
 
 	userResponse, msg, code, err := user.SignUpUser(User)
 	if err != nil {
-		rd := utility.BuildErrorResponse(code, "error", msg, utility.ValidationResponse(err, base.Validate), nil)
+		rd := utility.BuildErrorResponse(code, "error", msg, nil, gin.H{"error": err.Error()})
 		c.JSON(code, rd)
 		return
 	}
 
-	object := utility.BuildSuccessResponse(200, "User created successfully", userResponse)
+	object := utility.BuildSuccessResponse(200, "signup successful", userResponse)
 	c.JSON(200, object)
 }
 
