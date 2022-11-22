@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"path/filepath"
 	"time"
@@ -90,7 +89,6 @@ func GetMinedImages(userId interface{}) ([]model.MineImageResponse, error) {
 	var minedImages []model.MineImageResponse
 	cursor.All(ctx, &minedImages)
 
-	fmt.Println(minedImages, id)
 	return minedImages, nil
 }
 
