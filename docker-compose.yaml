@@ -1,10 +1,35 @@
 version: "3"
 services:
   picture_api:
-    build:
-      context: .
-    image: picture_api
+
+    image: docker.io/root0877/picture_api:latest
     ports:
       - 9000:9000
     container_name: picture-api
     restart: always
+
+  image_miner:
+    image: docker.io/root0877/image_miner:latest
+    ports:
+      - 8000:8000
+    container_name: image-miner
+    restart: always
+
+  frontend:
+    image: docker.io/root0877/miner_frontend:latest
+    ports:
+      - 3000:3000
+    container_name: frontend
+    restart: always
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+
+    depends_on:
+      - picture_api
+      - image_miner
+    
