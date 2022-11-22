@@ -118,3 +118,12 @@ func SelectFromCollection(ctx context.Context, database, collection string, filt
 	}
 	return cursor, nil
 }
+
+// calling the function and capturing it in Client..
+var Client *mongo.Client = ConnectToDB()
+
+// Accessing a database collection; the function returns the collection
+func OpenCollection(client *mongo.Client, collectionName string) *mongo.Collection {
+	var collection *mongo.Collection = client.Database("cluster0").Collection(collectionName)
+	return collection
+}
