@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/constants"
 	"github.com/workshopapps/pictureminer.api/internal/model"
@@ -21,7 +20,7 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 	// check if user already exists
 	_, err := getUserFromDB(user.Email)
 	if err == nil {
-		return model.UserResponse{}, "user already exist", 403, errors.New("user already exist")
+		return model.UserResponse{}, "user already exist", 403, errors.New("user already exist in database")
 	}
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
@@ -59,17 +58,17 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int, error) {
 	user, err := getUserFromDB(userLoginObject.Email)
 	if err != nil {
-		return model.UserResponse{}, "user does not exist", 404, validator.ValidationErrors{}
+		return model.UserResponse{}, "user does not exist", 404, err
 	}
 
 	if !isValidPassword(user.Password, userLoginObject.Password) {
-		return model.UserResponse{}, "invalid password", 401, validator.ValidationErrors{}
+		return model.UserResponse{}, "invalid password", 401, err
 	}
 
 	secretkey := config.GetConfig().Server.Secret
 	token, err := utility.CreateToken("id", user.ID.String(), secretkey)
 	if err != nil {
-		return model.UserResponse{}, fmt.Sprintf("unable to create token: %v", err.Error()), 500, validator.ValidationErrors{}
+		return model.UserResponse{}, fmt.Sprintf("unable to create token: %v", err.Error()), 500, err
 	}
 
 	// build user response

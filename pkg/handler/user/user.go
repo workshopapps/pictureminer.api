@@ -36,7 +36,7 @@ func (base *Controller) Signup(c *gin.Context) {
 
 	userResponse, msg, code, err := user.SignUpUser(User)
 	if err != nil {
-		rd := utility.BuildErrorResponse(code, "error", msg, nil, gin.H{"error": err.Error()})
+		rd := utility.BuildErrorResponse(code, "error", msg, err, nil)
 		c.JSON(code, rd)
 		return
 	}
@@ -64,7 +64,7 @@ func (base *Controller) Login(c *gin.Context) {
 
 	userResponse, msg, code, err := user.LoginUser(User)
 	if err != nil {
-		rd := utility.BuildErrorResponse(code, "error", msg, utility.ValidationResponse(err, base.Validate), nil)
+		rd := utility.BuildErrorResponse(code, "error", msg, err, nil)
 		c.JSON(code, rd)
 		return
 	}
