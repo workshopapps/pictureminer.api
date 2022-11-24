@@ -13,6 +13,8 @@ import (
 	"github.com/workshopapps/pictureminer.api/internal/model"
 )
 
+
+
 func GetImageContent(file io.ReadCloser, filename string) (*model.MicroserviceResponse, error) {
 	microserviceHost := config.GetConfig().Python.MicroserviceHost
 
