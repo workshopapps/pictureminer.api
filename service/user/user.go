@@ -41,12 +41,6 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 		return model.UserResponse{}, fmt.Sprintf("unable to create token: %v", err.Error()), 500, err
 	}
 
-	// implementaton code
-	estCount , CountErr := mongodb.CountFromCollection(user.ID)
-	if CountErr != nil {
-		return model.UserResponse{}, "error reading number of documents", 500, err
-	}
-
 
 	// build user response
 	userResponse := model.UserResponse{
@@ -56,7 +50,7 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 		Email:        user.Email,
 		TokenType:    "bearer",
 		Token:        token,
-		ApiCallCount: estCount,
+		ApiCallCount: 0,
 	}
 
 	return userResponse, "", 0, nil
@@ -79,8 +73,8 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 	}
 
 	// implementaton code
-	estCount , CountErr := mongodb.CountFromCollection(user.ID)
-	if CountErr != nil {
+	estCount , err := mongodb.CountFromCollection(user.ID)
+	if err != nil {
 		return model.UserResponse{}, "error reading number of documents", 500, err
 	}
 
