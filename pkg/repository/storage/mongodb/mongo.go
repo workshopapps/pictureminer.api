@@ -7,6 +7,7 @@ import (
 
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/utility"
+	"github.com/workshopapps/pictureminer.api/internal/constants"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -117,4 +118,22 @@ func SelectFromCollection(ctx context.Context, database, collection string, filt
 		return cursor, err
 	}
 	return cursor, nil
+}
+
+
+func CountFromCollection(user_id string) (int64, error) {
+userCollection := GetCollection(mongoClient, constants.UserCollection , constants.ImageCollection)
+filter := bson.D{{"user_id", user_id}}
+count, err := userCollection.CountDocuments(context.TODO(), filter)
+if err != nil {
+	return count, err
+}
+
+// implementaton code
+// estCount , CountErr := CountFromCollection("637f3cb921187c6a016f2087")
+// user.UsersCount = estCount
+// if CountErr != nil {
+// 	c.JSON(http.StatusInternalServerError, gin.H{"error":"error reading number of documents"})
+// }
+	return count, nil
 }
