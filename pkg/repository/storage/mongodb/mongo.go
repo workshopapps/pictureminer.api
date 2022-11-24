@@ -120,21 +120,3 @@ func SelectFromCollection(ctx context.Context, database, collection string, filt
 	}
 	return cursor, nil
 }
-
-
-func CountFromCollection(user_id primitive.ObjectID) (int64, error) {
-userCollection := GetCollection(mongoClient, constants.UserCollection , constants.ImageCollection)
-filter := bson.D{{"user_id", user_id}}
-count, err := userCollection.CountDocuments(context.TODO(), filter)
-if err != nil {
-	return count, err
-}
-
-// implementaton code
-// estCount , CountErr := CountFromCollection("637f3cb921187c6a016f2087")
-// user.UsersCount = estCount
-// if CountErr != nil {
-// 	c.JSON(http.StatusInternalServerError, gin.H{"error":"error reading number of documents"})
-// }
-	return count, nil
-}
