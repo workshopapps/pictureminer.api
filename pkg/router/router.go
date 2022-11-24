@@ -9,6 +9,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/pkg/middleware"
 	"github.com/workshopapps/pictureminer.api/utility"
 )
+
 func Setup(validate *validator.Validate, logger *utility.Logger) *gin.Engine {
 	r := gin.New()
 

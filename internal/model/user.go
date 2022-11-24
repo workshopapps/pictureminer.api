@@ -20,7 +20,7 @@ type UserResponse struct {
 	Email        string
 	Token        string
 	TokenType    string
-	ApiCallCount int
+	ApiCallCount int64
 }
 
 type UserLogin struct {
