@@ -80,7 +80,7 @@ func (base *Controller) ResetPassword(c *gin.Context) {
 	token := utility.ExtractToken(c)
 	_, err := utility.GetKey("id", token, secretKey)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", gin.H{"error": err.Error()}, nil)
 		c.JSON(http.StatusUnauthorized, rd)
 		return
 	}
@@ -101,7 +101,7 @@ func (base *Controller) ResetPassword(c *gin.Context) {
 		return
 	}
 
-	_, code, err := user.ResetPassword(reqBody)
+	code, err := user.ResetPassword(reqBody)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", "password reset failed", gin.H{"error": err.Error()}, nil)
 		c.JSON(code, rd)
