@@ -23,3 +23,18 @@ func GetUsers() ([]model.User, error) {
 
 	return users, nil
 }
+
+func GetMinedImages() ([]model.MinedImage, error){
+
+	ctx := context.TODO()
+	cursor, err := mongodb.SelectFromCollection(ctx, config.GetConfig().Mongodb.Database, constants.ImageCollection, bson.M{})
+
+	if err != nil {
+		return []model.MinedImage{}, err
+	}
+
+	var minedImages []model.MinedImage
+	cursor.All(ctx, &minedImages)
+
+	return minedImages, nil
+}
