@@ -20,8 +20,9 @@ type Controller struct {
 
 func (base *Controller) MineImageUpload(c *gin.Context) {
 
-	token := extractToken(c)
-	userId, err := getKey("id", token)
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	userId, err := utility.GetKey("id", token, secretKey)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
 		c.JSON(http.StatusUnauthorized, rd)
@@ -61,8 +62,9 @@ func (base *Controller) MineImageUpload(c *gin.Context) {
 
 func (base *Controller) MineImageUrl(c *gin.Context) {
 
-	token := extractToken(c)
-	userId, err := getKey("id", token)
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	userId, err := utility.GetKey("id", token, secretKey)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
 		c.JSON(http.StatusUnauthorized, rd)
@@ -116,8 +118,9 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 
 func (base *Controller) GetMinedImages(c *gin.Context) {
 
-	token := extractToken(c)
-	userId, err := getKey("id", token)
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	userId, err := utility.GetKey("id", token, secretKey)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
 		c.JSON(http.StatusUnauthorized, rd)
@@ -133,27 +136,6 @@ func (base *Controller) GetMinedImages(c *gin.Context) {
 
 	c.JSON(http.StatusOK, minedImages)
 
-}
-
-func extractToken(c *gin.Context) string {
-	token := c.Query("token")
-	if token != "" {
-		return token
-	}
-	token = c.Request.Header.Get("authorization")
-	slice := strings.Split(token, " ")
-	if len(slice) == 2 {
-		return slice[1]
-	}
-	return ""
-}
-
-func getKey(key, token string) (interface{}, error) {
-	claims, err := utility.DecodeToken(token, config.GetConfig().Server.Secret)
-	if err != nil {
-		return "", err
-	}
-	return claims[key], nil
 }
 
 func validImageFormat(filename string) bool {

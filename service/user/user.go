@@ -93,6 +93,34 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 	return userResponse, "", 0, nil
 }
 
+func ResetPassword(reqBody model.PasswordReset) (string, int, error) {
+	user, err := getUserFromDB(reqBody.Email)
+	if err != nil {
+		return "user does not exist", 404, err
+	}
+
+	if !isValidPassword(user.Password, reqBody.Password) {
+		return "invalid password", 401, errors.New("invalid password")
+	}
+
+	// update user password
+	newHash, _ := bcrypt.GenerateFromPassword([]byte(reqBody.PasswordNew), 10)
+	user.Password = string(newHash)
+
+	// update user in db
+	database := config.GetConfig().Mongodb.Database
+	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
+	filter := bson.M{ "email": user.Email }
+	update := bson.D{{ "$set", bson.D{{ "password", user.Password }}}}
+	count, err := userCollection.UpdateOne(context.TODO(), filter, update)
+	fmt.Println(count.MatchedCount, reqBody.PasswordNew)
+	if err != nil {
+		return  "Unable to save user to database", 500, err
+	}
+
+	return "", 0, nil
+}
+
 func getUserFromDB(email string) (model.User, error) {
 	var user model.User
 	database := config.GetConfig().Mongodb.Database
