@@ -23,7 +23,23 @@ func (base *Controller) GetUsers(c *gin.Context) {
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusOK, "success", map[string]interface{}{"data": users})
+	rd := utility.BuildSuccessResponse(http.StatusOK, "success", gin.H{"data": users})
+	c.JSON(http.StatusOK, rd)
+
+}
+
+// this returns the mined images of all users
+func (base *Controller) GetAllMinedImages(c *gin.Context) {
+
+	minedImages, err := admin.GetMinedImages()
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", err.Error(), err, nil)
+		c.JSON(http.StatusInternalServerError, rd)
+		return
+
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "success", gin.H{"data": minedImages})
 	c.JSON(http.StatusOK, rd)
 
 }
