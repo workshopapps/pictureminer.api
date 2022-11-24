@@ -18,7 +18,7 @@ import (
 func GetImageContent(file io.ReadCloser, filename string) (*model.MicroserviceResponse, error) {
 	microserviceHost := config.GetConfig().Python.MicroserviceHost
 
-	req, err := SetupMultipartRequest(file, microserviceHost, "head.jpeg")
+	req, err := SetupMultipartRequest(file, microserviceHost, filename, "")
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,36 @@ func GetImageContent(file io.ReadCloser, filename string) (*model.MicroserviceRe
 	return &content, nil
 }
 
-func SetupMultipartRequest(file io.ReadCloser, microserviceHost, filename string) (*http.Request, error) {
+func GetImagePromptResponse(file io.ReadCloser, filename, prompt string) (*model.MicroservicePromptResponse, error) {
+	microserviceHost := config.GetConfig().Python.MicroservicePromptHost
+
+	req, err := SetupMultipartRequest(file, microserviceHost, filename, prompt)
+	if err != nil {
+		return nil, err
+	}
+
+	client := &http.Client{Timeout: 120 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("%s", resp.Body)
+	}
+
+	var content model.MicroservicePromptResponse
+	err = json.NewDecoder(resp.Body).Decode(&content)
+	if err != nil {
+		return nil, err
+	}
+
+	return &content, nil
+}
+
+func SetupMultipartRequest(file io.ReadCloser, microserviceHost, filename string, prompt string) (*http.Request, error) {
 	defer file.Close()
 
 	body := &bytes.Buffer{}
@@ -58,6 +87,10 @@ func SetupMultipartRequest(file io.ReadCloser, microserviceHost, filename string
 	err = writer.Close()
 	if err != nil {
 		return nil, err
+	}
+
+	if prompt != "" {
+		microserviceHost += "?prompt=" + prompt
 	}
 
 	req, err := http.NewRequest("POST", microserviceHost, body)

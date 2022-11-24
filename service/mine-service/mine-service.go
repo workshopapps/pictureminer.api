@@ -46,7 +46,7 @@ func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string)
 	}
 
 	time := time.Now()
-	minedImage := model.MinedImage{
+	minedImage := &model.MinedImage{
 		ID:           primitive.NewObjectID(),
 		UserID:       id,
 		ImageName:    filename,
@@ -57,17 +57,9 @@ func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string)
 		DateModified: time,
 	}
 
-	_, err = mongodb.MongoPost(constants.ImageCollection, minedImage)
+	response, err := getMineImageResponse(minedImage, filename)
 	if err != nil {
 		return nil, err
-	}
-
-	response := &model.MineImageResponse{
-		ImageName:    filename,
-		ImagePath:    imagePath,
-		TextContent:  content.Content,
-		DateCreated:  time,
-		DateModified: time,
 	}
 
 	return response, nil
@@ -98,4 +90,21 @@ func duplicateFile(f io.ReadCloser) (io.ReadCloser, io.ReadCloser, error) {
 		return nil, nil, err
 	}
 	return io.NopCloser(bytes.NewReader(contents)), io.NopCloser(bytes.NewReader(contents)), nil
+}
+
+func getMineImageResponse(minedImage *model.MinedImage, filename string) (*model.MineImageResponse, error) {
+	_, err := mongodb.MongoPost(constants.ImageCollection, *minedImage)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &model.MineImageResponse{
+		ImageName:    filename,
+		ImagePath:    minedImage.ImagePath,
+		TextContent:  minedImage.TextContent,
+		DateCreated:  minedImage.DateCreated,
+		DateModified: minedImage.DateModified,
+	}
+
+	return response, nil
 }

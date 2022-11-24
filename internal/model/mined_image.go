@@ -28,3 +28,16 @@ type MineImageResponse struct {
 type MineImageUrlRequest struct {
 	Url string `bson:"url" json:"url" validate:"url,required"`
 }
+
+type MineImagePromptRequest struct {
+	Prompt string `form:"prompt" validate:"required"`
+}
+
+type MineImagePromptResponse struct {
+	ImageName    string    `bson:"image_name" json:"image_name"`
+	ImagePath    string    `bson:"image_path" json:"image_path"`
+	TextPrompt   string    `bson:"text_prompt" json:"text_prompt"`
+	CheckResult  bool      `bson:"check_result" json:"check_result"`
+	DateCreated  time.Time `bson:"date_created" json:"date_created"`
+	DateModified time.Time `bson:"date_modified" json:"date_modified"`
+}
