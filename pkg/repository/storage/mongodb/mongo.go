@@ -6,10 +6,10 @@ import (
 	"log"
 
 	"github.com/workshopapps/pictureminer.api/internal/config"
-	"github.com/workshopapps/pictureminer.api/utility"
 	"github.com/workshopapps/pictureminer.api/internal/constants"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -122,18 +122,18 @@ func SelectFromCollection(ctx context.Context, database, collection string, filt
 }
 
 func CountFromCollection(user_id primitive.ObjectID) (int64, error) {
-userCollection := GetCollection(mongoClient, constants.UserCollection , constants.ImageCollection)
-filter := bson.D{{"user_id", user_id}}
-count, err := userCollection.CountDocuments(context.TODO(), filter)
-if err != nil {
-	return count, err
-}
+	userCollection := GetCollection(mongoClient, constants.UserCollection, constants.ImageCollection)
+	filter := bson.D{{"user_id", user_id}}
+	count, err := userCollection.CountDocuments(context.TODO(), filter)
+	if err != nil {
+		return count, err
+	}
 
-// implementaton code
-// estCount , CountErr := CountFromCollection("637f3cb921187c6a016f2087")
-// user.UsersCount = estCount
-// if CountErr != nil {
-// 	c.JSON(http.StatusInternalServerError, gin.H{"error":"error reading number of documents"})
-// }
+	// implementaton code
+	// estCount , CountErr := CountFromCollection("637f3cb921187c6a016f2087")
+	// user.UsersCount = estCount
+	// if CountErr != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error":"error reading number of documents"})
+	// }
 	return count, nil
 }
