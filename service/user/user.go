@@ -93,6 +93,31 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 	return userResponse, "", 0, nil
 }
 
+func ResetPassword(reqBody model.PasswordReset) (int, error) {
+	user, err := getUserFromDB(reqBody.Email)
+	if err != nil {
+		return 404, fmt.Errorf("user does not exist: %s", err.Error())
+	}
+
+	if !isValidPassword(user.Password, reqBody.Password) {
+		return 401, errors.New("invalid password")
+	}
+
+	newPasswordHash, _ := bcrypt.GenerateFromPassword([]byte(reqBody.PasswordNew), 10)
+
+	// update user in db
+	database := config.GetConfig().Mongodb.Database
+	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
+	filter := bson.M{ "email": user.Email }
+	update := bson.D{{ "$set", bson.D{{ "password", newPasswordHash }}}}
+	_, err = userCollection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return 500, fmt.Errorf("unable to update user password: %s", err.Error())
+	}
+
+	return 0, nil
+}
+
 func getUserFromDB(email string) (model.User, error) {
 	var user model.User
 	database := config.GetConfig().Mongodb.Database
