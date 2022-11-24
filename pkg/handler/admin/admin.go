@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/service/admin"
 	"github.com/workshopapps/pictureminer.api/utility"
 )
@@ -30,6 +31,17 @@ func (base *Controller) GetUsers(c *gin.Context) {
 
 // this returns the mined images of all users
 func (base *Controller) GetAllMinedImages(c *gin.Context) {
+
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+
+	_, err := utility.GetKey("id", token, secretKey)
+
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
 
 	minedImages, err := admin.GetMinedImages()
 	if err != nil {
