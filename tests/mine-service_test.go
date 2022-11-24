@@ -1,4 +1,4 @@
-package mineservice
+package tests
 
 import (
 	"context"
@@ -30,7 +30,7 @@ func Test_MineServiceUpload(t *testing.T) {
 		var image io.ReadCloser
 		var userId interface{}
 
-		minedImage, err := MineServiceUpload(userId, image, "Filename")
+		minedImage, err := mineImageMock.MineServiceUpload(context.Background(), requestData, userId, image, "Filename")
 		asst.NoError(err)
 		asst.Equal(minedImage, &testData)
 
@@ -51,10 +51,9 @@ func Test_GetMinedImages(t *testing.T) {
 		}
 		mineImageMock := &mocks.MinedImage{TestData: &testData}
 		mineImageMock.On("mine image successful", context.Background()).Return(testData, nil).Once()
-		var image io.ReadCloser
 		var userId interface{}
 
-		minedImage, err := MineServiceUpload(userId, image, "Filename")
+		minedImage, err := mineImageMock.GetMinedImages(context.Background(), userId)
 		asst.NoError(err)
 		asst.Equal(minedImage, &testData)
 
