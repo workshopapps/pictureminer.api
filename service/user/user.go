@@ -62,7 +62,7 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 	}
 
 	if !isValidPassword(user.Password, userLoginObject.Password) {
-		return model.UserResponse{}, "invalid password", 401, err
+		return model.UserResponse{}, "invalid password", 401, errors.New("invalid password")
 	}
 
 	secretkey := config.GetConfig().Server.Secret
