@@ -12,7 +12,7 @@ import (
 func (base *Controller) PromptMineImageUpload(c *gin.Context) {
 
 	token := extractToken(c)
-	userId, err := getKey("id", token)
+	_, err := getKey("id", token)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
 		c.JSON(http.StatusUnauthorized, rd)
@@ -52,7 +52,7 @@ func (base *Controller) PromptMineImageUpload(c *gin.Context) {
 		return
 	}
 
-	minedImage, err := mineservice.PromptMineServiceUpload(userId, image, imageHeader.Filename, promptReq.Prompt)
+	minedImage, err := mineservice.PromptMineServiceUpload(image, imageHeader.Filename, promptReq.Prompt)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "undefined error", nil, err.Error())
 		c.JSON(http.StatusBadRequest, rd)

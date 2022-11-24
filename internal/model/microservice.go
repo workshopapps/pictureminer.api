@@ -5,6 +5,5 @@ type MicroserviceResponse struct {
 }
 
 type MicroservicePromptResponse struct {
-	CheckResult bool   `json:"check_result"`
-	Content     string `json:"text_description"`
+	CheckResult bool `json:"check_result"`
 }
