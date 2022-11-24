@@ -7,6 +7,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/utility"
 )
 
+
 type Configuration struct {
 	Server  ServerConfiguration
 	Mongodb MongodbConfiguration

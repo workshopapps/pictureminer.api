@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand"
+
 
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/constants"
@@ -41,6 +41,7 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 		return model.UserResponse{}, fmt.Sprintf("unable to create token: %v", err.Error()), 500, err
 	}
 
+
 	// build user response
 	userResponse := model.UserResponse{
 		Username:     user.Username,
@@ -62,7 +63,7 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 	}
 
 	if !isValidPassword(user.Password, userLoginObject.Password) {
-		return model.UserResponse{}, "invalid password", 401, err
+		return model.UserResponse{}, "invalid password", 401, errors.New("invalid password")
 	}
 
 	secretkey := config.GetConfig().Server.Secret
@@ -70,6 +71,13 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 	if err != nil {
 		return model.UserResponse{}, fmt.Sprintf("unable to create token: %v", err.Error()), 500, err
 	}
+
+	// implementaton code
+	estCount , err := mongodb.CountFromCollection(user.ID)
+	if err != nil {
+		return model.UserResponse{}, "error reading number of documents", 500, err
+	}
+
 
 	// build user response
 	userResponse := model.UserResponse{
@@ -79,7 +87,7 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 		Email:        user.Email,
 		TokenType:    "bearer",
 		Token:        token,
-		ApiCallCount: rand.Intn(10),
+		ApiCallCount: estCount,
 	}
 
 	return userResponse, "", 0, nil
