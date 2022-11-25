@@ -114,7 +114,7 @@ func (base *Controller) ResetPassword(c *gin.Context) {
 
 func (base *Controller) ForgotPassword(c *gin.Context) {
 	// bind password reset details to User struct
-	var reqBody model.PasswordReset
+	var reqBody model.PasswordForgot
 	err := c.Bind(&reqBody)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind password reset details", err, nil)
@@ -129,7 +129,7 @@ func (base *Controller) ForgotPassword(c *gin.Context) {
 		return
 	}
 
-	code, err := user.ResetPassword(reqBody)
+	code, err := user.ForgotPassword(reqBody)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", "password reset failed", gin.H{"error": err.Error()}, nil)
 		c.JSON(code, rd)
