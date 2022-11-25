@@ -100,3 +100,31 @@ func (base *Controller) ResetPassword(c *gin.Context) {
 	object := utility.BuildSuccessResponse(200, "password reset success", gin.H{})
 	c.JSON(200, object)
 }
+
+func (base *Controller) ForgotPassword(c *gin.Context) {
+	// bind password reset details to User struct
+	var reqBody model.PasswordForgot
+	err := c.Bind(&reqBody)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind password reset details", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validate.Struct(&reqBody)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validate), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	code, err := user.ForgotPassword(reqBody)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", "password reset failed", gin.H{"error": err.Error()}, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	object := utility.BuildSuccessResponse(200, "password reset success", gin.H{})
+	c.JSON(200, object)
+}
