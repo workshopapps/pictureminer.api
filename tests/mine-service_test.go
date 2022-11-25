@@ -1,62 +1,49 @@
 package tests
 
 import (
-	"context"
-	"io"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strings"
 	"testing"
-	"time"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/workshopapps/pictureminer.api/internal/model"
-	"github.com/workshopapps/pictureminer.api/pkg/mocks"
 )
 
-func Test_MineServiceUpload(t *testing.T) {
-	asst := assert.New(t)
-	t.Run("testing upload", func(t *testing.T) {
-		testData := model.MineImageResponse{
-			ImageName:    "imageName",
-			ImagePath:    "ImagePath",
-			TextContent:  "TextContent",
-			DateCreated:  time.Now(),
-			DateModified: time.Now(),
-		}
-		requestData := model.MineImageUrlRequest{
-			Url: "image.jpg",
-		}
-		mineImageMock := &mocks.MinedImage{TestData: &testData}
-		mineImageMock.On("mine image successful", context.Background(), requestData).Return(testData, nil).Once()
-		// maniputed the image
-		var image io.ReadCloser
-		var userId interface{}
+func TestMineServiceUpload(t *testing.T) {
+	url := "http://localhost:9000/api/v1/mine-service/url"
 
-		minedImage, err := mineImageMock.MineServiceUpload(context.Background(), requestData, userId, image, "Filename")
-		asst.NoError(err)
-		asst.Equal(minedImage, &testData)
+	method := "POST"
 
-		mineImageMock.AssertExpectations(t)
+	payload := strings.NewReader(`{
+    "url": "https://images.pexels.com/photos/1561020/pexels-photo-1561020.jpeg"
+}`)
 
-	})
-}
+	client := &http.Client{}
 
-func Test_GetMinedImages(t *testing.T) {
-	asst := assert.New(t)
-	t.Run("testing retrieving mined_image", func(t *testing.T) {
-		testData := model.MineImageResponse{
-			ImageName:    "imageName",
-			ImagePath:    "ImagePath",
-			TextContent:  "TextContent",
-			DateCreated:  time.Now(),
-			DateModified: time.Now(),
-		}
-		mineImageMock := &mocks.MinedImage{TestData: &testData}
-		mineImageMock.On("mine image successful", context.Background()).Return(testData, nil).Once()
-		var userId interface{}
+	req, err := http.NewRequest(method, url, payload)
 
-		minedImage, err := mineImageMock.GetMinedImages(context.Background(), userId)
-		asst.NoError(err)
-		asst.Equal(minedImage, &testData)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-		mineImageMock.AssertExpectations(t)
-	})
+	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjkzNzcyOTYsImlkIjoiT2JqZWN0SUQoXCI2MzgwOWUwMjlmMjc3MTg1NjJiMGE3NGFcIikifQ.b1M000NRCbQWN9TxlqvvCX_5khisQHDqNSfK8Igtil4")
+
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+
+	if err != nil {
+		fmt.Println(err)
+		t.Error(err)
+		return
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		t.Error(err)
+		return
+	}
+	fmt.Println(string(body))
 }
