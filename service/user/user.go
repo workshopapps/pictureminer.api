@@ -121,13 +121,17 @@ func ForgotPassword(reqBody model.PasswordForgot) (int, error) {
 		return 404, fmt.Errorf("user does not exist: %s", err.Error())
 	}
 
-	newPasswordHash, _ := bcrypt.GenerateFromPassword([]byte(reqBody.PasswordNew), 10)
+	if reqBody.Password != reqBody.ConfirmPassword {
+		return 401, errors.New("passwords do not match")
+	}
+
+	newPasswordHash, _ := bcrypt.GenerateFromPassword([]byte(reqBody.Password), 10)
 
 	// update user in db
 	database := config.GetConfig().Mongodb.Database
 	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
-	filter := bson.M{ "email": user.Email }
-	update := bson.D{{ "$set", bson.D{{ "password", newPasswordHash }}}}
+	filter := bson.M{"email": user.Email}
+	update := bson.D{{"$set", bson.D{{"password", newPasswordHash}}}}
 	_, err = userCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		return 500, fmt.Errorf("unable to update user password: %s", err.Error())
