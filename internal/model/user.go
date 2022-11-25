@@ -36,6 +36,4 @@ type PasswordReset struct {
 
 type PasswordForgot struct {
 	Email       	string `bson:"email" json:"email" validate:"required"`
-	Password    	string `bson:"password" json:"password" validate:"required"`
-	ConfirmPassword string `bson:"confirm_password" json:"confirm_password" validate:"required"`
 }

@@ -1,15 +1,11 @@
 package utility
 
 import (
-	"bytes"
 	"fmt"
 	"html/template"
-	"log"
 	"net/smtp"
 	"os"
 	"path/filepath"
-
-	"github.com/workshopapps/pictureminer.api/internal/model"
 )
 
 func EmailSender(senderEmail string, password string, receiverEmail []string, subject string, body string) Response {
@@ -58,24 +54,4 @@ type EmailData struct {
 	URL       string
 	FirstName string
 	Subject   string
-}
-
-// ? Email template parser
-
-
-func SendEmail(user *model.User, data *EmailData, sender, password string, templateName string) error {
-	//EmailSender(Sender, user.Password, )
-
-	var body bytes.Buffer
-
-	template, err := ParseTemplateDir("templates")
-	if err != nil {
-		log.Fatal("Could not parse template", err)
-	}
-
-	template = template.Lookup(templateName)
-	template.Execute(&body, &data)
-	fmt.Println(template.Name())
-
-	EmailSender(sender, )
 }

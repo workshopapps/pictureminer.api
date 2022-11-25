@@ -102,6 +102,15 @@ func (base *Controller) ResetPassword(c *gin.Context) {
 }
 
 func (base *Controller) ForgotPassword(c *gin.Context) {
+	// validate jwt token
+	// secretKey := config.GetConfig().Server.Secret
+	// token := utility.ExtractToken(c)
+	// _, err := utility.GetKey("id", token, secretKey)
+	// if err != nil {
+	// 	rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", gin.H{"error": err.Error()}, nil)
+	// 	c.JSON(http.StatusUnauthorized, rd)
+	// 	return
+	// }
 	// bind password reset details to User struct
 	var reqBody model.PasswordForgot
 	err := c.Bind(&reqBody)
