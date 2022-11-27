@@ -1,10 +1,10 @@
 package mineservice
 
 import (
+	"bytes"
 	"io"
 	"log"
 	"mime/multipart"
-	"strings"
 
 	"github.com/h2non/bimg"
 )
@@ -23,7 +23,6 @@ func compressImage(imageFile multipart.File) (io.ReadCloser, error) {
 	if err != nil {
 		return nil, err
 	}
-	r := io.NopCloser(strings.NewReader(string(processed)))
-
+	r := io.NopCloser(bytes.NewReader(processed))
 	return r, nil
 }
