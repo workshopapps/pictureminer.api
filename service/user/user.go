@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
+	"net/http"
 
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/constants"
@@ -41,7 +41,6 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 		return model.UserResponse{}, fmt.Sprintf("unable to create token: %v", err.Error()), 500, err
 	}
 
-
 	// build user response
 	userResponse := model.UserResponse{
 		Username:     user.Username,
@@ -73,11 +72,10 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 	}
 
 	// implementaton code
-	estCount , err := mongodb.CountFromCollection(user.ID)
+	estCount, err := mongodb.CountFromCollection(user.ID)
 	if err != nil {
 		return model.UserResponse{}, "error reading number of documents", 500, err
 	}
-
 
 	// build user response
 	userResponse := model.UserResponse{
@@ -99,23 +97,36 @@ func ResetPassword(reqBody model.PasswordReset) (int, error) {
 		return 404, fmt.Errorf("user does not exist: %s", err.Error())
 	}
 
-	if !isValidPassword(user.Password, reqBody.Password) {
-		return 401, errors.New("invalid password")
+	if reqBody.Password != reqBody.ConfirmPassword {
+		return 401, errors.New("passwords do not match")
 	}
 
-	newPasswordHash, _ := bcrypt.GenerateFromPassword([]byte(reqBody.PasswordNew), 10)
+	newPasswordHash, _ := bcrypt.GenerateFromPassword([]byte(reqBody.Password), 10)
 
 	// update user in db
 	database := config.GetConfig().Mongodb.Database
 	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
-	filter := bson.M{ "email": user.Email }
-	update := bson.D{{ "$set", bson.D{{ "password", newPasswordHash }}}}
+	filter := bson.M{"email": user.Email}
+	update := bson.D{{"$set", bson.D{{"password", newPasswordHash}}}}
 	_, err = userCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		return 500, fmt.Errorf("unable to update user password: %s", err.Error())
 	}
 
 	return 0, nil
+}
+
+func ForgotPassword(reqBody model.PasswordForgot) (int, error) {
+	_, err := getUserFromDB(reqBody.Email)
+	if err != nil {
+		return 404, fmt.Errorf("user does not exist: %s", err.Error())
+	}
+	
+	var w http.ResponseWriter
+	var r *http.Request
+
+	http.Redirect(w, r, "/reset", http.StatusFound)
+	return http.StatusOK, nil
 }
 
 func getUserFromDB(email string) (model.User, error) {

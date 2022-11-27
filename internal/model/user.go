@@ -29,7 +29,11 @@ type UserLogin struct {
 }
 
 type PasswordReset struct {
-	Email       string `bson:"email" json:"email" validate:"required"`
-	Password    string `bson:"password" json:"password" validate:"required"`
-	PasswordNew string `bson:"password_new" json:"password_new" validate:"required"`
+	Email           string `bson:"email" json:"email" validate:"required"`
+	Password        string `bson:"password" json:"password" validate:"required"`
+	ConfirmPassword string `bson:"confirm_password" json:"confirm_password" validate:"required"`
+}
+
+type PasswordForgot struct {
+	Email       	string `bson:"email" json:"email" validate:"required"`
 }

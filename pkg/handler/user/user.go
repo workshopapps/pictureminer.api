@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/service/user"
 	"github.com/workshopapps/pictureminer.api/utility"
@@ -75,19 +74,9 @@ func (base *Controller) Login(c *gin.Context) {
 }
 
 func (base *Controller) ResetPassword(c *gin.Context) {
-	// validate jwt token
-	secretKey := config.GetConfig().Server.Secret
-	token := utility.ExtractToken(c)
-	_, err := utility.GetKey("id", token, secretKey)
-	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", gin.H{"error": err.Error()}, nil)
-		c.JSON(http.StatusUnauthorized, rd)
-		return
-	}
-
 	// bind password reset details to User struct
 	var reqBody model.PasswordReset
-	err = c.Bind(&reqBody)
+	err := c.Bind(&reqBody)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind password reset details", err, nil)
 		c.JSON(http.StatusBadRequest, rd)
@@ -102,6 +91,43 @@ func (base *Controller) ResetPassword(c *gin.Context) {
 	}
 
 	code, err := user.ResetPassword(reqBody)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", "password reset failed", gin.H{"error": err.Error()}, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	object := utility.BuildSuccessResponse(200, "password reset success", gin.H{})
+	c.JSON(200, object)
+}
+
+func (base *Controller) ForgotPassword(c *gin.Context) {
+	// validate jwt token
+	// secretKey := config.GetConfig().Server.Secret
+	// token := utility.ExtractToken(c)
+	// _, err := utility.GetKey("id", token, secretKey)
+	// if err != nil {
+	// 	rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", gin.H{"error": err.Error()}, nil)
+	// 	c.JSON(http.StatusUnauthorized, rd)
+	// 	return
+	// }
+	// bind password reset details to User struct
+	var reqBody model.PasswordForgot
+	err := c.Bind(&reqBody)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind password reset details", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validate.Struct(&reqBody)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validate), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	code, err := user.ForgotPassword(reqBody)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", "password reset failed", gin.H{"error": err.Error()}, nil)
 		c.JSON(code, rd)
