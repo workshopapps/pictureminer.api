@@ -1,21 +1,29 @@
 package mineservice
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
+	"mime/multipart"
+	"strings"
 
-	"github.com/SKF/go-image-resizer/resizer"
+	"github.com/h2non/bimg"
 )
 
-func compressImage(imageName string) []byte {
-	imageFile, err := ioutil.ReadFile(imageName)
+func compressImage(imageFile multipart.File) (io.ReadCloser, error) {
+	buffer, err := io.ReadAll(imageFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	resizedImage, err := resizer.ResizeImage(imageFile, resizer.JpegEncoder, 1024, 1024)
+	converted, err := bimg.NewImage(buffer).Convert(bimg.PNG)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return resizedImage
+	processed, err := bimg.NewImage(converted).Process(bimg.Options{Width: 1024, Height: 1024, Quality: 720})
+	if err != nil {
+		return nil, err
+	}
+	r := io.NopCloser(strings.NewReader(string(processed)))
+
+	return r, nil
 }
