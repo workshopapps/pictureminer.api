@@ -146,3 +146,36 @@ func validImageFormat(filename string) bool {
 func getFileName(url string) string {
 	return url[strings.LastIndex(url, "/")+1:]
 }
+
+func (base *Controller) ParseUrlFromCsv(c *gin.Context) {
+
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	_, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	// get uploaded csv file
+	file, _, err := c.Request.FormFile("file")
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "no such file", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	validUrls, err := mineservice.ParseCSVfile(file)
+
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file type, upload only CSV", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "parsed CSV file successfully", validUrls)
+
+	c.JSON(http.StatusOK, gin.H{"urls": rd})
+
+}
