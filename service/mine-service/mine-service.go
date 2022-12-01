@@ -19,6 +19,23 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+func DemoMineImage(image io.ReadCloser, filename string) (*model.MineImageResponse, error) {
+	content, err := microservice.GetImageContent(image, filename)
+	if err != nil {
+		return nil, err
+	}
+
+	time := time.Now()
+	response := &model.MineImageResponse{
+		ImageName:    filename,
+		TextContent:  content.Content,
+		DateCreated:  time,
+		DateModified: time,
+	}
+
+	return response, nil
+}
+
 func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string) (*model.MineImageResponse, error) {
 	id, ok := userId.(string)
 	if !ok {
