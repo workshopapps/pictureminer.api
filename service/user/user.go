@@ -13,6 +13,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -148,4 +149,26 @@ func getUserFromDB(email string) (model.User, error) {
 
 func isValidPassword(userPassword, providedPassword string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(providedPassword)) == nil
+}
+
+
+func UpdateUserService(user model.UpdateUser) (*mongo.UpdateResult, error) {
+	database := config.GetConfig().Mongodb.Database
+	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
+
+	filter := bson.M{"email": user.Email}
+
+	update := bson.D{{Key: "$set", Value: bson.D{
+		{Key: "first_name", Value: user.FirstName},
+		{Key: "last_name", Value: user.LastName},
+		{Key: "email", Value: user.Email},
+		{Key: "username", Value: user.UserName}} }}
+
+	result, err := userCollection.UpdateOne(context.TODO(), filter, update)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result,nil
 }

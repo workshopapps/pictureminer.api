@@ -137,3 +137,31 @@ func (base *Controller) ForgotPassword(c *gin.Context) {
 	object := utility.BuildSuccessResponse(200, "password reset success", gin.H{})
 	c.JSON(200, object)
 }
+
+func (base *Controller) UpdateUser(c *gin.Context) {
+	var reqBody model.UpdateUser
+
+	err := c.Bind(&reqBody)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind user login details", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validate.Struct(&reqBody)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validate), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	result,err := user.UpdateUserService(reqBody)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validate), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	object := utility.BuildSuccessResponse(200, "User update successful", result)
+	c.JSON(200, object)
+}
