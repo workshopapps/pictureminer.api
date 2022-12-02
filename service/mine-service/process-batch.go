@@ -3,8 +3,10 @@ package mineservice
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -17,6 +19,15 @@ const (
 	BatchDescription = "description"
 	BatchTags        = "tags"
 	StatusOngoing    = "ongoing"
+)
+
+var (
+	UrlMap = map[string]bool{
+		"url":    true,
+		"urls":   true,
+		"image":  true,
+		"images": true,
+	}
 )
 
 func ProcessBatchService(file io.Reader) (interface{}, int, error) {
@@ -32,7 +43,8 @@ func ProcessBatchService(file io.Reader) (interface{}, int, error) {
 		return nil, http.StatusBadRequest, err
 	}
 
-	//url, err := getURLs(body)
+	urls, err := getURLs(body)
+	fmt.Println(urls, err)
 
 	// run goroutine in background
 	go processBatch(name, desc, tags)
@@ -93,6 +105,43 @@ func getDetails(file io.Reader) ([]string, []string) {
 
 	body = append(body, "yay")
 	return details, body
+}
+
+func getURLs(body []string) ([]string, error) {
+	var res []string
+	headers := strings.Split(body[0], ",")
+
+	// get index of header
+	idx := -1
+	for i, coln := range headers {
+		if _, ok := UrlMap[strings.ToLower(coln)]; ok {
+			idx = i
+			break
+		}
+	}
+	if idx == -1 {
+		return nil, errors.New("could not find url column header")
+	}
+
+	// filter valid urls
+	for _, row := range body[1:] {
+		rs := strings.Split(row, ",")
+		url := rs[idx]
+		if isValidURL(url) {
+			res = append(res, url)
+		}
+	}
+
+	return res, nil
+}
+
+func isValidURL(url string) bool {
+	if url == "" {
+		return false
+	}
+
+	ext := strings.ToLower(filepath.Ext(url))
+	return ext == ".png" || ext == ".jpg" || ext == ".jpeg"
 }
 
 func validateBatchDetails(dMap map[string]string) (string, string, []string, error) {
