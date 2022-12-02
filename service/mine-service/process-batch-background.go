@@ -1,15 +1,17 @@
 package mineservice
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
-
 	"github.com/workshopapps/pictureminer.api/internal/config"
+	"github.com/workshopapps/pictureminer.api/internal/constants"
 	"github.com/workshopapps/pictureminer.api/internal/model"
+	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Result struct {
@@ -43,23 +45,18 @@ const (
 	Untagged  = "untagged"
 )
 
-var (
-	BatchId = ""
-)
-
 func processBatch(email, batchID, name, desc string, tags, urls []string) {
-	BatchId = batchID
-
 	// labels for each url
 	labels := fetchLabelsForURLS(urls)
 
 	// classify label to matching tag
-	batchImgs := classifyLabels(labels, tags)
-	for _, bImg := range batchImgs {
-		fmt.Println(bImg)
-	}
+	batchImgs := classifyLabels(batchID, labels, tags)
 
 	// save to db
+	err := saveToDB(batchImgs)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	// on complete, notify user through email
 }
@@ -110,7 +107,7 @@ func getLabel(client *http.Client, imaggaURL, url, authToken, limit, threshold s
 	return label
 }
 
-func classifyLabels(labels []Label, tags []string) []model.BatchImage {
+func classifyLabels(batchID string, labels []Label, tags []string) []model.BatchImage {
 	// for O(1) lookups
 	tagsMap := make(map[string]bool)
 	for _, tag := range tags {
@@ -120,13 +117,13 @@ func classifyLabels(labels []Label, tags []string) []model.BatchImage {
 	// get best matching tag for each label
 	var batchImgs []model.BatchImage
 	for _, label := range labels {
-		batchImgs = append(batchImgs, classifyLabel(label, tagsMap))
+		batchImgs = append(batchImgs, classifyLabel(batchID, label, tagsMap))
 	}
 
 	return batchImgs
 }
 
-func classifyLabel(label Label, tagsMap map[string]bool) model.BatchImage {
+func classifyLabel(batchID string, label Label, tagsMap map[string]bool) model.BatchImage {
 	var filtered []Result
 
 	// filter for results that match with atleast one tag
@@ -147,7 +144,7 @@ func classifyLabel(label Label, tagsMap map[string]bool) model.BatchImage {
 
 	batchImage := model.BatchImage{
 		ID:      primitive.NewObjectID(),
-		BatchID: BatchId,
+		BatchID: batchID,
 		URL:     label.URL,
 		Tag:     bestTag,
 	}
@@ -158,8 +155,22 @@ func smoothify(str string) string {
 	return strings.Join(strings.Fields(str), "-")
 }
 
-func saveToDB() {
+func saveToDB(batchImgs []model.BatchImage) error {
+	database := config.GetConfig().Mongodb.Database
+	batchImgCol := mongodb.GetCollection(mongodb.Connection(), database, constants.BatchImageCollection)
 
+	// mongodb insertMany supports []interface{} only
+	imgs := make([]interface{}, len(batchImgs))
+	for i := 0; i < len(imgs); i++ {
+		imgs[i] = batchImgs[i]
+	}
+
+	_, err := batchImgCol.InsertMany(context.TODO(), imgs)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func nofityUser() {
