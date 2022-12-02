@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/service/user"
 	"github.com/workshopapps/pictureminer.api/utility"
@@ -139,11 +140,20 @@ func (base *Controller) ForgotPassword(c *gin.Context) {
 }
 
 func (base *Controller) UpdateUser(c *gin.Context) {
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	_, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
 	var reqBody model.UpdateUser
 
-	err := c.Bind(&reqBody)
+	err = c.Bind(&reqBody)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind user login details", err, nil)
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind user update details", err, nil)
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
@@ -155,13 +165,14 @@ func (base *Controller) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	result,err := user.UpdateUserService(reqBody)
+	statusCode,err := user.UpdateUserService(reqBody)
+
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validate), nil)
-		c.JSON(http.StatusBadRequest, rd)
+		rd := utility.BuildErrorResponse(statusCode, "error", "user update failed", gin.H{"error": err.Error()}, nil)
+		c.JSON(statusCode, rd)
 		return
 	}
 
-	object := utility.BuildSuccessResponse(200, "User update successful", result)
-	c.JSON(200, object)
+	object := utility.BuildSuccessResponse(200, "User update successful", gin.H{})
+	c.JSON(statusCode, object)
 }

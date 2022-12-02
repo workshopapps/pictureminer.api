@@ -13,7 +13,6 @@ import (
 	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -152,23 +151,67 @@ func isValidPassword(userPassword, providedPassword string) bool {
 }
 
 
-func UpdateUserService(user model.UpdateUser) (*mongo.UpdateResult, error) {
+func UpdateUserService(user model.UpdateUser) (int, error) {
 	database := config.GetConfig().Mongodb.Database
-	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
-
-	filter := bson.M{"email": user.Email}
-
-	update := bson.D{{Key: "$set", Value: bson.D{
-		{Key: "first_name", Value: user.FirstName},
-		{Key: "last_name", Value: user.LastName},
-		{Key: "email", Value: user.Email},
-		{Key: "username", Value: user.UserName}} }}
-
-	result, err := userCollection.UpdateOne(context.TODO(), filter, update)
-
-	if err != nil {
-		return nil, err
+	
+	filter := bson.D{{Key: "email", Value: user.Email}}
+	if len(user.LastName)>0 {
+		update:= bson.M{ "$set": bson.M{"last_name" :user.LastName }}
+		err:= UpdateFunc(database, filter, update)
+		if err != nil {return 400, err}
 	}
 
-	return result,nil
+	if len(user.FirstName)>0 {
+		update:= bson.M{"$set": bson.M{"first_name" :user.FirstName}}
+		err:= UpdateFunc(database, filter, update)
+		if err != nil {return 400, err}
+	}
+
+	if len(user.Email)>0 {
+		update:= bson.M{"$set": bson.M{"email" :user.Email}}
+		err:= UpdateFunc(database, filter, update)
+		if err != nil {return 400, err}
+	}
+
+	if len(user.UserName)>0 {
+		update:= bson.M{"$set": bson.M{"username" :user.UserName}}
+		err:= UpdateFunc(database, filter, update)
+		if err != nil { return 400, err}
+	}
+
+	if len(user.NewPassword)>0{
+		err:=CheckPasswords(user)
+		if err != nil { return 400, err}
+
+		hash, _ := bcrypt.GenerateFromPassword([]byte(user.NewPassword), 10)
+		user.NewPassword = string(hash)
+		update:= bson.M{"$set": bson.M{"password" :user.NewPassword}}
+		err = UpdateFunc(database, filter, update)
+		if err != nil { return 400, err}
+	}
+
+	return 200,nil
+}
+
+func UpdateFunc(db string,filter bson.D, update bson.M) error {
+	userCollection := mongodb.GetCollection(mongodb.Connection(), db, constants.UserCollection)
+	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
+	return err
+}
+
+func CheckPasswords(user model.UpdateUser) error  {
+		userDocument, err := getUserFromDB(user.Email)
+		if len(user.CurrentPassword) < 0 {
+			err:= errors.New("Provide current password")
+			return  err
+		}
+		if !isValidPassword(userDocument.Password, user.CurrentPassword){
+			err:= errors.New("Password invalid")
+			return  err
+		}	
+		if user.NewPassword != user.ConfirmPassword{
+			err:= errors.New("Passwords do not match")
+			return  err
+		}
+	return err
 }

@@ -43,4 +43,7 @@ type UpdateUser struct{
 	LastName		string		`bson:"last_name" json:"last_name"`
 	Email			string		`bson:"email" json:"email" validate:"required"`
 	UserName 		string		`bson:"username" json:"username"`
+	CurrentPassword string		`bson:"current_password" json:"current_password"`
+	NewPassword     string		`bson:"new_password" json:"new_password"`
+	ConfirmPassword string		`bson:"confirm_password" json:"confirm_password"`
 }
