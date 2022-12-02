@@ -171,7 +171,7 @@
             }
           },
           "500": {
-            "description": "unable to update user, message will be specified",
+            "description": "unable to update user, Message will be specified",
             "content": {
               "application/json": {
                 "schema": {
