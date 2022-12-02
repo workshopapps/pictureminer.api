@@ -2,6 +2,7 @@ package mineservice
 
 import (
 	"bufio"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -10,7 +11,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/workshopapps/pictureminer.api/internal/config"
+	"github.com/workshopapps/pictureminer.api/internal/constants"
 	"github.com/workshopapps/pictureminer.api/internal/model"
+	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -30,7 +35,7 @@ var (
 	}
 )
 
-func ProcessBatchService(file io.Reader) (interface{}, int, error) {
+func ProcessBatchService(userID string, file io.Reader) (interface{}, int, error) {
 	// extract batch details and body from csv
 	dMap, body, err := parseDetails(file)
 	if err != nil {
@@ -38,33 +43,54 @@ func ProcessBatchService(file io.Reader) (interface{}, int, error) {
 	}
 
 	// ensure all required details are available
-	name, desc, tags, err := validateBatchDetails(dMap)
+	bName, desc, tags, err := validateBatchDetails(dMap)
 	if err != nil {
 		return nil, http.StatusBadRequest, err
 	}
 
 	urls, err := getURLs(body)
-	fmt.Println(urls)
 	if err != nil {
 		return nil, http.StatusBadRequest, err
 	}
 
-	// run goroutine in background
-	go processBatch(name, desc, tags, urls)
-
-	// return success message
-	res := model.BatchResponse{
+	// save batch object to db
+	batch := model.Batch{
 		ID:          primitive.NewObjectID(),
-		Name:        name,
+		UserID:      userID,
+		Name:        bName,
 		Description: desc,
 		Tags:        tags,
 		Status:      StatusOngoing,
 		DateCreated: time.Now().Local(),
 	}
+	database := config.GetConfig().Mongodb.Database
+	batchCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.BatchCollection)
+	_, err = batchCollection.InsertOne(context.Background(), batch)
+	if err != nil {
+		return nil, http.StatusInternalServerError, fmt.Errorf("%s: %s", "Unable to save user to database", err.Error())
+	}
+
+	uEmail, code, err := getUserEmail(userID)
+	if err != nil {
+		return nil, code, err
+	}
+
+	// run goroutine in background to process batch
+	go processBatch(uEmail, batch.ID.Hex(), bName, desc, tags, urls)
+
+	// return success message
+	res := model.BatchResponse{
+		ID:          batch.ID,
+		Name:        batch.Name,
+		Description: batch.Description,
+		Tags:        batch.Tags,
+		Status:      batch.Status,
+		DateCreated: batch.DateCreated,
+	}
 	return res, http.StatusOK, nil
 }
 
-func processBatch(name, desc string, tags, urls []string) {
+func processBatch(userID, batchID, name, desc string, tags, urls []string) {
 
 }
 
@@ -169,4 +195,29 @@ func validateBatchDetails(dMap map[string]string) (string, string, []string, err
 	}
 
 	return strings.TrimSpace(name), strings.TrimSpace(description), tags, nil
+}
+
+func getUserEmail(userID string) (string, int, error) {
+	var user model.User
+
+	database := config.GetConfig().Mongodb.Database
+	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
+
+	// convert "ObjectID('<id hex>') => '<id hex>'"
+	id, err := primitive.ObjectIDFromHex(userID[10:len(userID)-2])
+	if err != nil {
+		return "", http.StatusBadRequest, err
+	}
+
+	result := userCollection.FindOne(context.TODO(), bson.M{"_id": id})
+	err = result.Err()
+	if err != nil {
+		return "", http.StatusNotFound, err
+	}
+
+	err = result.Decode(&user)
+	if err != nil {
+		return "", http.StatusInternalServerError, err
+	}
+	return user.Email, http.StatusOK, nil
 }
