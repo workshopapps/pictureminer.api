@@ -14,6 +14,8 @@ require (
 	github.com/google/uuid v1.3.0
 )
 
+require github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0 // indirect
+
 require (
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/jeanphorn/log4go v0.0.0-20190526082429-7dbb8deb9468
@@ -36,6 +38,7 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
+	github.com/go-martini/martini v0.0.0-20170121215854-22fa46961aab
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
 	github.com/go-openapi/spec v0.20.4 // indirect
