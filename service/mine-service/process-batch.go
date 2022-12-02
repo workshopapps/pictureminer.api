@@ -90,10 +90,6 @@ func ProcessBatchService(userID string, file io.Reader) (interface{}, int, error
 	return res, http.StatusOK, nil
 }
 
-func processBatch(userID, batchID, name, desc string, tags, urls []string) {
-
-}
-
 func parseDetails(file io.Reader) (map[string]string, []string, error) {
 	details, body := getDetails(file)
 
