@@ -133,7 +133,7 @@
           {
             "name": "current_password",
             "in": "path",
-            "description": "Username of account",
+            "description": "Current password of account",
             "required": false,
             "schema": {
               "type": "string"
@@ -142,7 +142,7 @@
           {
             "name": "new_password",
             "in": "path",
-            "description": "Username of account",
+            "description": "New password to be set",
             "required": false,
             "schema": {
               "type": "string"
@@ -151,7 +151,7 @@
           {
             "name": "confirm_password",
             "in": "path",
-            "description": "Username of account",
+            "description": "Repeat of password to be set",
             "required": false,
             "schema": {
               "type": "string"

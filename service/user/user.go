@@ -153,7 +153,6 @@ func isValidPassword(userPassword, providedPassword string) bool {
 
 func UpdateUserService(user model.UpdateUser) (int, error) {
 	database := config.GetConfig().Mongodb.Database
-	
 	filter := bson.D{{Key: "email", Value: user.Email}}
 	if len(user.LastName)>0 {
 		update:= bson.M{ "$set": bson.M{"last_name" :user.LastName }}
