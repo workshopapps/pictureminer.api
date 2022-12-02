@@ -20,6 +20,7 @@ func Auth(r *gin.Engine, validate *validator.Validate, ApiVersion string, logger
 		authUrl.POST("/signup", auth.Signup)
 		authUrl.POST("/reset", auth.ResetPassword)
 		authUrl.POST("/forgot-password", auth.ForgotPassword)
+		authUrl.PATCH("/update_user_picture", auth.UpdateProfilePicture)
 	}
 	return r
 }

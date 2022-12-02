@@ -12,6 +12,7 @@ s3:
   AWSAccessKeyID : "AKIAXOMDBDAFLLTWLU4Y"
   AWSSecretAccessKey : "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"
   BucketName : "miner-pictures"
+  ProfilePictureBucketName : "miner-profile-pic"
 python: 
   microservicehost: "https://yiowpv.deta.dev/api/microservice/content"
   # Change when the microservice host for prompt is available

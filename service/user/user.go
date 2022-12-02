@@ -4,12 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
+	"path/filepath"
+	"time"
 
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/constants"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
+	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/s3"
 	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -121,7 +125,7 @@ func ForgotPassword(reqBody model.PasswordForgot) (int, error) {
 	if err != nil {
 		return 404, fmt.Errorf("user does not exist: %s", err.Error())
 	}
-	
+
 	var w http.ResponseWriter
 	var r *http.Request
 
@@ -148,4 +152,36 @@ func getUserFromDB(email string) (model.User, error) {
 
 func isValidPassword(userPassword, providedPassword string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(providedPassword)) == nil
+}
+
+func ProfilePictureServiceUpload(userId interface{}, image io.ReadCloser, filename string) (string, error) {
+	string_id, ok := userId.(string)
+
+	if !ok {
+		return "", errors.New("invalid userid")
+	}
+
+	id := string_id[10 : len(string_id)-2]
+	imagePath, err := s3.UploadProfileImage(image, id+filepath.Ext(filename))
+	if err != nil {
+		return "", err
+	}
+
+	updateUserPicture := map[string]interface{}{
+		"profile_picture": imagePath,
+		"date_updated":    time.Now(),
+	}
+
+	update_response, err := mongodb.MongoUpdate(id, updateUserPicture, constants.UserCollection)
+
+	if err != nil {
+		return "", err
+	}
+
+	if update_response.MatchedCount != 1 {
+		return "", fmt.Errorf("User with ID not found")
+	}
+
+	return imagePath, nil
+
 }
