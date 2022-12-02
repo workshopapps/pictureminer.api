@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "traveladvisor-342712",
+  "private_key_id": "XXXXXX XXXXX XXXXXXX XXXXXXX",
+  "private_key": "XXXXXX XXXXX XXXXXXX XXXXXXX",
+  "client_email": "XXXXXX XXXXX XXXXXXX XXXXXXX",
+  "client_id": "XXXXXX XXXXX XXXXXXX XXXXXXX",
+  "auth_uri": "XXXXXX XXXXX XXXXXXX XXXXXXX",
+  "token_uri": "XXXXXX XXXXX XXXXXXX XXXXXXX",
+  "auth_provider_x509_cert_url": "XXXXXX XXXXX XXXXXXX XXXXXXX",
+  "client_x509_cert_url": "XXXXXX XXXXX XXXXXXX XXXXXXX"
+}
