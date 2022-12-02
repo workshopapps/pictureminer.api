@@ -44,10 +44,13 @@ func ProcessBatchService(file io.Reader) (interface{}, int, error) {
 	}
 
 	urls, err := getURLs(body)
-	fmt.Println(urls, err)
+	fmt.Println(urls)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
 
 	// run goroutine in background
-	go processBatch(name, desc, tags)
+	go processBatch(name, desc, tags, urls)
 
 	// return success message
 	res := model.BatchResponse{
@@ -61,7 +64,7 @@ func ProcessBatchService(file io.Reader) (interface{}, int, error) {
 	return res, http.StatusOK, nil
 }
 
-func processBatch(name, desc string, tags []string) {
+func processBatch(name, desc string, tags, urls []string) {
 
 }
 
@@ -103,7 +106,6 @@ func getDetails(file io.Reader) ([]string, []string) {
 		}
 	}
 
-	body = append(body, "yay")
 	return details, body
 }
 
@@ -126,7 +128,10 @@ func getURLs(body []string) ([]string, error) {
 	// filter valid urls
 	for _, row := range body[1:] {
 		rs := strings.Split(row, ",")
-		url := rs[idx]
+		url := ""
+		if idx < len(rs) {
+			url = rs[idx]
+		}
 		if isValidURL(url) {
 			res = append(res, url)
 		}
