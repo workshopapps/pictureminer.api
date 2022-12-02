@@ -7,6 +7,7 @@ import (
 
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/constants"
+	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -136,4 +137,54 @@ func CountFromCollection(user_id primitive.ObjectID) (int64, error) {
 	// 	c.JSON(http.StatusInternalServerError, gin.H{"error":"error reading number of documents"})
 	// }
 	return count, nil
+}
+
+
+func GetUserTags(user_id string,batch_id string) ([]string, int , error){
+  var tags []string
+  var length int
+
+	batchImagesCollection := GetCollection(mongoClient, constants.UserCollection, constants.BatchCollection)
+	filter := bson.D{{"user_id", user_id},{"batch_id", batch_id}}
+
+	batch_collection, err := batchImagesCollection.Find(context.TODO(), filter)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var results []model.BatchCollection
+		if err := batch_collection.All(context.TODO(), &results); err != nil {
+			fmt.Println(err)
+		}
+
+  for _, test := range results {
+        if test.User_id == user_id {
+          tags =  test.Tags
+          length = len(test.Tags)
+        }
+    }
+     return tags ,length ,err
+}
+
+func GetImageTags(batch_id string) ([]model.ImageCollection, []string, int, error){
+  var tag []string
+	batchImagesCollection := GetCollection(mongoClient, constants.UserCollection, constants.BatchMinedCollection)
+	filter := bson.D{{"batch_id", batch_id}}
+
+	image_collection, err := batchImagesCollection.Find(ctx, filter)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var results []model.ImageCollection
+		if err := image_collection.All(context.TODO(), &results); err != nil {
+			fmt.Println(err)
+		}
+
+  for _, test := range results {
+        if test.Batch_id == batch_id {
+           tag = append(tag,test.Tag)
+        }
+    }
+     return results, tag,len(tag), err
 }
