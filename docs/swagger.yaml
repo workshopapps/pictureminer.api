@@ -1,4 +1,4 @@
-basePath: /api/v1/
+basePath: /api/v1
 definitions:
   model.Ping:
     properties:
@@ -32,34 +32,64 @@ paths:
     get:
       description: Responds with the server status as JSON.
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utility.Response'
+            $ref: "#/definitions/utility.Response"
       summary: Checks the status of the server
       tags:
-      - health
+        - health
     post:
       description: Send a dummy post request to test the status of the server
       parameters:
-      - description: Ping JSON
-        in: body
-        name: ping
-        required: true
-        schema:
-          $ref: '#/definitions/model.Ping'
+        - description: Ping JSON
+          in: body
+          name: ping
+          required: true
+          schema:
+            $ref: "#/definitions/model.Ping"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utility.Response'
+            $ref: "#/definitions/utility.Response"
       summary: Checks the status of the server
       tags:
-      - health
+        - health
+
+  /admin/users/{username}:
+    delete:
+      tags:
+        - admin
+      summary: Delete a user
+      description: Delete a user
+      operationId: deleteUser
+      parameters:
+        - name: username
+          in: path
+          description: ""
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: user successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+
+        "500":
+          description: unable to delete user
+          content:
+            application/json:
+              schema:
+                type: object
+
 schemes:
-- http
+  - http
 swagger: "2.0"
