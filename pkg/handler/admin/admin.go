@@ -15,6 +15,7 @@ type Controller struct {
 	Logger   *utility.Logger
 }
 
+// Getusers
 func (base *Controller) GetUsers(c *gin.Context) {
 
 	users, err := admin.GetUsers()
@@ -27,6 +28,34 @@ func (base *Controller) GetUsers(c *gin.Context) {
 	rd := utility.BuildSuccessResponse(http.StatusOK, "success", gin.H{"data": users})
 	c.JSON(http.StatusOK, rd)
 
+}
+
+// Delete ALL users
+// func (base *Controller) DeleteUsers(c *gin.Context){
+// 	err := admin.DeleteUsers()
+// 	if err != nil {
+// 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to delete user", err,nil)
+// 		c.JSON(http.StatusInternalServerError,rd)
+// 		return
+// 	}
+// 	rd := utility.BuildSuccessResponse(http.StatusOK, "success", gin.H{"message" : "user deleted successfully"} )
+// 	c.JSON(http.StatusOK, rd)
+
+// }
+
+
+
+// Delete User
+func (base *Controller) DeleteUser(c *gin.Context){
+	username := c.Param("username") //string
+	err := admin.DeleteUser(username)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to delete user", err,nil)
+		c.JSON(http.StatusInternalServerError,rd)
+		return
+	}
+	rd := utility.BuildSuccessResponse(http.StatusOK, "success", gin.H{"message" : "user deleted successfully"} )
+	c.JSON(http.StatusOK, rd)
 }
 
 // this returns the mined images of all users
