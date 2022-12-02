@@ -59,3 +59,33 @@ func (base *Controller) ProcessBatch(c *gin.Context) {
 	rd := utility.BuildSuccessResponse(http.StatusOK, "process batch started", res)
 	c.JSON(http.StatusOK, rd)
 }
+
+func (base *Controller) GetBatches(c *gin.Context) {
+
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	userID, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	// validate user ID
+	id, ok := userID.(string)
+	if !ok {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid user id claim", gin.H{"error": "could not process user id"}, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	batches, err := mineservice.GetBatchesService(id)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could retrive batches", gin.H{"error": err.Error()}, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	c.JSON(http.StatusOK, batches)
+
+}
