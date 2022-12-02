@@ -8,12 +8,13 @@ import (
 )
 
 type Configuration struct {
-	Server    ServerConfiguration
-	Mongodb   MongodbConfiguration
-	Redis     RedisConfiguration
-	S3        S3StorageConfiguration
-	Python    MicroserviceConfiguration
-	ImaggaAPI ImmaggaConfiguration
+	Server      ServerConfiguration
+	Mongodb     MongodbConfiguration
+	Redis       RedisConfiguration
+	S3          S3StorageConfiguration
+	Python      MicroserviceConfiguration
+	ImaggaAPI   ImmaggaConfiguration
+	NotifyEmail NotifyEmail
 }
 
 // Setup initialize configuration

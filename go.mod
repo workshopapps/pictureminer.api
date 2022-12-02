@@ -43,6 +43,7 @@ require (
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
@@ -73,6 +74,8 @@ require (
 	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

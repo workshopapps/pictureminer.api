@@ -11,6 +11,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/internal/constants"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
+	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -55,10 +56,11 @@ func processBatch(email, batchID, name, desc string, tags, urls []string) {
 	// save to db
 	err := saveToDB(batchImgs)
 	if err != nil {
-		fmt.Println(err)
+		warnUser(email, name, err.Error())
 	}
 
 	// on complete, notify user through email
+	notifyUser(email, name)
 }
 
 func fetchLabelsForURLS(urls []string) []Label {
@@ -67,13 +69,15 @@ func fetchLabelsForURLS(urls []string) []Label {
 	AuthToken := config.GetConfig().ImaggaAPI.Auth
 	httpClient := &http.Client{}
 	for _, url := range urls {
-		label := getLabel(httpClient, ImaggaURL, url, AuthToken, Limit, Threshold)
-		labels = append(labels, label)
+		label, err := getLabel(httpClient, ImaggaURL, url, AuthToken, Limit, Threshold)
+		if err == nil {
+			labels = append(labels, label)g
+		}
 	}
 	return labels
 }
 
-func getLabel(client *http.Client, imaggaURL, url, authToken, limit, threshold string) Label {
+func getLabel(client *http.Client, imaggaURL, url, authToken, limit, threshold string) (Label, error) {
 	req, _ := http.NewRequest("GET", imaggaURL, nil)
 	req.Header.Set("Authorization", authToken)
 	q := req.URL.Query()
@@ -84,14 +88,14 @@ func getLabel(client *http.Client, imaggaURL, url, authToken, limit, threshold s
 
 	res, err := client.Do(req)
 	if err != nil {
-		fmt.Println(err)
+		return Label{}, err
 	}
 	defer res.Body.Close()
 
 	var apiRes APIResponse
 	err = json.NewDecoder(res.Body).Decode(&apiRes)
 	if err != nil {
-		fmt.Println(err)
+		return Label{}, err
 	}
 
 	var results []Result
@@ -104,7 +108,7 @@ func getLabel(client *http.Client, imaggaURL, url, authToken, limit, threshold s
 		Results: results,
 	}
 
-	return label
+	return label, nil
 }
 
 func classifyLabels(batchID string, labels []Label, tags []string) []model.BatchImage {
@@ -173,6 +177,18 @@ func saveToDB(batchImgs []model.BatchImage) error {
 	return nil
 }
 
-func nofityUser() {
+func notifyUser(email, batchName string) {
+	from := config.GetConfig().NotifyEmail.Email
+	password := config.GetConfig().NotifyEmail.Email
+	body := fmt.Sprintf("Hello, batch <b>%v</b> processing is complete!", batchName)
 
+	utility.EmailSender(from, password, []string{email}, "Process Batch Complete", body)
+}
+
+func warnUser(email, batchName, msg string) {
+	from := config.GetConfig().NotifyEmail.Email
+	password := config.GetConfig().NotifyEmail.Email
+	body := fmt.Sprintf("Hello, batch <b>%v</b> processing is failed!<br>error: %v", batchName, msg)
+
+	utility.EmailSender(from, password, []string{email}, "Process Batch Failed", body)
 }

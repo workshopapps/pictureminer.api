@@ -9,13 +9,16 @@ server:
   secret: "mySecretKey"
 s3:
   AWSRegion: "us-east-1"
-  AWSAccessKeyID : "AKIAXOMDBDAFLLTWLU4Y"
-  AWSSecretAccessKey : "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"
-  BucketName : "miner-pictures"
-python: 
+  AWSAccessKeyID: "AKIAXOMDBDAFLLTWLU4Y"
+  AWSSecretAccessKey: "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"
+  BucketName: "miner-pictures"
+python:
   microservicehost: "https://yiowpv.deta.dev/api/microservice/content"
   # Change when the microservice host for prompt is available
   microserviceprompthost: "https://yiowpv.deta.dev/api/microservice/content"
 ImaggaAPI:
   URL: "https://api.imagga.com/v2/tags"
   Auth: "Basic YWNjXzRjODM4N2MxZGM5YWNkOTowODNjNTk5YmMwMTlmYjFlMjJjNTM4NWIzMTJiZjkxYg=="
+NotifyEmail:
+  Email: "hng9.discripto@gmail.com"
+  Password: "pzajnkgwvsrnxhdj"
