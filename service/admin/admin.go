@@ -33,12 +33,12 @@ func DeleteUsers()error{
 ctx, cancel := context.WithDeadline(context.Background(), d)
 defer cancel()
 
-// 	_, err := mongodb.DeleteAUsersFromCollection(ctx, config.GetConfig().Mongodb.Database, constants.UserCollection,nil)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
+	_, err := mongodb.DeleteAllUsersFromCollection(ctx, config.GetConfig().Mongodb.Database, constants.UserCollection)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 // Delete a user
 func DeleteUser(username string) error {
