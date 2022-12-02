@@ -1,8 +1,8 @@
 package constants
 
 const (
-	UserCollection  = "users"
-	ImageCollection = "mined_images"
-	BatchCollection = "batches"
-	BatchImageCollection = "images"
+	UserCollection       = "users"
+	ImageCollection      = "mined_images"
+	BatchCollection      = "batches"
+	BatchImageCollection = "batch_images"
 )

@@ -24,3 +24,10 @@ type BatchResponse struct {
 	Status      string             `bson:"status" json:"status"`
 	DateCreated time.Time          `bson:"date_created" json:"date_created"`
 }
+
+type BatchImage struct {
+	ID      primitive.ObjectID `bson:"_id" json:"id"`
+	BatchID string             `bson:"batch_id" json:"batch_id"`
+	URL     string             `bson:"url" json:"url"`
+	Tag     string             `bson:"tag" json:"tag"`
+}
