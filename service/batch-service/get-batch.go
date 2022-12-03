@@ -40,6 +40,10 @@ func GetBatchImages(batchID string) (interface{}, error) {
 	batchCollection.FindOne(ctx, bson.M{"_id": validBatchID}).Decode(&batch)
 
 	filter := bson.M{"batch_id": batchID}
+	cursor, err := mongodb.SelectFromCollection(ctx, db, constants.BatchImageCollection, filter)
+	if err != nil {
+		return []model.BatchImage{}, err
+	}
   
 	imgs := []model.BatchImage{}
 	err = cursor.All(ctx, &imgs)
