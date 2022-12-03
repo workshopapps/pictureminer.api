@@ -24,3 +24,17 @@ func GetBatchesService(userID string) ([]model.Batch, error) {
 
 	return batches, nil
 }
+
+func GetImagesInBatch(batchId string ) ([]model.BatchImage, error){
+	db := config.GetConfig().Mongodb.Database
+	ctx := context.Background()
+	filter := bson.M{"batch_id": batchId}
+	cursor, err := mongodb.SelectFromCollection(ctx, db, constants.BatchImageCollection, filter)
+	if err != nil {
+		return nil, err
+	}
+	batchImages:= []model.BatchImage{}
+	cursor.All(ctx, &batchImages)
+
+	return batchImages, nil
+}

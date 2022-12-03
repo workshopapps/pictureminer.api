@@ -2,6 +2,7 @@ package mineservice
 
 import (
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -177,4 +178,34 @@ func validImageFormat(filename string) bool {
 
 func getFileName(url string) string {
 	return url[strings.LastIndex(url, "/")+1:]
+}
+
+func (base *Controller) DownloadCsv(c *gin.Context) {
+
+	// secretKey := config.GetConfig().Server.Secret
+	// token := utility.ExtractToken(c)
+	// userId, err := utility.GetKey("id", token, secretKey)
+	// if err != nil {
+	// 	rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+	// 	c.JSON(http.StatusUnauthorized, rd)
+	// 	return
+	// }
+	batchId := c.Param("batchid")
+	var dummySlice, err = mineservice.GetImagesInBatch(batchId)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not get images for this batch id", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+	errr := mineservice.ParseImageResponseForDownload(dummySlice)
+	if errr != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not generate csv for download", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	c.File("filename.csv")
+	defer os.Remove("filename.csv")
+	
+
 }
