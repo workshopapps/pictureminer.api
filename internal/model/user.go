@@ -20,14 +20,15 @@ type User struct {
 }
 
 type UserResponse struct {
-	Username       string
-	FirstName      string
-	LastName       string
-	Email          string
-	ProfilePicture string
-	Token          string
-	TokenType      string
-	ApiCallCount   int64
+	Username     string
+	FirstName    string
+	LastName     string
+	Email        string
+	ProfileKey   string
+	ProfileUrl   string
+	Token        string
+	TokenType    string
+	ApiCallCount int64
 }
 
 type UserLogin struct {

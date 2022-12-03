@@ -1,237 +1,203 @@
 {
-  "schemes": ["http"],
-  "swagger": "2.0",
-  "info": {
-    "description": "A picture mining service API in Go using Gin framework.",
-    "title": "Minergram",
-    "contact": {},
-    "version": "1.0"
-  },
-  "host": "localhost:9000",
-  "basePath": "/api/v1/",
-  "paths": {
-    "/admin/users": {
-      "get": {
-        "description": "List all users",
-        "produces": ["application/json"],
-        "tags": ["users"],
-        "summary": "List all users",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/model.User"
-              }
-            }
-          }
-        }
-      }
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "A picture mining service API in Go using Gin framework.",
+        "title": "Minergram",
+        "contact": {},
+        "version": "1.0"
     },
-    "/api/v1/health": {
-      "get": {
-        "description": "Responds with the server status as JSON.",
-        "produces": ["application/json"],
-        "tags": ["health"],
-        "summary": "Checks the status of the server",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/utility.Response"
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Send a dummy post request to test the status of the server",
-        "produces": ["application/json"],
-        "tags": ["health"],
-        "summary": "Checks the status of the server",
-        "parameters": [
-          {
-            "description": "Ping JSON",
-            "name": "ping",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/model.Ping"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/utility.Response"
-            }
-          }
-        }
-      }
-    }
-  },
-  "definitions": {
-    "model.Ping": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        }
-      }
-    },
-    "/update-user": {
-      "put": {
-        "tags": ["user"],
-        "summary": "Update a user",
-        "description": "Update a user's first name, last name, username and password, if a user wants to update their password, the three password fields are required",
-        "operationId": "updateUser",
-
-        "parameters": [
-          {
-            "name": "email",
-            "in": "path",
-            "description": "Email of the account, this is required",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-
-          {
-            "name": "username",
-            "in": "path",
-            "description": "Username of account",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-
-          {
-            "name": "first_name",
-            "in": "path",
-            "description": "First name of account",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "last_name",
-            "in": "path",
-            "description": "Last name of account",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "current_password",
-            "in": "path",
-            "description": "Current password of account",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "new_password",
-            "in": "path",
-            "description": "New password to be set",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "confirm_password",
-            "in": "path",
-            "description": "Repeat of password to be set",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-
-        "responses": {
-          "200": {
-            "description": "user successfully updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
+    "host": "localhost:9000",
+    "basePath": "/api/v1/",
+    "paths": {
+        "/admin/users": {
+            "get": {
+                "description": "List all users",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "List all users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.User"
+                            }
+                        }
+                    }
                 }
-              }
             }
-          },
-          "500": {
-            "description": "unable to update user, Message will be specified",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
+        },
+        "/api/v1/health": {
+            "get": {
+                "description": "Responds with the server status as JSON.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Checks the status of the server",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utility.Response"
+                        }
+                    }
                 }
-              }
+            },
+            "post": {
+                "description": "Send a dummy post request to test the status of the server",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Checks the status of the server",
+                "parameters": [
+                    {
+                        "description": "Ping JSON",
+                        "name": "ping",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Ping"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utility.Response"
+                        }
+                    }
+                }
             }
-          }
+        },
+        "/forgot-password": {
+            "post": {
+                "description": "Send a dummy post request to test the status of the server",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Forgot Password"
+                ],
+                "summary": "Checks the status of the forgot passoword",
+                "parameters": [
+                    {
+                        "description": "Ping JSON",
+                        "name": "ping",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.PasswordForgot"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utility.Response"
+                        }
+                    }
+                }
+            }
         }
-      }
     },
-
-    "model.User": {
-      "type": "object",
-      "required": ["email", "password", "username"],
-      "properties": {
-        "email": {
-          "type": "string"
+    "definitions": {
+        "model.PasswordForgot": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
         },
-        "first_name": {
-          "type": "string"
+        "model.Ping": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
         },
-        "id": {
-          "type": "string"
+        "model.User": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "date_created": {
+                    "type": "string"
+                },
+                "date_updated": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "profile_key": {
+                    "type": "string"
+                },
+                "profile_url": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
         },
-        "last_name": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        },
-        "profile_key": {
-          "type": "string"
-        },
-        "profile_url": {
-          "type": "string"
-        },
-        "username": {
-          "type": "string"
+        "utility.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "error": {
+                    "description": "for errors that occur even if request is successful"
+                },
+                "extra": {},
+                "message": {
+                    "type": "string"
+                },
+                "name": {
+                    "description": "name of the error",
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
         }
-      }
-    },
-    "utility.Response": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "integer"
-        },
-        "data": {},
-        "error": {
-          "description": "for errors that occur even if request is successful"
-        },
-        "extra": {},
-        "message": {
-          "type": "string"
-        },
-        "name": {
-          "description": "name of the error",
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        }
-      }
     }
-  }
 }

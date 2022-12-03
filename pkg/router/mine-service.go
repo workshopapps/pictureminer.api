@@ -21,3 +21,13 @@ func MineService(r *gin.Engine, validate *validator.Validate, ApiVersion string,
 	}
 	return r
 }
+
+func DownLoadCsv(r *gin.Engine, validate *validator.Validate, ApiVersion string, logger *utility.Logger) *gin.Engine {
+	mineservice := mineservice.Controller{Validate: validate, Logger: logger}
+	authUrl := r.Group(fmt.Sprintf("/api/%v", ApiVersion))
+	{
+		authUrl.GET("/csv-service/download/:batchid", mineservice.DownloadCsv)
+	}
+
+	return r
+}
