@@ -12,14 +12,12 @@ s3:
   AWSAccessKeyID: "AKIAXOMDBDAFLLTWLU4Y"
   AWSSecretAccessKey: "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"
   BucketName: "miner-pictures"
+  ProfilePictureBucketName : "miner-profile-pic"
 ImaggaAPI:
   URL: "https://api.imagga.com/v2/tags"
   Auth: "Basic YWNjXzRjODM4N2MxZGM5YWNkOTowODNjNTk5YmMwMTlmYjFlMjJjNTM4NWIzMTJiZjkxYg=="
 NotifyEmail:
   Email: "hng9.discripto@gmail.com"
   Password: "pzajnkgwvsrnxhdj"
-  AWSAccessKeyID : "AKIAXOMDBDAFLLTWLU4Y"
-  AWSSecretAccessKey : "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"
-  BucketName : "miner-pictures"
 python: 
   microservicehost: "http://178.128.242.94/caption-generator"
