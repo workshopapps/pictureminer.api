@@ -25,6 +25,13 @@ const (
 	BatchDescription = "description"
 	BatchTags        = "tags"
 	StatusOngoing    = "ongoing"
+	StatusDone       = "done"
+)
+
+var (
+	ERRNoURLsInJSON       = errors.New("no image urls specified in json file/ no csv file")
+	ERRNoURLsInCSV        = errors.New("no urls in CSV")
+	ERRURLFieldNotPresent = errors.New("url field not present in csv")
 )
 
 var (

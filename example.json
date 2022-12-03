@@ -1,0 +1,9 @@
+{
+    "name": "example",
+    "description": "this is an example file",
+    "tags": [
+        "string",
+        "string",
+        "hello"
+    ]
+}
