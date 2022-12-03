@@ -16,6 +16,39 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin/mined-images": {
+            "get": {
+                "description": "this returns the mined images of all users",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Mined Images"
+                ],
+                "summary": "this returns the mined images of all users",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.MinedImage"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/admin/users": {
             "get": {
                 "description": "List all users",
@@ -118,9 +151,69 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/login": {
+            "post": {
+                "description": "Logs in a User",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "summary": "Login User",
+                "parameters": [
+                    {
+                        "description": "User Login",
+                        "name": "User",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UserLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.UserLogin"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "model.MinedImage": {
+            "type": "object",
+            "properties": {
+                "dateCreated": {
+                    "type": "string"
+                },
+                "dateModified": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imageKey": {
+                    "type": "string"
+                },
+                "imageName": {
+                    "type": "string"
+                },
+                "imagePath": {
+                    "type": "string"
+                },
+                "textContent": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "string"
+                }
+            }
+        },
         "model.PasswordForgot": {
             "type": "object",
             "required": [
@@ -176,6 +269,21 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.UserLogin": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 }
             }

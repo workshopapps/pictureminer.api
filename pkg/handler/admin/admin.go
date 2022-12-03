@@ -36,7 +36,14 @@ func (base *Controller) GetUsers(c *gin.Context) {
 
 }
 
-// this returns the mined images of all users
+// GetAllMinedImages          godoc
+// @Summary     this returns the mined images of all users
+// @Description this returns the mined images of all users
+// @Tags        Mined Images
+// @Produce     json
+// @Param Authorization header string true "insert your access token" default(Bearer <Add access token here>)
+// @Success     200  {object} []model.MinedImage
+// @Router      /admin/mined-images [get]
 func (base *Controller) GetAllMinedImages(c *gin.Context) {
 
 	secretKey := config.GetConfig().Server.Secret

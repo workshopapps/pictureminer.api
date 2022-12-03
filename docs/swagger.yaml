@@ -1,5 +1,24 @@
 basePath: /api/v1/
 definitions:
+  model.MinedImage:
+    properties:
+      dateCreated:
+        type: string
+      dateModified:
+        type: string
+      id:
+        type: string
+      imageKey:
+        type: string
+      imageName:
+        type: string
+      imagePath:
+        type: string
+      textContent:
+        type: string
+      userID:
+        type: string
+    type: object
   model.PasswordForgot:
     properties:
       email:
@@ -39,6 +58,16 @@ definitions:
     - password
     - username
     type: object
+  model.UserLogin:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
   utility.Response:
     properties:
       code:
@@ -62,6 +91,28 @@ info:
   title: Minergram
   version: "1.0"
 paths:
+  /admin/mined-images:
+    get:
+      description: this returns the mined images of all users
+      parameters:
+      - default: Bearer <Add access token here>
+        description: insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.MinedImage'
+            type: array
+      summary: this returns the mined images of all users
+      tags:
+      - Mined Images
   /admin/users:
     get:
       description: List all users
@@ -129,6 +180,26 @@ paths:
       summary: Checks the status of the forgot passoword
       tags:
       - Forgot Password
+  /login:
+    post:
+      description: Logs in a User
+      parameters:
+      - description: User Login
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserLogin'
+      summary: Login User
+      tags:
+      - Login
 schemes:
 - http
 swagger: "2.0"
