@@ -90,6 +90,28 @@ paths:
               schema:
                 type: object
 
+  /admin/mined-images:
+    get:
+      tags: -a
+      summary: Get all mined Images
+      description: Get all mined Images
+      operationId: getmineImages
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: user successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+        "500":
+          description: unable to delete user
+          content:
+            application/json:
+              schema:
+                type: object
+
 schemes:
   - http
 swagger: "2.0"
