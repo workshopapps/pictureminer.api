@@ -139,6 +139,48 @@ func (base *Controller) ForgotPassword(c *gin.Context) {
 	c.JSON(200, object)
 }
 
+func (base *Controller) UpdateProfilePicture(c *gin.Context) {
+
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	userId, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	if c.ContentType() != "multipart/form-data" {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "file is not present"})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	image, imageHeader, err := c.Request.FormFile("image")
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not parse file", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+	defer image.Close()
+
+	if !utility.ValidImageFormat(imageHeader.Filename) {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file", nil, gin.H{"error": "file is not an image"})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	picturePath, err := user.ProfilePictureServiceUpload(userId, image, imageHeader.Filename)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "undefined error", nil, err.Error())
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "Profile picture upload successful", gin.H{"profile_url": picturePath})
+	c.JSON(http.StatusOK, rd)
+}
+
 func (base *Controller) UpdateUser(c *gin.Context) {
 	secretKey := config.GetConfig().Server.Secret
 	token := utility.ExtractToken(c)
@@ -150,9 +192,7 @@ func (base *Controller) UpdateUser(c *gin.Context) {
 	}
 
 	var reqBody model.UpdateUser
-
-	err = c.Bind(&reqBody)
-	if err != nil {
+	if err = c.Bind(&reqBody); err != nil {
 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind user update details", err, nil)
 		c.JSON(http.StatusBadRequest, rd)
 		return
@@ -165,8 +205,7 @@ func (base *Controller) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	statusCode,err := user.UpdateUserService(reqBody)
-
+	statusCode, err := user.UpdateUserService(reqBody)
 	if err != nil {
 		rd := utility.BuildErrorResponse(statusCode, "error", "user update failed", gin.H{"error": err.Error()}, nil)
 		c.JSON(statusCode, rd)
