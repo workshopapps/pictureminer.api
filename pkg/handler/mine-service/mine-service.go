@@ -18,6 +18,38 @@ type Controller struct {
 	Logger   *utility.Logger
 }
 
+func (base *Controller) DemoMineImage(c *gin.Context) {
+	if c.ContentType() != "multipart/form-data" {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "file is not present"})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	image, imageHeader, err := c.Request.FormFile("image")
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not parse file", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+	defer image.Close()
+
+	if !validImageFormat(imageHeader.Filename) {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file", nil, gin.H{"error": "file is not an image"})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	minedImage, err := mineservice.DemoMineImage(image, imageHeader.Filename)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "undefined error", nil, err.Error())
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "mine image successful", minedImage)
+	c.JSON(http.StatusOK, rd)
+}
+
 func (base *Controller) MineImageUpload(c *gin.Context) {
 
 	secretKey := config.GetConfig().Server.Secret

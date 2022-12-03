@@ -10,6 +10,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/internal/constants"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
+	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/s3"
 	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -24,8 +25,13 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 	}
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+
+	profile_url, profile_key := s3.DefaultProfile()
+
 	user.Password = string(hash)
 	user.ID = primitive.NewObjectID()
+	user.ProfileUrl = profile_url
+	user.ProfileKey = profile_key
 
 	// save to DB
 	database := config.GetConfig().Mongodb.Database
@@ -121,7 +127,7 @@ func ForgotPassword(reqBody model.PasswordForgot) (int, error) {
 	if err != nil {
 		return 404, fmt.Errorf("user does not exist: %s", err.Error())
 	}
-	
+
 	var w http.ResponseWriter
 	var r *http.Request
 
@@ -148,4 +154,70 @@ func getUserFromDB(email string) (model.User, error) {
 
 func isValidPassword(userPassword, providedPassword string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(providedPassword)) == nil
+}
+
+
+func UpdateUserService(user model.UpdateUser) (int, error) {
+	database := config.GetConfig().Mongodb.Database
+	
+	filter := bson.D{{Key: "email", Value: user.Email}}
+	if len(user.LastName)>0 {
+		update:= bson.M{ "$set": bson.M{"last_name" :user.LastName }}
+		err:= UpdateFunc(database, filter, update)
+		if err != nil {return 400, err}
+	}
+
+	if len(user.FirstName)>0 {
+		update:= bson.M{"$set": bson.M{"first_name" :user.FirstName}}
+		err:= UpdateFunc(database, filter, update)
+		if err != nil {return 400, err}
+	}
+
+	if len(user.Email)>0 {
+		update:= bson.M{"$set": bson.M{"email" :user.Email}}
+		err:= UpdateFunc(database, filter, update)
+		if err != nil {return 400, err}
+	}
+
+	if len(user.UserName)>0 {
+		update:= bson.M{"$set": bson.M{"username" :user.UserName}}
+		err:= UpdateFunc(database, filter, update)
+		if err != nil { return 400, err}
+	}
+
+	if len(user.NewPassword)>0{
+		err:=CheckPasswords(user)
+		if err != nil { return 400, err}
+
+		hash, _ := bcrypt.GenerateFromPassword([]byte(user.NewPassword), 10)
+		user.NewPassword = string(hash)
+		update:= bson.M{"$set": bson.M{"password" :user.NewPassword}}
+		err = UpdateFunc(database, filter, update)
+		if err != nil { return 400, err}
+	}
+
+	return 200,nil
+}
+
+func UpdateFunc(db string,filter bson.D, update bson.M) error {
+	userCollection := mongodb.GetCollection(mongodb.Connection(), db, constants.UserCollection)
+	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
+	return err
+}
+
+func CheckPasswords(user model.UpdateUser) error  {
+		userDocument, err := getUserFromDB(user.Email)
+		if len(user.CurrentPassword) < 0 {
+			err:= errors.New("Provide current password")
+			return  err
+		}
+		if !isValidPassword(userDocument.Password, user.CurrentPassword){
+			err:= errors.New("Password invalid")
+			return  err
+		}	
+		if user.NewPassword != user.ConfirmPassword{
+			err:= errors.New("Passwords do not match")
+			return  err
+		}
+	return err
 }
