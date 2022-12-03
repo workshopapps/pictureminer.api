@@ -15,6 +15,13 @@ type Controller struct {
 	Logger   *utility.Logger
 }
 
+// GetUsers godoc
+// @Summary      List all users
+// @Description  List all users
+// @Tags         users
+// @Produce		json
+// @Success      200  {object}  []model.User
+// @Router       /admin/users [get]
 func (base *Controller) GetUsers(c *gin.Context) {
 
 	users, err := admin.GetUsers()

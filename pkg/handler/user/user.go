@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/service/user"
 	"github.com/workshopapps/pictureminer.api/utility"
@@ -136,4 +137,81 @@ func (base *Controller) ForgotPassword(c *gin.Context) {
 
 	object := utility.BuildSuccessResponse(200, "password reset success", gin.H{})
 	c.JSON(200, object)
+}
+
+func (base *Controller) UpdateProfilePicture(c *gin.Context) {
+
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	userId, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	if c.ContentType() != "multipart/form-data" {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "file is not present"})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	image, imageHeader, err := c.Request.FormFile("image")
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not parse file", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+	defer image.Close()
+
+	if !utility.ValidImageFormat(imageHeader.Filename) {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file", nil, gin.H{"error": "file is not an image"})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	picturePath, err := user.ProfilePictureServiceUpload(userId, image, imageHeader.Filename)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "undefined error", nil, err.Error())
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "Profile picture upload successful", gin.H{"profile_url": picturePath})
+	c.JSON(http.StatusOK, rd)
+}
+
+func (base *Controller) UpdateUser(c *gin.Context) {
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	_, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	var reqBody model.UpdateUser
+	if err = c.Bind(&reqBody); err != nil {
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind user update details", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validate.Struct(&reqBody)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validate), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	statusCode, err := user.UpdateUserService(reqBody)
+	if err != nil {
+		rd := utility.BuildErrorResponse(statusCode, "error", "user update failed", gin.H{"error": err.Error()}, nil)
+		c.JSON(statusCode, rd)
+		return
+	}
+
+	object := utility.BuildSuccessResponse(200, "User update successful", gin.H{})
+	c.JSON(statusCode, object)
 }
