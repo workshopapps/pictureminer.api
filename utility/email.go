@@ -6,10 +6,13 @@ import (
 	"net/smtp"
 	"os"
 	"path/filepath"
+
+	"github.com/joho/godotenv"
 )
 
 func EmailSender(senderEmail string, password string, receiverEmail []string, subject string, body string) Response {
 	//connect
+	godotenv.Load(".env", "sample.env")
 	host := os.Getenv("host")
 	port := os.Getenv("port")
 	address := host + ":" + port
@@ -48,7 +51,6 @@ func ParseTemplateDir(dir string) (*template.Template, error) {
 
 	return template.ParseFiles(paths...)
 }
-
 
 type EmailData struct {
 	URL       string

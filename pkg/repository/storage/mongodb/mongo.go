@@ -137,3 +137,27 @@ func CountFromCollection(user_id primitive.ObjectID) (int64, error) {
 	// }
 	return count, nil
 }
+
+func MongoUpdate(id string, updateEntries map[string]interface{}, collection string) (*mongo.UpdateResult, error) {
+	c := getCollection(collection)
+	user_id, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	update := make(bson.M)
+
+	for i, j := range updateEntries {
+		update[i] = j
+	}
+
+	db_data := bson.M{"$set": update}
+	result, err := c.UpdateByID(context.TODO(), user_id, db_data)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}

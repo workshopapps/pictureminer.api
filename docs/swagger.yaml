@@ -24,6 +24,29 @@ definitions:
       email:
         type: string
     type: object
+  model.User:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      profile_key:
+        type: string
+      profile_url:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
   utility.Response:
     properties:
       code:
@@ -47,9 +70,15 @@ info:
   title: Minergram
   version: "1.0"
 paths:
+<<<<<<< HEAD
   /admin/mined-images:
     get:
       description: this returns the mined images of all users
+=======
+  /admin/users:
+    get:
+      description: List all users
+>>>>>>> fd55bf3a6a78a333fafa32cd3a84e43150f39400
       produces:
       - application/json
       responses:
@@ -57,11 +86,19 @@ paths:
           description: OK
           schema:
             items:
+<<<<<<< HEAD
               $ref: '#/definitions/model.MinedImage'
             type: array
       summary: this returns the mined images of all users
       tags:
       - Mined Images
+=======
+              $ref: '#/definitions/model.User'
+            type: array
+      summary: List all users
+      tags:
+      - users
+>>>>>>> fd55bf3a6a78a333fafa32cd3a84e43150f39400
   /api/v1/health:
     get:
       description: Responds with the server status as JSON.

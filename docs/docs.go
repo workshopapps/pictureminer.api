@@ -16,23 +16,39 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+<<<<<<< HEAD
         "/admin/mined-images": {
             "get": {
                 "description": "this returns the mined images of all users",
+=======
+        "/admin/users": {
+            "get": {
+                "description": "List all users",
+>>>>>>> fd55bf3a6a78a333fafa32cd3a84e43150f39400
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
+<<<<<<< HEAD
                     "Mined Images"
                 ],
                 "summary": "this returns the mined images of all users",
+=======
+                    "users"
+                ],
+                "summary": "List all users",
+>>>>>>> fd55bf3a6a78a333fafa32cd3a84e43150f39400
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
+<<<<<<< HEAD
                                 "$ref": "#/definitions/model.MinedImage"
+=======
+                                "$ref": "#/definitions/model.User"
+>>>>>>> fd55bf3a6a78a333fafa32cd3a84e43150f39400
                             }
                         }
                     }
@@ -123,6 +139,40 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.User": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "profile_key": {
+                    "type": "string"
+                },
+                "profile_url": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
