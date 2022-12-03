@@ -5,6 +5,29 @@ definitions:
       email:
         type: string
     type: object
+  model.User:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      profile_key:
+        type: string
+      profile_url:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
   utility.Response:
     properties:
       code:
@@ -28,109 +51,53 @@ info:
   title: Minergram
   version: "1.0"
 paths:
+  /admin/users:
+    get:
+      description: List all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+      summary: List all users
+      tags:
+      - users
   /api/v1/health:
     get:
       description: Responds with the server status as JSON.
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/utility.Response"
+            $ref: '#/definitions/utility.Response'
       summary: Checks the status of the server
       tags:
-        - health
+      - health
     post:
       description: Send a dummy post request to test the status of the server
       parameters:
-        - description: Ping JSON
-          in: body
-          name: ping
-          required: true
-          schema:
-            $ref: "#/definitions/model.Ping"
+      - description: Ping JSON
+        in: body
+        name: ping
+        required: true
+        schema:
+          $ref: '#/definitions/model.Ping'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/utility.Response"
+            $ref: '#/definitions/utility.Response'
       summary: Checks the status of the server
       tags:
-        - health
-  /update-user:
-    put:
-      tags:
-        - user
-      summary: Update a user
-      description: Update a user
-      operationId: updateUser
-      parameters:
-        - name: email
-          in: path
-          description: "Email of the account, this is required"
-          required: true
-          schema:
-            type: string
-
-        - name: username
-          in: path
-          description: "Username of account"
-          required: false
-          schema:
-            type: string
-
-        - name: first_name
-          in: path
-          description: "First name of account"
-          required: false
-          schema:
-            type: string
-
-        - name: last_name
-          in: path
-          description: "Last name of account"
-          required: false
-          schema:
-            type: string
-        
-        - name: current_password
-          in: path
-          description: "Current password of account"
-          required: false
-          schema:
-            type: string
-
-        - name: new_password
-          in: path
-          description: "New password to be set"
-          required: false
-          schema:
-            type: string
-
-        - name: confirm_password
-        in: path
-        description: "Repeat of password to be set"
-        required: false
-        schema:
-          type: string
-
-      responses:
-        "200":
-          description: user successfully updated
-          content:
-            application/json:
-              schema:
-                type: object
-
-        "500":
-          description: unable to update user
-          content:
-            application/json:
-              schema:
-                type: object
+      - health
 schemes:
-  - http
+- http
 swagger: "2.0"

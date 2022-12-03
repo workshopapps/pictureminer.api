@@ -34,7 +34,7 @@ func (base *Controller) DemoMineImage(c *gin.Context) {
 	}
 	defer image.Close()
 
-	if !validImageFormat(imageHeader.Filename) {
+	if !utility.ValidImageFormat(imageHeader.Filename) {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file", nil, gin.H{"error": "file is not an image"})
 		c.JSON(http.StatusBadRequest, rd)
 		return
@@ -76,7 +76,7 @@ func (base *Controller) MineImageUpload(c *gin.Context) {
 	}
 	defer image.Close()
 
-	if !validImageFormat(imageHeader.Filename) {
+	if !utility.ValidImageFormat(imageHeader.Filename) {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file", nil, gin.H{"error": "file is not an image"})
 		c.JSON(http.StatusBadRequest, rd)
 		return
@@ -132,7 +132,7 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 
 	filename := getFileName(req.Url)
 
-	if !validImageFormat(filename) {
+	if !utility.ValidImageFormat(filename) {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file", nil, gin.H{"error": "file is not an image"})
 		c.JSON(http.StatusBadRequest, rd)
 		return
@@ -169,11 +169,6 @@ func (base *Controller) GetMinedImages(c *gin.Context) {
 
 	c.JSON(http.StatusOK, minedImages)
 
-}
-
-func validImageFormat(filename string) bool {
-	ext := strings.ToLower(filepath.Ext(filename))
-	return ext == ".png" || ext == ".jpg" || ext == ".jpeg"
 }
 
 func getFileName(url string) string {
