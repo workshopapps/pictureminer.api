@@ -2,15 +2,17 @@ package main
 
 import (
 	"log"
-	"github.com/workshopapps/pictureminer.api/internal/config"
+
 	"github.com/go-playground/validator/v10"
+	"github.com/workshopapps/pictureminer.api/internal/config"
+	sentry "github.com/workshopapps/pictureminer.api/pkg/middleware"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/s3"
 	"github.com/workshopapps/pictureminer.api/utility"
 
 	// "github.com/workshopapps/pictureminer.api/pkg/repository/storage/redis"
+	_ "github.com/workshopapps/pictureminer.api/docs"
 	"github.com/workshopapps/pictureminer.api/pkg/router"
-	_"github.com/workshopapps/pictureminer.api/docs"
 )
 
 func init() {
@@ -19,6 +21,7 @@ func init() {
 	mongodb.ConnectToDB()
 
 	s3.ConnectAws()
+	sentry.SentryLogger()
 }
 
 // @title           Minergram

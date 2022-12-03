@@ -14,6 +14,7 @@ type Configuration struct {
 	Redis   RedisConfiguration
 	S3      S3StorageConfiguration
 	Python  MicroserviceConfiguration
+	Sentry  SentryConfiguration
 }
 
 // Setup initialize configuration
