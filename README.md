@@ -384,7 +384,7 @@ const  uploadImage  =  async  file  =>  {
 <br>
 <br>
 
-# Version 2 of Discripto app
+# Version 2.0 of Discripto app
 
 Our website link: https://minergram.netlify.app
 Our API link: https://discripto.hng.tech/api1/
@@ -392,10 +392,10 @@ Our API link: https://discripto.hng.tech/api1/
 At this stage our app has basically the same functionality. But this time We are focusing on commercializing the app. Here we have new features
 
 <ul>
-<li>User should be able upload images in batches while the system sorts the images based on tags provided by the Username</li>
-<li>User can Input the Image through various formats and receive output through preferred formats</li>
-<li>A public API Documentation is provided for Use for third party consumers</li>
-<li>A friendly payment system integration</li>
+<li>User should be able upload images in batches while the system sorts the images based on tags provided by the User.</li>
+<li>User can input the image through various formats and receive output through preferred formats.</li>
+<li>A public API Documentation is provided for use by third party consumers.</li>
+<li>A friendly payment system integration.</li>
 </ul>
 <br>
 <br>
@@ -403,7 +403,7 @@ At this stage our app has basically the same functionality. But this time We are
 
 # Example 1
 
-Mine Images through csv files: A csv file as the implies means "Comma separated Values" a file that separates data with commas.
+Mine Images through csv files: A csv file as the implies means "Comma separated Values" a file that separates data with commas. Images can also be mined through various processes like images upload etc following a similar process.
 
 I will be Showing steps of mining Image Using the website
 
@@ -432,7 +432,7 @@ access to our ApI calling</li>
 <h3>
 
 <h3>Authorization Required</h3>
-<h3>Bearer:</h3>
+<h3>Bearer:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjkyMjc2MDEsImlkIjoiT2JqZWN0SUQoXCI2MzdkMTdjOTQxMTg5ZmRjNmJiODkwZWVcIikifQ.sTzq6C2B86w94auIjqjSveJ55E6G8Iwa-E564gUdjrg"</h3>
 <h3>Request Type: POST</h3>
 <br>
 Request Url: <code>https://discripto.hng.tech/api1/ </code>
@@ -485,7 +485,7 @@ Response format:
 <h2><strong>Getting list of sorted Images in a Batch</strong><h2>
 
 <h3>Authorization Required</h3>
-<h3>Bearer:</h3>
+<h3>Bearer: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjkyMjc2MDEsImlkIjoiT2JqZWN0SUQoXCI2MzdkMTdjOTQxMTg5ZmRjNmJiODkwZWVcIikifQ.sTzq6C2B86w94auIjqjSveJ55E6G8Iwa-E564gUdjrg"</h3>
 <h3>Request Type: GET</h3>
 <br>
 Request Url: <code>https://discripto.hng.tech/api1/ </code>
