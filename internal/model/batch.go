@@ -44,8 +44,6 @@ type ProcessBatchAPIResponse struct {
 	Name        string    `json:"name,required"`
 	Description string    `json:"description,omitempty"`
 	Tags        []string  `json:"tags,required"`
-	Images      []string  `json:"images"`
 	Status      string    `json:"status"`
-	Message     string    `json:"message"`
 	DateCreated time.Time `bson:"date_created"`
 }

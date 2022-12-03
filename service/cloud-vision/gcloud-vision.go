@@ -11,7 +11,7 @@ import (
 // ProcessImages processes images in the background using google cloud vision API.
 // It has not been integrated with the code due to an issue with setting up a valid
 // billing account on google cloud.
-func ProcessImages(details *model.ProcessBatchAPIResponse) (*visionpb.BatchAnnotateImagesResponse, error) {
+func ProcessImages(details *model.ProcessBatchAPIResponse, images []string) (*visionpb.BatchAnnotateImagesResponse, error) {
 	ctx := context.TODO()
 
 	// Creates a client.
@@ -21,8 +21,8 @@ func ProcessImages(details *model.ProcessBatchAPIResponse) (*visionpb.BatchAnnot
 	}
 	defer client.Close()
 
-	request := make([]*visionpb.AnnotateImageRequest, 0, len(details.Images))
-	for _, imageURL := range details.Images {
+	request := make([]*visionpb.AnnotateImageRequest, 0, len(images))
+	for _, imageURL := range images {
 		req := &visionpb.AnnotateImageRequest{
 			Image: vision.NewImageFromURI(imageURL),
 			Features: []*visionpb.Feature{

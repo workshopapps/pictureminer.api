@@ -40,7 +40,7 @@ func (base *Controller) ProcessBatchAPI(c *gin.Context) {
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusOK, "mine image successful", result)
+	rd := utility.BuildSuccessResponse(http.StatusOK, "process batch started", result)
 	c.JSON(http.StatusOK, rd)
 }
 
