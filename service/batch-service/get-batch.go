@@ -53,7 +53,7 @@ func GetBatchImages(batchID string) (interface{}, error) {
 	}
 
 	mapper := map[string][]string{}
-	mapper[Untagged] = []string{}
+	mapper[Untagged] = nil
 	for _, tag := range batch.Tags {
 		mapper[tag] = nil
 	}
