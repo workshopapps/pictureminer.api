@@ -1,4 +1,4 @@
-package mineservice
+package batchservice
 
 import (
 	"context"
