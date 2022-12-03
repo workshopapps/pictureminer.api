@@ -13,6 +13,4 @@ s3:
   AWSSecretAccessKey : "yepL/xP02oCuadGiXnWWkaKF5PP4ORZKKBxNDRDy"
   BucketName : "miner-pictures"
 python: 
-  microservicehost: "https://yiowpv.deta.dev/api/microservice/content"
-  # Change when the microservice host for prompt is available
-  microserviceprompthost: "https://yiowpv.deta.dev/api/microservice/content"
+  microservicehost: "http://178.128.242.94/caption-generator"
