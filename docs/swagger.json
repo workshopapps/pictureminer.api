@@ -1,6 +1,6 @@
 {
     "schemes": [
-        "http"
+        "https"
     ],
     "swagger": "2.0",
     "info": {
@@ -9,7 +9,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:9000",
+    "host": "discripto.hng.tech/api1",
     "basePath": "/api/v1/",
     "paths": {
         "/admin/mined-images": {
