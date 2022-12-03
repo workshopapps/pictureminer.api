@@ -71,7 +71,7 @@ func fetchLabelsForURLS(urls []string) []Label {
 	for _, url := range urls {
 		label, err := getLabel(httpClient, ImaggaURL, url, AuthToken, Limit, Threshold)
 		if err == nil {
-			labels = append(labels, label)g
+			labels = append(labels, label)
 		}
 	}
 	return labels

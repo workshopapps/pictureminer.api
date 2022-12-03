@@ -19,7 +19,7 @@ func GetBatchesService(userID string) ([]model.Batch, error) {
 		return nil, err
 	}
 
-	var batches []model.Batch
+	batches := []model.Batch{}
 	cursor.All(ctx, &batches)
 
 	return batches, nil

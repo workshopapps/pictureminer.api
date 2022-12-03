@@ -24,6 +24,7 @@ func Setup(validate *validator.Validate, logger *utility.Logger) *gin.Engine {
 	Health(r, validate, ApiVersion, logger)
 	Auth(r, validate, ApiVersion, logger)
 	MineServiceUpload(r, validate, ApiVersion, logger)
+	ProcessBatch(r, validate, ApiVersion, logger)
 	Admin(r, validate, ApiVersion, logger)
 	SwaggerDocs(r, ApiVersion)
 
