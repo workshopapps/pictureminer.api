@@ -1,4 +1,4 @@
-package mineservice
+package batch
 
 import (
 	"net/http"
@@ -6,10 +6,43 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/workshopapps/pictureminer.api/internal/config"
-	mineservice "github.com/workshopapps/pictureminer.api/service/mine-service"
+	batchservice "github.com/workshopapps/pictureminer.api/service/batch-service"
 	"github.com/workshopapps/pictureminer.api/utility"
 )
+
+type Controller struct {
+	Validate *validator.Validate
+	Logger   *utility.Logger
+}
+
+func (base *Controller) ProcessBatchAPI(c *gin.Context) {
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	userId, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	if c.ContentType() != "multipart/form-data" {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "file is not present"})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	result, err := batchservice.ProcessBatchAPI(userId.(string), c.Request)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "undefined error", nil, err.Error())
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "process batch started", result)
+	c.JSON(http.StatusOK, rd)
+}
 
 func (base *Controller) ProcessBatch(c *gin.Context) {
 	secretKey := config.GetConfig().Server.Secret
@@ -67,7 +100,7 @@ func (base *Controller) ProcessBatch(c *gin.Context) {
 		return
 	}
 
-	res, code, err := mineservice.ProcessBatchService(id, batchName, desc, tags, file)
+	res, code, err := batchservice.ProcessBatchService(id, batchName, desc, tags, file)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "failed", "an error occurred", gin.H{"error": err.Error()}, nil)
 		c.JSON(code, rd)
@@ -116,7 +149,7 @@ func (base *Controller) ProcessBatchCSV(c *gin.Context) {
 		return
 	}
 
-	res, code, err := mineservice.ProcessBatchCSVService(id, file)
+	res, code, err := batchservice.ProcessBatchCSVService(id, file)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "failed", "an error occurred", gin.H{"error": err.Error()}, nil)
 		c.JSON(code, rd)
@@ -146,7 +179,7 @@ func (base *Controller) GetBatches(c *gin.Context) {
 		return
 	}
 
-	batches, err := mineservice.GetBatchesService(id)
+	batches, err := batchservice.GetBatchesService(id)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could retrive batches", gin.H{"error": err.Error()}, nil)
 		c.JSON(http.StatusBadRequest, rd)

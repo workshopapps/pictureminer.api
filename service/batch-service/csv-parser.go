@@ -1,4 +1,4 @@
-package mineservice
+package batchservice
 
 import (
 	"encoding/csv"
@@ -30,7 +30,7 @@ func checkExtension(url string) bool {
 	return false
 }
 
-func ParseCSVfile(file io.Reader) ([]string, error) {
+func parseCSVfile(file io.Reader) ([]string, error) {
 
 	var urls []string // slice to store urls
 

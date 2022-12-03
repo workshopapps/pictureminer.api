@@ -31,3 +31,19 @@ type BatchImage struct {
 	URL     string             `bson:"url" json:"url"`
 	Tag     string             `bson:"tag" json:"tag"`
 }
+
+type ProcessBatchAPIRequest struct {
+	Name        string   `json:"name,required"`
+	Description string   `json:"description,omitempty"`
+	Tags        []string `json:"tags,required"`
+	Images      []string `json:"images"`
+}
+
+type ProcessBatchAPIResponse struct {
+	ID          string    `json:"id"`
+	Name        string    `json:"name,required"`
+	Description string    `json:"description,omitempty"`
+	Tags        []string  `json:"tags,required"`
+	Status      string    `json:"status"`
+	DateCreated time.Time `bson:"date_created"`
+}
