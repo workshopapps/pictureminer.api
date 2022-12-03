@@ -14,7 +14,7 @@ func CreateToken(key, val, secretkey string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["authorized"] = true
-	claims["exp"] = time.Now().Add(1 * time.Hour).Unix()
+	claims["exp"] = time.Now().Add(10 * time.Hour).Unix()
 	claims[key] = val
 
 	// Sign and get the complete encoded token as a string using the secret

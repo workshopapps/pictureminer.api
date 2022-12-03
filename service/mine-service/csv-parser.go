@@ -2,9 +2,22 @@ package mineservice
 
 import (
 	"encoding/csv"
-	"mime/multipart"
+	"errors"
+	"io"
 	"strings"
 )
+
+// returns the index of the url
+func getUrlHeaderIndex(headers []string) (int, error) {
+	valid_headers := []string{"url", "urls", "image", "images"}
+
+	for i, head := range headers {
+		if head == valid_headers[0] || head == valid_headers[1] || head == valid_headers[2] || head == valid_headers[3] {
+			return i, nil
+		}
+	}
+	return 0, errors.New("no valid csv header present")
+}
 
 func checkExtension(url string) bool {
 	mime_types := []string{".png", ".jpg", ".jpeg"}
@@ -17,15 +30,28 @@ func checkExtension(url string) bool {
 	return false
 }
 
-// func ParseCSVfile(file *os.File) []string {
-func ParseCSVfile(file multipart.File) ([]string, error) {
+func ParseCSVfile(file io.Reader) ([]string, error) {
 
-	var urls []string
+	var urls []string // slice to store urls
 
 	// Read CSV file
 	reader := csv.NewReader(file)
 
 	records, err := reader.ReadAll()
+	if err != nil {
+		return []string{}, err
+	}
+
+	var headers []string // csv headers
+	for row, column := range records {
+		if row == 0 {
+			for _, v := range column {
+				headers = append(headers, v)
+			}
+		}
+	}
+
+	index, err := getUrlHeaderIndex(headers)
 	if err != nil {
 		return []string{}, err
 	}
@@ -36,7 +62,8 @@ func ParseCSVfile(file multipart.File) ([]string, error) {
 			continue
 		}
 
-		url := column[0]
+		url := column[index]
+
 		// check if url is blank, then skip
 		if url == "" {
 			continue
@@ -48,5 +75,6 @@ func ParseCSVfile(file multipart.File) ([]string, error) {
 		}
 
 	}
+
 	return urls, nil
 }
