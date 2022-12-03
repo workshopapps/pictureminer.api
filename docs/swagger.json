@@ -9,40 +9,26 @@
   },
   "host": "localhost:9000",
   "basePath": "/api/v1/",
-  "definitions": {
-    "model.Ping": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
+  "paths": {
+    "/admin/users": {
+      "get": {
+        "description": "List all users",
+        "produces": ["application/json"],
+        "tags": ["users"],
+        "summary": "List all users",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/model.User"
+              }
+            }
+          }
         }
       }
     },
-    "utility.Response": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "integer"
-        },
-        "data": {},
-        "error": {
-          "description": "for errors that occur even if request is successful"
-        },
-        "extra": {},
-        "message": {
-          "type": "string"
-        },
-        "name": {
-          "description": "name of the error",
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        }
-      }
-    }
-  },
-  "paths": {
     "/api/v1/health": {
       "get": {
         "description": "Responds with the server status as JSON.",
@@ -81,6 +67,16 @@
               "$ref": "#/definitions/utility.Response"
             }
           }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "model.Ping": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
         }
       }
     },
@@ -180,6 +176,60 @@
               }
             }
           }
+        }
+      }
+    },
+
+    "model.User": {
+      "type": "object",
+      "required": ["email", "password", "username"],
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "profile_key": {
+          "type": "string"
+        },
+        "profile_url": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    },
+    "utility.Response": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "data": {},
+        "error": {
+          "description": "for errors that occur even if request is successful"
+        },
+        "extra": {},
+        "message": {
+          "type": "string"
+        },
+        "name": {
+          "description": "name of the error",
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
         }
       }
     }

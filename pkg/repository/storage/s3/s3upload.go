@@ -95,10 +95,10 @@ func UploadProfileImage(file io.ReadCloser, filename string) (string, error) {
 // This checks if an s3 bucket key exists
 func keyExists(key string) (bool, error) {
 	svc := s3.New(s3session)
-	MyBucket = config.GetConfig().S3.BucketName
+	ProfilePictureBucket = config.GetConfig().S3.ProfilePictureBucketName
 
 	_, err := svc.HeadObject(&s3.HeadObjectInput{
-		Bucket: aws.String(MyBucket),
+		Bucket: aws.String(ProfilePictureBucket),
 		Key:    aws.String(key),
 	})
 
@@ -118,19 +118,20 @@ func keyExists(key string) (bool, error) {
 // This sets up an s3 bucket key named "default" for the client
 // it also sets up a default profile picture for new users.
 func DefaultProfile() (profile_url, profile_key string) {
-	//func DefaultProfile() (string, string) {
 	cwd, _ := os.Getwd()
 	file, _ := os.Open(fmt.Sprintf("%s/static/avatar.jpg", cwd))
 	defer file.Close()
 
-	profile_url = fmt.Sprintf("https://miner-pictures.s3.amazonaws.com/%s", constants.S3_generic_avatar_key)
+	ProfilePictureBucket = config.GetConfig().S3.ProfilePictureBucketName
+
+	profile_url = fmt.Sprintf("https://%s.s3.amazonaws.com/%s", ProfilePictureBucket, constants.S3_generic_avatar_key)
 	profile_key = uuid.New().String()
 
 	exists, _ := keyExists(constants.S3_generic_avatar_key)
 
 	// if the s3 bucket key "default" doesnt exist, create one
 	if !exists {
-		profile_url, _ := UploadImage(file, constants.S3_generic_avatar_key)
+		profile_url, _ := UploadProfileImage(file, constants.S3_generic_avatar_key)
 		return profile_url, profile_key
 	}
 
