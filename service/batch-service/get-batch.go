@@ -25,7 +25,6 @@ func GetBatchesService(userID string) ([]model.Batch, error) {
 
 	return batches, nil
 }
-
 func GetBatchImages(batchID string) (interface{}, error) {
 	db := config.GetConfig().Mongodb.Database
 	ctx := context.Background()
@@ -41,11 +40,7 @@ func GetBatchImages(batchID string) (interface{}, error) {
 	batchCollection.FindOne(ctx, bson.M{"_id": validBatchID}).Decode(&batch)
 
 	filter := bson.M{"batch_id": batchID}
-	cursor, err := mongodb.SelectFromCollection(ctx, db, constants.BatchImageCollection, filter)
-	if err != nil {
-		return nil, err
-	}
-
+  
 	imgs := []model.BatchImage{}
 	err = cursor.All(ctx, &imgs)
 	if err != nil {
@@ -70,4 +65,20 @@ func GetBatchImages(batchID string) (interface{}, error) {
 	}
 
 	return resp, nil
+  }
+
+func GetImagesInBatch(batchId string ) ([]model.BatchImage, error){
+	db := config.GetConfig().Mongodb.Database
+	ctx := context.Background()
+	filter := bson.M{"batch_id": batchId}
+
+	cursor, err := mongodb.SelectFromCollection(ctx, db, constants.BatchImageCollection, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	batchImages:= []model.BatchImage{}
+	cursor.All(ctx, &batchImages)
+
+	return batchImages, nil
 }
