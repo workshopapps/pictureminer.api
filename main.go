@@ -26,9 +26,9 @@ func init() {
 // @version         1.0
 // @description     A picture mining service API in Go using Gin framework.
 
-// @host      localhost:9000
+// @host      discripto.hng.tech/api1
 // @BasePath  /api/v1/
-// @schemes http
+// @schemes https
 func main() {
 	//Load config
 	logger := utility.NewLogger()

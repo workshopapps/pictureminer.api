@@ -84,7 +84,7 @@ definitions:
       status:
         type: string
     type: object
-host: localhost:9000
+host: discripto.hng.tech/api1
 info:
   contact: {}
   description: A picture mining service API in Go using Gin framework.
@@ -201,5 +201,5 @@ paths:
       tags:
       - Login
 schemes:
-- http
+- https
 swagger: "2.0"
