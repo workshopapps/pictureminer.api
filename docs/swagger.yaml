@@ -1,5 +1,12 @@
 basePath: /api/v1/
 definitions:
+  model.PasswordForgot:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
   model.Ping:
     properties:
       email:
@@ -7,6 +14,10 @@ definitions:
     type: object
   model.User:
     properties:
+      date_created:
+        type: string
+      date_updated:
+        type: string
       email:
         type: string
       first_name:
@@ -98,6 +109,26 @@ paths:
       summary: Checks the status of the server
       tags:
       - health
+  /forgot-password:
+    post:
+      description: Send a dummy post request to test the status of the server
+      parameters:
+      - description: Ping JSON
+        in: body
+        name: ping
+        required: true
+        schema:
+          $ref: '#/definitions/model.PasswordForgot'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utility.Response'
+      summary: Checks the status of the forgot passoword
+      tags:
+      - Forgot Password
 schemes:
 - http
 swagger: "2.0"

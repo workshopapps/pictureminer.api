@@ -87,9 +87,51 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/forgot-password": {
+            "post": {
+                "description": "Send a dummy post request to test the status of the server",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Forgot Password"
+                ],
+                "summary": "Checks the status of the forgot passoword",
+                "parameters": [
+                    {
+                        "description": "Ping JSON",
+                        "name": "ping",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.PasswordForgot"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utility.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "model.PasswordForgot": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Ping": {
             "type": "object",
             "properties": {
@@ -106,6 +148,12 @@ const docTemplate = `{
                 "username"
             ],
             "properties": {
+                "date_created": {
+                    "type": "string"
+                },
+                "date_updated": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },
