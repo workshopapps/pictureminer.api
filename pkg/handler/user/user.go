@@ -46,6 +46,14 @@ func (base *Controller) Signup(c *gin.Context) {
 	c.JSON(200, object)
 }
 
+// Login          godoc
+// @Summary		Login User
+// @Description Logs in a User
+// @Tags        Login
+// @Produce     json
+// @Param User body model.UserLogin true "User Login" model.UserLogin
+// @Success     200  {object} model.UserLogin
+// @Router      /login [post]
 func (base *Controller) Login(c *gin.Context) {
 	// bind user login details to User struct
 	var User model.UserLogin
