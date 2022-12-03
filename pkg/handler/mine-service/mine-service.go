@@ -3,7 +3,6 @@ package mineservice
 import (
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +10,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	mineservice "github.com/workshopapps/pictureminer.api/service/mine-service"
+	batchservice "github.com/workshopapps/pictureminer.api/service/batch-service"
 	"github.com/workshopapps/pictureminer.api/utility"
 )
 
@@ -186,7 +186,7 @@ func (base *Controller) DownloadCsv(c *gin.Context) {
 	// 	return
 	// }
 	batchId := c.Param("batchid")
-	var dummySlice, err = mineservice.GetImagesInBatch(batchId)
+	var dummySlice, err = batchservice.GetImagesInBatch(batchId)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not get images for this batch id", nil, gin.H{"error": err.Error()})
 		c.JSON(http.StatusBadRequest, rd)
