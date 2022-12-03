@@ -9,7 +9,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/utility"
 )
 
-func MineServiceUpload(r *gin.Engine, validate *validator.Validate, ApiVersion string, logger *utility.Logger) *gin.Engine {
+func MineService(r *gin.Engine, validate *validator.Validate, ApiVersion string, logger *utility.Logger) *gin.Engine {
 	mineservice := mineservice.Controller{Validate: validate, Logger: logger}
 
 	authUrl := r.Group(fmt.Sprintf("/api/%v", ApiVersion))
@@ -18,6 +18,7 @@ func MineServiceUpload(r *gin.Engine, validate *validator.Validate, ApiVersion s
 		authUrl.POST("/mine-service/url", mineservice.MineImageUrl)
 		authUrl.GET("/mine-service/get-all", mineservice.GetMinedImages)
 		authUrl.GET("/batch-service/get-all/:batch_id", mineservice.GetBatchResult)
+		authUrl.POST("/mine-service/demo", mineservice.DemoMineImage)
 	}
 	return r
 }

@@ -5,6 +5,29 @@ definitions:
       email:
         type: string
     type: object
+  model.User:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      profile_key:
+        type: string
+      profile_url:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
   utility.Response:
     properties:
       code:
@@ -28,6 +51,21 @@ info:
   title: Minergram
   version: "1.0"
 paths:
+  /admin/users:
+    get:
+      description: List all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+      summary: List all users
+      tags:
+      - users
   /api/v1/health:
     get:
       description: Responds with the server status as JSON.

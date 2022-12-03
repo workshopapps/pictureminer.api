@@ -144,7 +144,7 @@ func GetUserTags(user_id string,batch_id primitive.ObjectID) ([]string, int , er
   var tags []string
   var length int
 
-	batchImagesCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.BatchCollection)
+	batchImagesCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.BatchCollectionMe)
 	filter := bson.D{{"user_id", user_id},{"batch_id", batch_id}}
 
 	batch_collection, err := batchImagesCollection.Find(context.TODO(), filter)
@@ -187,4 +187,28 @@ func GetImageTags(batch_id string) ([]model.ImageCollection, []string, int, erro
         }
     }
      return results, tag,len(tag), err
+}
+
+func MongoUpdate(id string, updateEntries map[string]interface{}, collection string) (*mongo.UpdateResult, error) {
+	c := getCollection(collection)
+	user_id, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	update := make(bson.M)
+
+	for i, j := range updateEntries {
+		update[i] = j
+	}
+
+	db_data := bson.M{"$set": update}
+	result, err := c.UpdateByID(context.TODO(), user_id, db_data)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
