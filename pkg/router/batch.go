@@ -17,6 +17,7 @@ func ProcessBatch(r *gin.Engine, validate *validator.Validate, ApiVersion string
 		authUrl.POST("/batch-service/process-batch", mineservice.ProcessBatch)
 		authUrl.POST("/batch-service/process-batch-csv", mineservice.ProcessBatchCSV)
 		authUrl.GET("/batch-service/get-batches", mineservice.GetBatches)
+		authUrl.GET("/batch-service/images/:batch_id", mineservice.GetBatchImages)
 	}
 	return r
 }

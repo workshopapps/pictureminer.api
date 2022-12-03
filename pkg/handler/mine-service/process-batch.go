@@ -156,3 +156,33 @@ func (base *Controller) GetBatches(c *gin.Context) {
 	c.JSON(http.StatusOK, batches)
 
 }
+
+func (base *Controller) GetBatchImages(c *gin.Context) {
+
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	_, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	// get batch id
+	batchID := c.Param("batch_id")
+	if batchID == "" {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", gin.H{"error": "batch id field missing"}, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	batchImgs, err := mineservice.GetBatchImages(batchID)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not retrive batch images", gin.H{"error": err.Error()}, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	c.JSON(http.StatusOK, batchImgs)
+
+}
