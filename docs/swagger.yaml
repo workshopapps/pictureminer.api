@@ -1,5 +1,24 @@
 basePath: /api/v1/
 definitions:
+  model.MinedImage:
+    properties:
+      dateCreated:
+        type: string
+      dateModified:
+        type: string
+      id:
+        type: string
+      imageKey:
+        type: string
+      imageName:
+        type: string
+      imagePath:
+        type: string
+      textContent:
+        type: string
+      userID:
+        type: string
+    type: object
   model.Ping:
     properties:
       email:
@@ -28,6 +47,21 @@ info:
   title: Minergram
   version: "1.0"
 paths:
+  /admin/mined-images:
+    get:
+      description: this returns the mined images of all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.MinedImage'
+            type: array
+      summary: this returns the mined images of all users
+      tags:
+      - Mined Images
   /api/v1/health:
     get:
       description: Responds with the server status as JSON.

@@ -16,6 +16,29 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin/mined-images": {
+            "get": {
+                "description": "this returns the mined images of all users",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Mined Images"
+                ],
+                "summary": "this returns the mined images of all users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.MinedImage"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/health": {
             "get": {
                 "description": "Responds with the server status as JSON.",
@@ -67,6 +90,35 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.MinedImage": {
+            "type": "object",
+            "properties": {
+                "dateCreated": {
+                    "type": "string"
+                },
+                "dateModified": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imageKey": {
+                    "type": "string"
+                },
+                "imageName": {
+                    "type": "string"
+                },
+                "imagePath": {
+                    "type": "string"
+                },
+                "textContent": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Ping": {
             "type": "object",
             "properties": {
