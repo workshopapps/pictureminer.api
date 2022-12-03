@@ -180,3 +180,38 @@ func (base *Controller) UpdateProfilePicture(c *gin.Context) {
 	rd := utility.BuildSuccessResponse(http.StatusCreated, "Profile picture upload successful", gin.H{"profile_url": picturePath})
 	c.JSON(http.StatusOK, rd)
 }
+
+func (base *Controller) UpdateUser(c *gin.Context) {
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	_, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	var reqBody model.UpdateUser
+	if err = c.Bind(&reqBody); err != nil {
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to bind user update details", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validate.Struct(&reqBody)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validate), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	statusCode, err := user.UpdateUserService(reqBody)
+	if err != nil {
+		rd := utility.BuildErrorResponse(statusCode, "error", "user update failed", gin.H{"error": err.Error()}, nil)
+		c.JSON(statusCode, rd)
+		return
+	}
+
+	object := utility.BuildSuccessResponse(200, "User update successful", gin.H{})
+	c.JSON(statusCode, object)
+}
