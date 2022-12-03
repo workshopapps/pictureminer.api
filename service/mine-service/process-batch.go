@@ -3,6 +3,7 @@ package mineservice
 import (
 	"bufio"
 	"context"
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"io"
@@ -35,7 +36,7 @@ var (
 	}
 )
 
-func ProcessBatchService(userID string, file io.Reader) (interface{}, int, error) {
+func ProcessBatchCSVService(userID string, file io.Reader) (interface{}, int, error) {
 	// extract batch details and body from csv
 	dMap, body, err := parseDetails(file)
 	if err != nil {
@@ -76,7 +77,83 @@ func ProcessBatchService(userID string, file io.Reader) (interface{}, int, error
 	}
 
 	// run goroutine in background to process batch
-	go processBatch(uEmail, batch.ID.Hex(), bName, desc, tags, urls)
+	go processBatch(uEmail, bName, desc, batch.ID, tags, urls)
+
+	// return success message
+	res := model.BatchResponse{
+		ID:          batch.ID,
+		Name:        batch.Name,
+		Description: batch.Description,
+		Tags:        batch.Tags,
+		Status:      batch.Status,
+		DateCreated: batch.DateCreated,
+	}
+	return res, http.StatusOK, nil
+}
+
+func ProcessBatchService(userID, batchName, desc, tagsStr string, csvFile io.Reader) (interface{}, int, error) {
+	// parse and filter valid tags
+	tags := strings.Split(tagsStr, ",")
+	validTags := []string{}
+	for _, tag := range tags {
+		tag = strings.TrimSpace(tag)
+		if tag != "" {
+			validTags = append(validTags, tag)
+		}
+	}
+
+	// read urls from csv
+	csvr := csv.NewReader(csvFile)
+	dataset, err := csvr.ReadAll()
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
+
+	// get index of urls
+	idx := -1
+	for i, header := range dataset[0] {
+		if _, ok := UrlMap[strings.ToLower(header)]; ok {
+			idx = i
+			break
+		}
+	}
+	if idx == -1 {
+		return nil, http.StatusBadRequest, errors.New("could not find url column header")
+	}
+
+	// filter valid urls
+	urls := []string{}
+	for _, dataRow := range dataset[1:] {
+		url := dataRow[idx]
+		if isValidURL(url) {
+			urls = append(urls, url)
+		}
+	}
+
+	// save batch object to db
+	batch := model.Batch{
+		ID:          primitive.NewObjectID(),
+		UserID:      userID,
+		Name:        batchName,
+		Description: desc,
+		Tags:        validTags,
+		Status:      StatusOngoing,
+		DateCreated: time.Now().Local(),
+	}
+	database := config.GetConfig().Mongodb.Database
+	batchCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.BatchCollection)
+	_, err = batchCollection.InsertOne(context.Background(), batch)
+	if err != nil {
+		return nil, http.StatusInternalServerError, fmt.Errorf("%s: %s", "Unable to save user to database", err.Error())
+	}
+
+	uEmail, code, err := getUserEmail(userID)
+	if err != nil {
+		return nil, code, err
+	}
+
+	// run goroutine in background to process batch
+	go processBatch(uEmail, batchName, desc, batch.ID, tags, urls)
 
 	// return success message
 	res := model.BatchResponse{
@@ -132,7 +209,6 @@ func getDetails(file io.Reader) ([]string, []string) {
 }
 
 func getURLs(body []string) ([]string, error) {
-	var res []string
 	headers := strings.Split(body[0], ",")
 
 	// get index of header
@@ -148,6 +224,7 @@ func getURLs(body []string) ([]string, error) {
 	}
 
 	// filter valid urls
+	var res []string
 	for _, row := range body[1:] {
 		rs := strings.Split(row, ",")
 		url := ""
@@ -200,7 +277,7 @@ func getUserEmail(userID string) (string, int, error) {
 	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
 
 	// convert "ObjectID('<id hex>') => '<id hex>'"
-	id, err := primitive.ObjectIDFromHex(userID[10:len(userID)-2])
+	id, err := primitive.ObjectIDFromHex(userID[10 : len(userID)-2])
 	if err != nil {
 		return "", http.StatusBadRequest, err
 	}

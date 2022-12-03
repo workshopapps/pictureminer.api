@@ -27,6 +27,24 @@ func (base *Controller) ProcessBatch(c *gin.Context) {
 		return
 	}
 
+	// retrieve and validate required create batch details
+	batchName := c.PostForm("name")
+	if batchName == "" {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", gin.H{"error": "name field missing"}, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	tags := c.PostForm("tags")
+	if tags == "" {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", gin.H{"error": "tags field missing"}, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	// optional field
+	desc := c.PostForm("description")
+
 	file, fileHeader, err := c.Request.FormFile("csv")
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "unable to process file", gin.H{"error": err.Error()}, nil)
@@ -49,7 +67,7 @@ func (base *Controller) ProcessBatch(c *gin.Context) {
 		return
 	}
 
-	res, code, err := mineservice.ProcessBatchService(id, file)
+	res, code, err := mineservice.ProcessBatchService(id, batchName, desc, tags, file)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "failed", "an error occurred", gin.H{"error": err.Error()}, nil)
 		c.JSON(code, rd)
@@ -98,7 +116,7 @@ func (base *Controller) ProcessBatchCSV(c *gin.Context) {
 		return
 	}
 
-	res, code, err := mineservice.ProcessBatchService(id, file)
+	res, code, err := mineservice.ProcessBatchCSVService(id, file)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "failed", "an error occurred", gin.H{"error": err.Error()}, nil)
 		c.JSON(code, rd)

@@ -12,6 +12,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"github.com/workshopapps/pictureminer.api/utility"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -41,26 +42,42 @@ type (
 )
 
 const (
-	Threshold = "30"
-	Limit     = "10"
-	Untagged  = "untagged"
+	Threshold      = "30"
+	Limit          = "10"
+	Untagged       = "untagged"
+	statusComplete = "completed"
 )
 
-func processBatch(email, batchID, name, desc string, tags, urls []string) {
+func processBatch(email, bName, desc string, batchID primitive.ObjectID, tags, urls []string) {
 	// labels for each url
 	labels := fetchLabelsForURLS(urls)
 
 	// classify label to matching tag
-	batchImgs := classifyLabels(batchID, labels, tags)
+	batchImgs := classifyLabels(batchID.Hex(), labels, tags)
 
 	// save to db
 	err := saveToDB(batchImgs)
 	if err != nil {
-		warnUser(email, name, err.Error())
+		warnUser(email, bName, err.Error())
 	}
 
 	// on complete, notify user through email
-	notifyUser(email, name)
+	notifyUser(email, bName)
+
+	// update batch status
+	updateBatchStatusDB(batchID, email, bName)
+}
+
+func updateBatchStatusDB(batchID primitive.ObjectID, email, bName string) {
+	// update batch status in db
+	database := config.GetConfig().Mongodb.Database
+	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.BatchCollection)
+	filter := bson.M{"_id": batchID}
+	update := bson.D{{"$set", bson.D{{"status", statusComplete}}}}
+	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		warnUser(email, bName, err.Error())
+	}
 }
 
 func fetchLabelsForURLS(urls []string) []Label {
