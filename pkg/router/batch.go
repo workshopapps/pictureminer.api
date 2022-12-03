@@ -1,0 +1,22 @@
+package router
+
+import (
+	"fmt"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	mineservice "github.com/workshopapps/pictureminer.api/pkg/handler/mine-service"
+	"github.com/workshopapps/pictureminer.api/utility"
+)
+
+func ProcessBatch(r *gin.Engine, validate *validator.Validate, ApiVersion string, logger *utility.Logger) *gin.Engine {
+	mineservice := mineservice.Controller{Validate: validate, Logger: logger}
+
+	authUrl := r.Group(fmt.Sprintf("/api/%v", ApiVersion))
+	{
+		authUrl.POST("/batch-service/process-batch", mineservice.ProcessBatch)
+		authUrl.POST("/batch-service/process-batch-csv", mineservice.ProcessBatchCSV)
+		authUrl.GET("/batch-service/get-batches", mineservice.GetBatches)
+	}
+	return r
+}

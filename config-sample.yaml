@@ -9,6 +9,15 @@ server:
   secret: "mySecretKey"
 s3:
   AWSRegion: "us-east-1"
+  AWSAccessKeyID: "AKIAXOMDBDAFLLTWLU4Y"
+  AWSSecretAccessKey: "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"
+  BucketName: "miner-pictures"
+ImaggaAPI:
+  URL: "https://api.imagga.com/v2/tags"
+  Auth: "Basic YWNjXzRjODM4N2MxZGM5YWNkOTowODNjNTk5YmMwMTlmYjFlMjJjNTM4NWIzMTJiZjkxYg=="
+NotifyEmail:
+  Email: "hng9.discripto@gmail.com"
+  Password: "pzajnkgwvsrnxhdj"
   AWSAccessKeyID : "AKIAXOMDBDAFLLTWLU4Y"
   AWSSecretAccessKey : "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"
   BucketName : "miner-pictures"
