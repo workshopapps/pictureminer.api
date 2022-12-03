@@ -209,3 +209,51 @@ func warnUser(email, batchName, msg string) {
 
 	utility.EmailSender(from, password, []string{email}, "Process Batch Failed", body)
 }
+
+
+/*--------------------*/
+
+func classifyAlgorithm(resultId string, label Label, tagMap map[string]bool) model.BatchImage {
+	var filterResult []Result
+
+	for _, res := range label.Results {
+		name := smoothify(res.Name)
+		if tagMap[name] {
+			filterResult = append(filterResult, res)
+		}
+	}
+
+	bestTag, maxScore := Untagged, -1.0
+	for _, res := range filterResult {
+		if res.Score > maxScore {
+			bestTag, maxScore = res.Name, res.Score
+		}
+	}
+
+	batchImage := model.BatchImage{
+		ID:      primitive.NewObjectID(),
+		BatchID: resultId,
+		URL:     label.URL,
+		Tag:     bestTag,
+	}
+	return batchImage
+
+}
+
+func labelClassifier(resultId string, labels []Label, tags []string) []model.BatchImage {
+	// for O(1) lookups
+	tagsMap := make(map[string]bool)
+	for _, tag := range tags {
+		tagsMap[smoothify(tag)] = true
+	}
+
+	// get best matching tag for each label
+	var batchImgs []model.BatchImage
+	for _, label := range labels {
+		batchImgs = append(batchImgs, classifyAlgorithm(resultId, label, tagsMap))
+	}
+
+	return batchImgs
+}
+
+
