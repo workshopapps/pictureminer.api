@@ -5,12 +5,14 @@ import (
 )
 
 type User struct {
-	ID        primitive.ObjectID `bson:"_id, omitempty"`
-	Username  string             `bson:"username" json:"username" validate:"required"`
-	FirstName string             `bson:"first_name" json:"first_name"`
-	LastName  string             `bson:"last_name" json:"last_name"`
-	Email     string             `bson:"email" json:"email" validate:"required,email"`
-	Password  string             `bson:"password" json:"password" validate:"required"`
+	ID         primitive.ObjectID `bson:"_id, omitempty"`
+	Username   string             `bson:"username" json:"username" validate:"required"`
+	FirstName  string             `bson:"first_name" json:"first_name"`
+	LastName   string             `bson:"last_name" json:"last_name"`
+	Email      string             `bson:"email" json:"email" validate:"required,email"`
+	Password   string             `bson:"password" json:"password" validate:"required"`
+	ProfileKey string             `bson:"profile_key" json:"profile_key"`
+	ProfileUrl string             `bson:"profile_url" json:"profile_url"`
 }
 
 type UserResponse struct {
@@ -35,7 +37,7 @@ type PasswordReset struct {
 }
 
 type PasswordForgot struct {
-	Email       	string `bson:"email" json:"email" validate:"required"`
+	Email string `bson:"email" json:"email" validate:"required"`
 }
 
 type UpdateUser struct{

@@ -10,6 +10,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/internal/constants"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
+	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/s3"
 	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -24,8 +25,13 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 	}
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+
+	profile_url, profile_key := s3.DefaultProfile()
+
 	user.Password = string(hash)
 	user.ID = primitive.NewObjectID()
+	user.ProfileUrl = profile_url
+	user.ProfileKey = profile_key
 
 	// save to DB
 	database := config.GetConfig().Mongodb.Database
@@ -121,7 +127,7 @@ func ForgotPassword(reqBody model.PasswordForgot) (int, error) {
 	if err != nil {
 		return 404, fmt.Errorf("user does not exist: %s", err.Error())
 	}
-	
+
 	var w http.ResponseWriter
 	var r *http.Request
 
