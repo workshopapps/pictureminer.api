@@ -101,6 +101,14 @@ func (base *Controller) ResetPassword(c *gin.Context) {
 	c.JSON(200, object)
 }
 
+// Post             godoc
+// @Summary     Checks the status of the forgot passoword
+// @Description Send a dummy post request to test the status of the server
+// @Tags        Forgot Password
+// @Produce     json
+// @Param       ping body     model.PasswordForgot true "Ping JSON"
+// @Success     200  {object} utility.Response
+// @Router      /forgot-password [post]
 func (base *Controller) ForgotPassword(c *gin.Context) {
 	// validate jwt token
 	// secretKey := config.GetConfig().Server.Secret
