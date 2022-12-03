@@ -1,13 +1,11 @@
 package mineservice
 
 import (
-	"bytes"
 	"fmt"
-  "encoding/json"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
   "github.com/workshopapps/pictureminer.api/internal/model"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
 type UrlOne struct{
   Url string `bson:"url" json:"url"`
 }
@@ -18,21 +16,12 @@ type TagOne struct{
   Data []UrlOne `bson:"data" json:"data"`
 }
 
+func GetbatchImages(userId string, batchId string) ([]TagOne, error) {
 
-func GetbatchImages(userId string, batchId string) (*bytes.Buffer, error) {
-	//  userId , ok := userId.(string)
-	// if !ok {
-	// 	return TagOne{}, errors.New("invalid userId")
-	// }
+batch_id_primitive , _ := primitive.ObjectIDFromHex(batchId)
+var response []TagOne
 
- //  batchId , ok = batchId.(string)
- // if !ok {
- //   return TagOne{}, errors.New("invalid batchId")
- // }
-
-var response *bytes.Buffer
-
-  tags, length , err := mongodb.GetUserTags(userId ,batchId)
+  tags, length , err := mongodb.GetUserTags(userId ,batch_id_primitive)
   if err != nil {
     return response, err
   }
@@ -48,15 +37,16 @@ var response *bytes.Buffer
   fmt.Println(length1)
 
 response = filterTags(length,image_collection,tag,tags)
+
 	return response, nil
 
 }
 
-func filterTags(length int, image_collection []model.ImageCollection ,tag []string,tags []string) *bytes.Buffer{
+func filterTags(length int, image_collection []model.ImageCollection ,tag []string,tags []string) []TagOne{
 
   var tagone TagOne
   var urlone UrlOne
-  var dd bytes.Buffer
+  var str []TagOne
   for k := 0; k < length ; k++ {
   for i , test:= range image_collection{
 
@@ -66,7 +56,9 @@ func filterTags(length int, image_collection []model.ImageCollection ,tag []stri
       tagone.Data = append(tagone.Data , urlone )
     }
   }
-  json.NewEncoder(&dd).Encode(tagone)
+	str = append(str, tagone)
+	fmt.Println(str)
+
   }
-return &dd
+return str
 }

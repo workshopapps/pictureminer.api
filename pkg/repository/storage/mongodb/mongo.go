@@ -123,7 +123,7 @@ func SelectFromCollection(ctx context.Context, database, collection string, filt
 }
 
 func CountFromCollection(user_id primitive.ObjectID) (int64, error) {
-	userCollection := GetCollection(mongoClient, constants.UserCollection, constants.ImageCollection)
+	userCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.ImageCollection)
 	filter := bson.D{{"user_id", user_id}}
 	count, err := userCollection.CountDocuments(context.TODO(), filter)
 	if err != nil {
@@ -140,11 +140,11 @@ func CountFromCollection(user_id primitive.ObjectID) (int64, error) {
 }
 
 
-func GetUserTags(user_id string,batch_id string) ([]string, int , error){
+func GetUserTags(user_id string,batch_id primitive.ObjectID) ([]string, int , error){
   var tags []string
   var length int
 
-	batchImagesCollection := GetCollection(mongoClient, constants.UserCollection, constants.BatchCollection)
+	batchImagesCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.BatchCollection)
 	filter := bson.D{{"user_id", user_id},{"batch_id", batch_id}}
 
 	batch_collection, err := batchImagesCollection.Find(context.TODO(), filter)
@@ -168,7 +168,7 @@ func GetUserTags(user_id string,batch_id string) ([]string, int , error){
 
 func GetImageTags(batch_id string) ([]model.ImageCollection, []string, int, error){
   var tag []string
-	batchImagesCollection := GetCollection(mongoClient, constants.UserCollection, constants.BatchMinedCollection)
+	batchImagesCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.BatchMinedCollection)
 	filter := bson.D{{"batch_id", batch_id}}
 
 	image_collection, err := batchImagesCollection.Find(ctx, filter)

@@ -2,14 +2,14 @@ package mineservice
 
 import (
   "fmt"
+  // "io/ioutil"
+  // "encoding/json"
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	mineservice "github.com/workshopapps/pictureminer.api/service/mine-service"
 	"github.com/workshopapps/pictureminer.api/utility"
 )
-
-
 
 func (base *Controller) GetBatchResult(c *gin.Context) {
 
@@ -23,7 +23,6 @@ func (base *Controller) GetBatchResult(c *gin.Context) {
 	}
 
   batchId := c.Param("batch_id")
-
   UserIdstr := fmt.Sprintf("%v", userId)
 
 	batchImages, err := mineservice.GetbatchImages(UserIdstr,batchId)
@@ -32,7 +31,5 @@ func (base *Controller) GetBatchResult(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
-
 	c.JSON(http.StatusOK, batchImages)
-
 }
