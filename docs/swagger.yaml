@@ -68,6 +68,44 @@ definitions:
     - email
     - password
     type: object
+  model.UserResponse:
+    properties:
+      apiCallCount:
+        type: integer
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      profileKey:
+        type: string
+      profileUrl:
+        type: string
+      token:
+        type: string
+      tokenType:
+        type: string
+      username:
+        type: string
+    type: object
+  model.UserSignUp:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
   utility.Response:
     properties:
       code:
@@ -112,7 +150,7 @@ paths:
             type: array
       summary: this returns the mined images of all users
       tags:
-      - Mined Images
+      - admin
   /admin/users:
     get:
       description: List all users
@@ -127,7 +165,7 @@ paths:
             type: array
       summary: List all users
       tags:
-      - users
+      - admin
   /api/v1/health:
     get:
       description: Responds with the server status as JSON.
@@ -199,7 +237,27 @@ paths:
             $ref: '#/definitions/model.UserLogin'
       summary: Login User
       tags:
-      - Login
+      - users
+  /signup:
+    post:
+      description: Creates an account for a new user
+      parameters:
+      - description: User Signup
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserSignUp'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserResponse'
+      summary: Signs Up a User
+      tags:
+      - users
 schemes:
 - https
 swagger: "2.0"

@@ -36,6 +36,17 @@ type UserLogin struct {
 	Password string `bson:"password" json:"password" validate:"required"`
 }
 
+// created this struct for swagger docs
+type UserSignUp struct {
+	Username    string             `bson:"username" json:"username" validate:"required"`
+	FirstName   string             `bson:"first_name" json:"first_name"`
+	LastName    string             `bson:"last_name" json:"last_name"`
+	Email       string             `bson:"email" json:"email" validate:"required,email"`
+	Password    string             `bson:"password" json:"password" validate:"required"`
+}
+
+
+
 type PasswordReset struct {
 	Email           string `bson:"email" json:"email" validate:"required"`
 	Password        string `bson:"password" json:"password" validate:"required"`

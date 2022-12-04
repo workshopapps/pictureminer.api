@@ -17,6 +17,14 @@ func (base *Controller) CreateUser(c *gin.Context) {
 
 }
 
+// Signup          godoc
+// @Summary		Signs Up a User
+// @Description Creates an account for a new user
+// @Tags        users
+// @Produce     json
+// @Param User body model.UserSignUp true "User Signup" model.User
+// @Success     200  {object} model.UserResponse
+// @Router      /signup [post]
 func (base *Controller) Signup(c *gin.Context) {
 
 	// bind userdetails to User struct
@@ -49,7 +57,7 @@ func (base *Controller) Signup(c *gin.Context) {
 // Login          godoc
 // @Summary		Login User
 // @Description Logs in a User
-// @Tags        Login
+// @Tags        users
 // @Produce     json
 // @Param User body model.UserLogin true "User Login" model.UserLogin
 // @Success     200  {object} model.UserLogin
