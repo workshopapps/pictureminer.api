@@ -51,6 +51,14 @@ func (base *Controller) DemoMineImage(c *gin.Context) {
 	c.JSON(http.StatusOK, rd)
 }
 
+// Post             godoc
+// @Summary     Mines an uploaded image
+// @Description Send a post request containing a file an receives a response of its context content.
+// @Tags        Mine-Service
+// @Produce     json
+// @Param       @Param os.File formData file true "image"
+// @Success     200  {object} model.MineImageResponse
+// @Router      /mine-service/upload [post]
 func (base *Controller) MineImageUpload(c *gin.Context) {
 
 	secretKey := config.GetConfig().Server.Secret
