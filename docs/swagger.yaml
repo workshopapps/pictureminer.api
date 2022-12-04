@@ -1,5 +1,18 @@
 basePath: /api/v1/
 definitions:
+  model.MineImageResponse:
+    properties:
+      date_created:
+        type: string
+      date_modified:
+        type: string
+      image_name:
+        type: string
+      image_path:
+        type: string
+      text_content:
+        type: string
+    type: object
   model.MinedImage:
     properties:
       dateCreated:
@@ -238,6 +251,26 @@ paths:
       summary: Login User
       tags:
       - users
+  /mine-service/upload:
+    post:
+      description: Send a post request containing a file an receives a response of
+        its context content.
+      parameters:
+      - description: image
+        in: formData
+        name: os.File
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MineImageResponse'
+      summary: Mines an uploaded image
+      tags:
+      - Mine-Service
   /signup:
     post:
       description: Creates an account for a new user
