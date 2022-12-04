@@ -18,7 +18,7 @@ type Controller struct {
 // GetUsers godoc
 // @Summary      List all users
 // @Description  List all users
-// @Tags         users
+// @Tags         admin
 // @Produce		json
 // @Success      200  {object}  []model.User
 // @Router       /admin/users [get]
@@ -39,7 +39,7 @@ func (base *Controller) GetUsers(c *gin.Context) {
 // GetAllMinedImages          godoc
 // @Summary     this returns the mined images of all users
 // @Description this returns the mined images of all users
-// @Tags        Mined Images
+// @Tags        admin
 // @Produce     json
 // @Param Authorization header string true "insert your access token" default(Bearer <Add access token here>)
 // @Success     200  {object} []model.MinedImage
