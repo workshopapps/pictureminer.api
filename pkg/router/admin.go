@@ -16,7 +16,6 @@ func Admin(r *gin.Engine, validate *validator.Validate, ApiVersion string, logge
 	adminUrl := r.Group(fmt.Sprintf("/api/%v", ApiVersion))
 	{
 		adminUrl.GET("/admin/users", admin.GetUsers)
-		adminUrl.DELETE("/admin/users", admin.DeleteUsers)
 		adminUrl.GET("/admin/mined-images", admin.GetAllMinedImages)
 		adminUrl.DELETE("/admin/users/:email", admin.DeleteUser)
 		
