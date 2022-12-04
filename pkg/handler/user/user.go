@@ -90,6 +90,14 @@ func (base *Controller) Login(c *gin.Context) {
 	c.JSON(200, object)
 }
 
+// Post             godoc
+// @Summary     Resests the password of the user
+// @Description Send a post request to reset th password of the user
+// @Tags        users
+// @Produce     json
+// @Param       ping body     model.PasswordReset true "Ping JSON"
+// @Success     200  {object} utility.Response
+// @Router      /reset [post]
 func (base *Controller) ResetPassword(c *gin.Context) {
 	// bind password reset details to User struct
 	var reqBody model.PasswordReset

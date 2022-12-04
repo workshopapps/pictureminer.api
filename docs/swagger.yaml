@@ -26,6 +26,19 @@ definitions:
     required:
     - email
     type: object
+  model.PasswordReset:
+    properties:
+      confirm_password:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - confirm_password
+    - email
+    - password
+    type: object
   model.Ping:
     properties:
       email:
@@ -236,6 +249,26 @@ paths:
           schema:
             $ref: '#/definitions/model.UserLogin'
       summary: Login User
+      tags:
+      - users
+  /reset:
+    post:
+      description: Send a post request to reset th password of the user
+      parameters:
+      - description: Ping JSON
+        in: body
+        name: ping
+        required: true
+        schema:
+          $ref: '#/definitions/model.PasswordReset'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utility.Response'
+      summary: Resests the password of the user
       tags:
       - users
   /signup:
