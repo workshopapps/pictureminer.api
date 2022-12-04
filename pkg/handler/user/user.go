@@ -220,7 +220,7 @@ func (base *Controller) UpdateProfilePicture(c *gin.Context) {
 // @Produce     json
 // @Param User body model.UpdateUser true "User Update" model.UserUpdate
 // @Success     200  {object} model.UserLogin
-// @Router      /update-user [post]
+// @Router      /update-user [patch]
 func (base *Controller) UpdateUser(c *gin.Context) {
 	secretKey := config.GetConfig().Server.Secret
 	token := utility.ExtractToken(c)
