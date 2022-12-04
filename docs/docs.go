@@ -278,40 +278,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/update_user_picture": {
-            "patch": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Send a patch request containing a file to be updated and receives a response of its url path after upload.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Update-User-Profile"
-                ],
-                "summary": "Updates a User profile picture image",
-                "parameters": [
-                    {
-                        "type": "file",
-                        "description": "image",
-                        "name": "os.File",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.UserResponse"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -398,6 +364,35 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.UpdateUser": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "confirm_password": {
+                    "type": "string"
+                },
+                "current_password": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "new_password": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
