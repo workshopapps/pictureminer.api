@@ -2,7 +2,7 @@ package mineservice
 
 import (
 	"net/http"
-	"path/filepath"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -10,6 +10,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	mineservice "github.com/workshopapps/pictureminer.api/service/mine-service"
+	batchservice "github.com/workshopapps/pictureminer.api/service/batch-service"
 	"github.com/workshopapps/pictureminer.api/utility"
 )
 
@@ -18,6 +19,46 @@ type Controller struct {
 	Logger   *utility.Logger
 }
 
+func (base *Controller) DemoMineImage(c *gin.Context) {
+	if c.ContentType() != "multipart/form-data" {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "file is not present"})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	image, imageHeader, err := c.Request.FormFile("image")
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not parse file", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+	defer image.Close()
+
+	if !utility.ValidImageFormat(imageHeader.Filename) {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file", nil, gin.H{"error": "file is not an image"})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	minedImage, err := mineservice.DemoMineImage(image, imageHeader.Filename)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "undefined error", nil, err.Error())
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "mine image successful", minedImage)
+	c.JSON(http.StatusOK, rd)
+}
+
+// Post             godoc
+// @Summary     Mines an uploaded image
+// @Description Send a post request containing a file an receives a response of its context content.
+// @Tags        Mine-Service
+// @Produce     json
+// @Param       @Param os.File formData file true "image"
+// @Success     200  {object} model.MineImageResponse
+// @Router      /mine-service/upload [post]
 func (base *Controller) MineImageUpload(c *gin.Context) {
 
 	secretKey := config.GetConfig().Server.Secret
@@ -43,7 +84,7 @@ func (base *Controller) MineImageUpload(c *gin.Context) {
 	}
 	defer image.Close()
 
-	if !validImageFormat(imageHeader.Filename) {
+	if !utility.ValidImageFormat(imageHeader.Filename) {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file", nil, gin.H{"error": "file is not an image"})
 		c.JSON(http.StatusBadRequest, rd)
 		return
@@ -99,7 +140,7 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 
 	filename := getFileName(req.Url)
 
-	if !validImageFormat(filename) {
+	if !utility.ValidImageFormat(filename) {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file", nil, gin.H{"error": "file is not an image"})
 		c.JSON(http.StatusBadRequest, rd)
 		return
@@ -138,11 +179,36 @@ func (base *Controller) GetMinedImages(c *gin.Context) {
 
 }
 
-func validImageFormat(filename string) bool {
-	ext := strings.ToLower(filepath.Ext(filename))
-	return ext == ".png" || ext == ".jpg" || ext == ".jpeg"
-}
-
 func getFileName(url string) string {
 	return url[strings.LastIndex(url, "/")+1:]
+}
+
+func (base *Controller) DownloadCsv(c *gin.Context) {
+
+	// secretKey := config.GetConfig().Server.Secret
+	// token := utility.ExtractToken(c)
+	// userId, err := utility.GetKey("id", token, secretKey)
+	// if err != nil {
+	// 	rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+	// 	c.JSON(http.StatusUnauthorized, rd)
+	// 	return
+	// }
+	batchId := c.Param("batchid")
+	var dummySlice, err = batchservice.GetImagesInBatch(batchId)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not get images for this batch id", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+	errr := mineservice.ParseImageResponseForDownload(dummySlice)
+	if errr != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not generate csv for download", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	c.File("filename.csv")
+	defer os.Remove("filename.csv")
+	
+
 }

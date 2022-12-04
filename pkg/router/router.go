@@ -9,6 +9,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/pkg/middleware"
 	"github.com/workshopapps/pictureminer.api/utility"
 )
+
 func Setup(validate *validator.Validate, logger *utility.Logger) *gin.Engine {
 	r := gin.New()
 
@@ -23,9 +24,11 @@ func Setup(validate *validator.Validate, logger *utility.Logger) *gin.Engine {
 	ApiVersion := "v1"
 	Health(r, validate, ApiVersion, logger)
 	Auth(r, validate, ApiVersion, logger)
-	MineServiceUpload(r, validate, ApiVersion, logger)
+	ProcessBatch(r, validate, ApiVersion, logger)
+	MineService(r, validate, ApiVersion, logger)
 	Admin(r, validate, ApiVersion, logger)
 	SwaggerDocs(r, ApiVersion)
+	// DownLoadCsv(r, validate, ApiVersion, logger)
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{

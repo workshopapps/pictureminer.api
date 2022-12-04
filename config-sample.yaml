@@ -13,6 +13,15 @@ s3:
   AWSSecretAccessKey: "yepL/xP02oCuadGiXnWWkaKF5PP4ORZKKBxNDRDy"
   BucketName: "miner-pictures"
 python:
-  microservicehost: "https://yiowpv.deta.dev/api/microservice/content"
   # Change when the microservice host for prompt is available
   microserviceprompthost: "https://yiowpv.deta.dev/api/microservice/content"
+
+  ProfilePictureBucketName : "miner-profile-pic"
+ImaggaAPI:
+  URL: "https://api.imagga.com/v2/tags"
+  Auth: "Basic YWNjXzRjODM4N2MxZGM5YWNkOTowODNjNTk5YmMwMTlmYjFlMjJjNTM4NWIzMTJiZjkxYg=="
+NotifyEmail:
+  Email: "hng9.discripto@gmail.com"
+  Password: "pzajnkgwvsrnxhdj"
+python: 
+  microservicehost: "http://178.128.242.94/caption-generator"

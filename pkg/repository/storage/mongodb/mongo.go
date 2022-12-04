@@ -7,6 +7,7 @@ import (
 
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/constants"
+	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -149,7 +150,7 @@ func DeleteAUserFromCollection(ctx context.Context, database, collection string,
 }
 
 func CountFromCollection(user_id primitive.ObjectID) (int64, error) {
-	userCollection := GetCollection(mongoClient, constants.UserCollection, constants.ImageCollection)
+	userCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.ImageCollection)
 	filter := bson.D{{"user_id", user_id}}
 	count, err := userCollection.CountDocuments(context.TODO(), filter)
 	if err != nil {
@@ -163,4 +164,78 @@ func CountFromCollection(user_id primitive.ObjectID) (int64, error) {
 	// 	c.JSON(http.StatusInternalServerError, gin.H{"error":"error reading number of documents"})
 	// }
 	return count, nil
+}
+
+
+func GetUserTags(user_id string,batch_id primitive.ObjectID) ([]string, int , error){
+  var tags []string
+  var length int
+
+	batchImagesCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.BatchCollectionMe)
+	filter := bson.D{{"user_id", user_id},{"batch_id", batch_id}}
+
+	batch_collection, err := batchImagesCollection.Find(context.TODO(), filter)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var results []model.BatchCollection
+		if err := batch_collection.All(context.TODO(), &results); err != nil {
+			fmt.Println(err)
+		}
+
+  for _, test := range results {
+        if test.User_id == user_id {
+          tags =  test.Tags
+          length = len(test.Tags)
+        }
+    }
+     return tags ,length ,err
+}
+
+func GetImageTags(batch_id string) ([]model.ImageCollection, []string, int, error){
+  var tag []string
+	batchImagesCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.BatchMinedCollection)
+	filter := bson.D{{"batch_id", batch_id}}
+
+	image_collection, err := batchImagesCollection.Find(ctx, filter)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var results []model.ImageCollection
+		if err := image_collection.All(context.TODO(), &results); err != nil {
+			fmt.Println(err)
+		}
+
+  for _, test := range results {
+        if test.Batch_id == batch_id {
+           tag = append(tag,test.Tag)
+        }
+    }
+     return results, tag,len(tag), err
+}
+
+func MongoUpdate(id string, updateEntries map[string]interface{}, collection string) (*mongo.UpdateResult, error) {
+	c := getCollection(collection)
+	user_id, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	update := make(bson.M)
+
+	for i, j := range updateEntries {
+		update[i] = j
+	}
+
+	db_data := bson.M{"$set": update}
+	result, err := c.UpdateByID(context.TODO(), user_id, db_data)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
