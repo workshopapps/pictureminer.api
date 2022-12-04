@@ -26,19 +26,6 @@ func GetUsers() ([]model.User, error) {
 	return users, nil
 }
 
-// Delete all user
-func DeleteUsers()error{
-	d := time.Now().Add(1 * time.Minute)
-
-ctx, cancel := context.WithDeadline(context.Background(), d)
-defer cancel()
-
-	_, err := mongodb.DeleteAllUsersFromCollection(ctx, config.GetConfig().Mongodb.Database, constants.UserCollection)
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
 // Delete a user
 func DeleteUser(username string) error {
