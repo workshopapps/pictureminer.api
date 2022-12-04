@@ -117,6 +117,43 @@
                 }
             }
         },
+        "/batch-service/process-batch-api": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Process a list of images as a batch",
+                "tags": [
+                    "batch-api"
+                ],
+                "summary": "Processes a batch of images",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "json",
+                        "name": "json",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "csv",
+                        "name": "csv",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utility.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/forgot-password": {
             "post": {
                 "description": "Send a dummy post request to test the status of the server",
@@ -187,9 +224,6 @@
                     }
                 ],
                 "description": "Send a post request containing a file an receives a response of its context content.",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Mine-Service"
                 ],
@@ -198,7 +232,7 @@
                     {
                         "type": "file",
                         "description": "image",
-                        "name": "os.File",
+                        "name": "image",
                         "in": "formData",
                         "required": true
                     }
@@ -207,7 +241,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.MineImageResponse"
+                            "$ref": "#/definitions/utility.Response"
                         }
                     }
                 }
@@ -342,26 +376,6 @@
         }
     },
     "definitions": {
-        "model.MineImageResponse": {
-            "type": "object",
-            "properties": {
-                "date_created": {
-                    "type": "string"
-                },
-                "date_modified": {
-                    "type": "string"
-                },
-                "image_name": {
-                    "type": "string"
-                },
-                "image_path": {
-                    "type": "string"
-                },
-                "text_content": {
-                    "type": "string"
-                }
-            }
-        },
         "model.MinedImage": {
             "type": "object",
             "properties": {

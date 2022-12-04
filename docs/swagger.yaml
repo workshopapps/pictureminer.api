@@ -1,18 +1,5 @@
 basePath: /api/v1/
 definitions:
-  model.MineImageResponse:
-    properties:
-      date_created:
-        type: string
-      date_modified:
-        type: string
-      image_name:
-        type: string
-      image_path:
-        type: string
-      text_content:
-        type: string
-    type: object
   model.MinedImage:
     properties:
       dateCreated:
@@ -240,6 +227,29 @@ paths:
       summary: Checks the status of the server
       tags:
       - health
+  /batch-service/process-batch-api:
+    post:
+      description: Process a list of images as a batch
+      parameters:
+      - description: json
+        in: formData
+        name: json
+        required: true
+        type: file
+      - description: csv
+        in: formData
+        name: csv
+        type: file
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utility.Response'
+      security:
+      - BearerAuth: []
+      summary: Processes a batch of images
+      tags:
+      - batch-api
   /forgot-password:
     post:
       description: Send a dummy post request to test the status of the server
@@ -287,16 +297,14 @@ paths:
       parameters:
       - description: image
         in: formData
-        name: os.File
+        name: image
         required: true
         type: file
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.MineImageResponse'
+            $ref: '#/definitions/utility.Response'
       security:
       - BearerAuth: []
       summary: Mines an uploaded image
