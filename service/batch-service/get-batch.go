@@ -51,25 +51,26 @@ func GetBatchImages(batchID string) (interface{}, error) {
 		return []model.BatchImage{}, err
 	}
 
-	// mapper := map[string][]string{}
-	// mapper[Untagged] = nil
-	// for _, tag := range batch.Tags {
-	// 	mapper[tag] = nil
-	// }
+	mapper := map[string][]string{}
+	mapper[Untagged] = nil
+	for _, tag := range batch.Tags {
+		mapper[tag] = nil
+	}
 
-	// for _, img := range imgs {
-	// 	mapper[img.Tag] = append(mapper[img.Tag], img.URL)
-	// }
-
-	// resp := map[string][]string{}
-	// for key, val := range mapper {
-	// 	if val != nil {
-	// 		resp[key] = val
-	// 	}
-	// }
-	resp := []map[string]string{}
 	for _, img := range imgs {
-		resp = append(resp, map[string]string{img.Tag: img.URL})
+		mapper[img.Tag] = append(mapper[img.Tag], img.URL)
+	}
+
+	mapped := map[string][]string{}
+	for key, val := range mapper {
+		if val != nil {
+			mapped[key] = val
+		}
+	}
+
+	resp := []map[string][]string{}
+	for key, val := range mapped {
+		resp = append(resp, map[string][]string{key: val})
 	}
 
 	return resp, nil
