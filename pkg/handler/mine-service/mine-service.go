@@ -59,6 +59,7 @@ func (base *Controller) DemoMineImage(c *gin.Context) {
 // @Param       @Param os.File formData file true "image"
 // @Success     200  {object} model.MineImageResponse
 // @Router      /mine-service/upload [post]
+// @Security BearerAuth
 func (base *Controller) MineImageUpload(c *gin.Context) {
 
 	secretKey := config.GetConfig().Server.Secret

@@ -158,13 +158,6 @@ paths:
   /admin/mined-images:
     get:
       description: this returns the mined images of all users
-      parameters:
-      - default: Bearer <Add access token here>
-        description: insert your access token
-        in: header
-        name: Authorization
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -174,6 +167,8 @@ paths:
             items:
               $ref: '#/definitions/model.MinedImage'
             type: array
+      security:
+      - BearerAuth: []
       summary: this returns the mined images of all users
       tags:
       - admin
@@ -189,6 +184,8 @@ paths:
             items:
               $ref: '#/definitions/model.User'
             type: array
+      security:
+      - BearerAuth: []
       summary: List all users
       tags:
       - admin
@@ -336,6 +333,8 @@ schemes:
           description: OK
           schema:
             $ref: '#/definitions/model.MineImageResponse'
+      security:
+      - BearerAuth: []
       summary: Mines an uploaded image
       tags:
       - Mine-Service
@@ -381,4 +380,9 @@ schemes:
       - users
 schemes:
 - https
+securityDefinitions:
+  BearerAuth:
+    in: header "Bearer <add access token here>"
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
