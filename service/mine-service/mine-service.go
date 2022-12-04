@@ -106,6 +106,20 @@ func GetMinedImages(userId interface{}) ([]model.MineImageResponse, error) {
 	return minedImages, nil
 }
 
+func DeleteMinedImageService(imageKey string) error {
+	ctx := context.TODO()
+	db := config.GetConfig().Mongodb.Database
+
+	filter := bson.M{"image_key": imageKey}
+	minedImageCol := mongodb.GetCollection(mongodb.Connection(), db, constants.ImageCollection)
+	_, err := minedImageCol.DeleteOne(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func duplicateFile(f io.ReadCloser) (io.ReadCloser, io.ReadCloser, error) {
 	contents, err := io.ReadAll(f)
 	if err != nil {
@@ -122,6 +136,7 @@ func getMineImageResponse(minedImage *model.MinedImage, filename string) (*model
 
 	response := &model.MineImageResponse{
 		ImageName:    filename,
+		ImageKey:     minedImage.ImageKey,
 		ImagePath:    minedImage.ImagePath,
 		TextContent:  minedImage.TextContent,
 		DateCreated:  minedImage.DateCreated,
