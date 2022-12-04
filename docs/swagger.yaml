@@ -73,8 +73,6 @@ definitions:
         type: string
       username:
         type: string
-    required:
-    - email
     type: object
   model.User:
     properties:
@@ -344,8 +342,9 @@ paths:
       - users
   /update-user:
     patch:
-      description: Updates a User's information - email,firstName,lastName,password-
-        Bearer token and email required
+      description: Updates a User's information - email,firstName,lastName,password
+        - Bearer token required - To change password, current_password, new_password
+        and confirm_password(repeat of the new password) are required
       parameters:
       - description: User Update
         in: body
@@ -358,8 +357,6 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/model.UserLogin'
       summary: Update User
       tags:
       - users

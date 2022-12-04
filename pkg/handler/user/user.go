@@ -215,16 +215,16 @@ func (base *Controller) UpdateProfilePicture(c *gin.Context) {
 
 // Update User          godoc
 // @Summary		Update User
-// @Description Updates a User's information - email,firstName,lastName,password- Bearer token and email required
+// @Description Updates a User's information - email,firstName,lastName,password - Bearer token required - To change password, current_password, new_password and confirm_password(repeat of the new password) are required
 // @Tags        users
 // @Produce     json
 // @Param User body model.UpdateUser true "User Update" model.UserUpdate
-// @Success     200  {object} model.UserLogin
+// @Success     200  
 // @Router      /update-user [patch]
 func (base *Controller) UpdateUser(c *gin.Context) {
 	secretKey := config.GetConfig().Server.Secret
 	token := utility.ExtractToken(c)
-	_, err := utility.GetKey("id", token, secretKey)
+	userId, err := utility.GetKey("id", token, secretKey)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
 		c.JSON(http.StatusUnauthorized, rd)
@@ -245,7 +245,7 @@ func (base *Controller) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	statusCode, err := user.UpdateUserService(reqBody)
+	statusCode, err := user.UpdateUserService(reqBody,userId)
 	if err != nil {
 		rd := utility.BuildErrorResponse(statusCode, "error", "user update failed", gin.H{"error": err.Error()}, nil)
 		c.JSON(statusCode, rd)
