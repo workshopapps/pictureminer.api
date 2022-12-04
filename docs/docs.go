@@ -280,8 +280,8 @@ const docTemplate = `{
             }
         },
         "/update-user": {
-            "post": {
-                "description": "Updates a User's information - email,firstName,lastName,password",
+            "patch": {
+                "description": "Updates a User's information - email,firstName,lastName,password- Bearer token and email required",
                 "produces": [
                     "application/json"
                 ],
