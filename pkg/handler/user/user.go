@@ -171,6 +171,15 @@ func (base *Controller) ForgotPassword(c *gin.Context) {
 	c.JSON(200, object)
 }
 
+// Post         godoc
+// @Summary     Updates a User profile picture image
+// @Description Send a patch request containing a file to be updated and receives a response of its url path after upload.
+// @Tags        Update-User-Profile
+// @Produce     json
+// @Param       @Param os.File formData file true "image"
+// @Success     200  {object} model.UserResponse
+// @Router      /update_user_picture [patch]
+// @Security BearerAuth
 func (base *Controller) UpdateProfilePicture(c *gin.Context) {
 
 	secretKey := config.GetConfig().Server.Secret
