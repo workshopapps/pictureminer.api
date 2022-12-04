@@ -17,6 +17,14 @@ func (base *Controller) CreateUser(c *gin.Context) {
 
 }
 
+// Signup          godoc
+// @Summary		Signs Up a User
+// @Description Creates an account for a new user
+// @Tags        users
+// @Produce     json
+// @Param User body model.UserSignUp true "User Signup" model.User
+// @Success     200  {object} model.UserResponse
+// @Router      /signup [post]
 func (base *Controller) Signup(c *gin.Context) {
 
 	// bind userdetails to User struct
@@ -46,6 +54,14 @@ func (base *Controller) Signup(c *gin.Context) {
 	c.JSON(200, object)
 }
 
+// Login          godoc
+// @Summary		Login User
+// @Description Logs in a User
+// @Tags        users
+// @Produce     json
+// @Param User body model.UserLogin true "User Login" model.UserLogin
+// @Success     200  {object} model.UserLogin
+// @Router      /login [post]
 func (base *Controller) Login(c *gin.Context) {
 	// bind user login details to User struct
 	var User model.UserLogin
@@ -74,6 +90,14 @@ func (base *Controller) Login(c *gin.Context) {
 	c.JSON(200, object)
 }
 
+// Post             godoc
+// @Summary     Resests the password of the user
+// @Description Send a post request to reset th password of the user
+// @Tags        users
+// @Produce     json
+// @Param       ping body     model.PasswordReset true "Ping JSON"
+// @Success     200  {object} utility.Response
+// @Router      /reset [post]
 func (base *Controller) ResetPassword(c *gin.Context) {
 	// bind password reset details to User struct
 	var reqBody model.PasswordReset
@@ -147,6 +171,15 @@ func (base *Controller) ForgotPassword(c *gin.Context) {
 	c.JSON(200, object)
 }
 
+// Post         godoc
+// @Summary     Updates a User profile picture image
+// @Description Send a patch request containing a file to be updated and receives a response of its url path after upload.
+// @Tags        Update-User-Profile
+// @Produce     json
+// @Param       @Param os.File formData file true "image"
+// @Success     200  {object} model.UserResponse
+// @Router      /update_user_picture [patch]
+// @Security BearerAuth
 func (base *Controller) UpdateProfilePicture(c *gin.Context) {
 
 	secretKey := config.GetConfig().Server.Secret
@@ -189,6 +222,14 @@ func (base *Controller) UpdateProfilePicture(c *gin.Context) {
 	c.JSON(http.StatusOK, rd)
 }
 
+// Update User          godoc
+// @Summary		Update User
+// @Description Updates a User's information - email,firstName,lastName,password- Bearer token and email required
+// @Tags        users
+// @Produce     json
+// @Param User body model.UpdateUser true "User Update" model.UserUpdate
+// @Success     200  {object} model.UserLogin
+// @Router      /update-user [patch]
 func (base *Controller) UpdateUser(c *gin.Context) {
 	secretKey := config.GetConfig().Server.Secret
 	token := utility.ExtractToken(c)

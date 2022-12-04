@@ -40,7 +40,11 @@ func GetBatchImages(batchID string) (interface{}, error) {
 	batchCollection.FindOne(ctx, bson.M{"_id": validBatchID}).Decode(&batch)
 
 	filter := bson.M{"batch_id": batchID}
-  
+	cursor, err := mongodb.SelectFromCollection(ctx, db, constants.BatchImageCollection, filter)
+	if err != nil {
+		return []model.BatchImage{}, err
+	}
+
 	imgs := []model.BatchImage{}
 	err = cursor.All(ctx, &imgs)
 	if err != nil {
@@ -57,17 +61,22 @@ func GetBatchImages(batchID string) (interface{}, error) {
 		mapper[img.Tag] = append(mapper[img.Tag], img.URL)
 	}
 
-	resp := map[string][]string{}
+	mapped := map[string][]string{}
 	for key, val := range mapper {
 		if val != nil {
-			resp[key] = val
+			mapped[key] = val
 		}
 	}
 
-	return resp, nil
-  }
+	resp := []map[string][]string{}
+	for key, val := range mapped {
+		resp = append(resp, map[string][]string{key: val})
+	}
 
-func GetImagesInBatch(batchId string ) ([]model.BatchImage, error){
+	return resp, nil
+}
+
+func GetImagesInBatch(batchId string) ([]model.BatchImage, error) {
 	db := config.GetConfig().Mongodb.Database
 	ctx := context.Background()
 	filter := bson.M{"batch_id": batchId}
@@ -77,7 +86,7 @@ func GetImagesInBatch(batchId string ) ([]model.BatchImage, error){
 		return nil, err
 	}
 
-	batchImages:= []model.BatchImage{}
+	batchImages := []model.BatchImage{}
 	cursor.All(ctx, &batchImages)
 
 	return batchImages, nil

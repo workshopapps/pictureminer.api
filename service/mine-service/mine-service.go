@@ -52,12 +52,17 @@ func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string)
 		return nil, err
 	}
 
+	image, imageCopy, err = duplicateFile(image)
+	if err != nil {
+		return nil, err
+	}
+
 	imagePath, err := s3.UploadImage(image, imageHash+filepath.Ext(filename))
 	if err != nil {
 		return nil, err
 	}
 
-	content, err := microservice.GetImageContent(image, filename)
+	content, err := microservice.GetImageContent(imageCopy, filename)
 	if err != nil {
 		return nil, err
 	}

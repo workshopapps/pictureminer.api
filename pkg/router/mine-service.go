@@ -17,6 +17,7 @@ func MineService(r *gin.Engine, validate *validator.Validate, ApiVersion string,
 		authUrl.POST("/mine-service/upload", mineservice.MineImageUpload)
 		authUrl.POST("/mine-service/url", mineservice.MineImageUrl)
 		authUrl.GET("/mine-service/get-all", mineservice.GetMinedImages)
+		authUrl.GET("/batch-service/get-all/:batch_id", mineservice.GetBatchResult)
 		authUrl.POST("/mine-service/demo", mineservice.DemoMineImage)
 	}
 	return r

@@ -18,10 +18,11 @@ type Controller struct {
 // GetUsers godoc
 // @Summary      List all users
 // @Description  List all users
-// @Tags         users
+// @Tags         admin
 // @Produce		json
 // @Success      200  {object}  []model.User
 // @Router       /admin/users [get]
+// @Security BearerAuth
 func (base *Controller) GetUsers(c *gin.Context) {
 
 	users, err := admin.GetUsers()
@@ -36,7 +37,14 @@ func (base *Controller) GetUsers(c *gin.Context) {
 
 }
 
-// this returns the mined images of all users
+// GetAllMinedImages          godoc
+// @Summary     this returns the mined images of all users
+// @Description this returns the mined images of all users
+// @Tags        admin
+// @Produce     json
+// @Success     200  {object} []model.MinedImage
+// @Router      /admin/mined-images [get]
+// @Security BearerAuth
 func (base *Controller) GetAllMinedImages(c *gin.Context) {
 
 	secretKey := config.GetConfig().Server.Secret

@@ -9,8 +9,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/model"
-	mineservice "github.com/workshopapps/pictureminer.api/service/mine-service"
 	batchservice "github.com/workshopapps/pictureminer.api/service/batch-service"
+	mineservice "github.com/workshopapps/pictureminer.api/service/mine-service"
 	"github.com/workshopapps/pictureminer.api/utility"
 )
 
@@ -51,6 +51,14 @@ func (base *Controller) DemoMineImage(c *gin.Context) {
 	c.JSON(http.StatusOK, rd)
 }
 
+// Post             godoc
+// @Summary     Mines an uploaded image
+// @Description Send a post request containing a file an receives a response of its context content.
+// @Tags        Mine-Service
+// @Param       image formData file true "image"
+// @Success     200  {object} utility.Response
+// @Router      /mine-service/upload [post]
+// @Security BearerAuth
 func (base *Controller) MineImageUpload(c *gin.Context) {
 
 	secretKey := config.GetConfig().Server.Secret
@@ -201,6 +209,5 @@ func (base *Controller) DownloadCsv(c *gin.Context) {
 
 	c.File("filename.csv")
 	defer os.Remove("filename.csv")
-	
 
 }
