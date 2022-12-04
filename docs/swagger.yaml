@@ -1,18 +1,5 @@
 basePath: /api/v1
 definitions:
-  model.MineImageResponse:
-    properties:
-      date_created:
-        type: string
-      date_modified:
-        type: string
-      image_name:
-        type: string
-      image_path:
-        type: string
-      text_content:
-        type: string
-    type: object
   model.MinedImage:
     properties:
       dateCreated:
@@ -56,6 +43,25 @@ definitions:
     properties:
       email:
         type: string
+    type: object
+  model.UpdateUser:
+    properties:
+      confirm_password:
+        type: string
+      current_password:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      new_password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
     type: object
   model.User:
     properties:
@@ -276,6 +282,29 @@ schemes:
   - http
 
       - health
+  /batch-service/process-batch-api:
+    post:
+      description: Process a list of images as a batch
+      parameters:
+      - description: json
+        in: formData
+        name: json
+        required: true
+        type: file
+      - description: csv
+        in: formData
+        name: csv
+        type: file
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utility.Response'
+      security:
+      - BearerAuth: []
+      summary: Processes a batch of images
+      tags:
+      - batch-api
   /forgot-password:
     post:
       description: Send a dummy post request to test the status of the server
@@ -323,16 +352,14 @@ schemes:
       parameters:
       - description: image
         in: formData
-        name: os.File
+        name: image
         required: true
         type: file
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.MineImageResponse'
+            $ref: '#/definitions/utility.Response'
       security:
       - BearerAuth: []
       summary: Mines an uploaded image
@@ -378,6 +405,49 @@ schemes:
       summary: Signs Up a User
       tags:
       - users
+  /update-user:
+    patch:
+      description: Updates a User's information - email,firstName,lastName,password-
+        Bearer token and email required
+      parameters:
+      - description: User Update
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserLogin'
+      summary: Update User
+      tags:
+      - users
+  /update_user_picture:
+    patch:
+      description: Send a patch request containing a file to be updated and receives
+        a response of its url path after upload.
+      parameters:
+      - description: image
+        in: formData
+        name: os.File
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserResponse'
+      security:
+      - BearerAuth: []
+      summary: Updates a User profile picture image
+      tags:
+      - Update-User-Profile
 schemes:
 - https
 securityDefinitions:

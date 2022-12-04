@@ -17,6 +17,15 @@ type Controller struct {
 	Logger   *utility.Logger
 }
 
+// ProcessBatchAPI godoc
+// @Summary      Processes a batch of images
+// @Description  Process a list of images as a batch
+// @Tags         batch-api
+// @Param       json formData file true "json"
+// @Param       csv formData file false "csv"
+// @Success      200   {object}  utility.Response
+// @Router       /batch-service/process-batch-api [post]
+// @Security BearerAuth
 func (base *Controller) ProcessBatchAPI(c *gin.Context) {
 	secretKey := config.GetConfig().Server.Secret
 	token := utility.ExtractToken(c)

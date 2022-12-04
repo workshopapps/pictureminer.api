@@ -121,6 +121,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/batch-service/process-batch-api": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Process a list of images as a batch",
+                "tags": [
+                    "batch-api"
+                ],
+                "summary": "Processes a batch of images",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "json",
+                        "name": "json",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "csv",
+                        "name": "csv",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utility.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/forgot-password": {
             "post": {
                 "description": "Send a dummy post request to test the status of the server",
@@ -191,9 +228,6 @@ const docTemplate = `{
                     }
                 ],
                 "description": "Send a post request containing a file an receives a response of its context content.",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Mine-Service"
                 ],
@@ -202,7 +236,7 @@ const docTemplate = `{
                     {
                         "type": "file",
                         "description": "image",
-                        "name": "os.File",
+                        "name": "image",
                         "in": "formData",
                         "required": true
                     }
@@ -211,7 +245,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.MineImageResponse"
+                            "$ref": "#/definitions/utility.Response"
                         }
                     }
                 }
@@ -278,29 +312,74 @@ const docTemplate = `{
                     }
                 }
             }
-        }
-    },
-    "definitions": {
-        "model.MineImageResponse": {
-            "type": "object",
-            "properties": {
-                "date_created": {
-                    "type": "string"
-                },
-                "date_modified": {
-                    "type": "string"
-                },
-                "image_name": {
-                    "type": "string"
-                },
-                "image_path": {
-                    "type": "string"
-                },
-                "text_content": {
-                    "type": "string"
+        },
+        "/update-user": {
+            "patch": {
+                "description": "Updates a User's information - email,firstName,lastName,password- Bearer token and email required",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update User",
+                "parameters": [
+                    {
+                        "description": "User Update",
+                        "name": "User",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UpdateUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.UserLogin"
+                        }
+                    }
                 }
             }
         },
+        "/update_user_picture": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Send a patch request containing a file to be updated and receives a response of its url path after upload.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Update-User-Profile"
+                ],
+                "summary": "Updates a User profile picture image",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "image",
+                        "name": "os.File",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.UserResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
         "model.MinedImage": {
             "type": "object",
             "properties": {
@@ -364,6 +443,35 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.UpdateUser": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "confirm_password": {
+                    "type": "string"
+                },
+                "current_password": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "new_password": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
