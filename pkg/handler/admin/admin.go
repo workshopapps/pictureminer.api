@@ -26,6 +26,14 @@ type Controller struct {
 // @Security BearerAuth
 
 func (base *Controller) GetUsers(c *gin.Context) {
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	_, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", gin.H{"error": err.Error()}, nil)
+	c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
 
 	users, err := admin.GetUsers()
 	if err != nil {
