@@ -19,3 +19,5 @@ ImaggaAPI:
 NotifyEmail:
   Email: "hng9.discripto@gmail.com"
   Password: "pzajnkgwvsrnxhdj"
+python: 
+  microservicehost: "https://yiowpv.deta.dev/api/microservice/content"
