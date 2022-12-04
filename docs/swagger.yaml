@@ -57,6 +57,25 @@ definitions:
       email:
         type: string
     type: object
+  model.UpdateUser:
+    properties:
+      confirm_password:
+        type: string
+      current_password:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      new_password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    type: object
   model.User:
     properties:
       date_created:
@@ -321,6 +340,26 @@ paths:
           schema:
             $ref: '#/definitions/model.UserResponse'
       summary: Signs Up a User
+      tags:
+      - users
+  /update-user:
+    post:
+      description: Updates a User's information - email,firstName,lastName,password
+      parameters:
+      - description: User Update
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserLogin'
+      summary: Update User
       tags:
       - users
 schemes:

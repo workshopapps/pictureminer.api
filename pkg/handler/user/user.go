@@ -213,6 +213,14 @@ func (base *Controller) UpdateProfilePicture(c *gin.Context) {
 	c.JSON(http.StatusOK, rd)
 }
 
+// Update User          godoc
+// @Summary		Update User
+// @Description Updates a User's information - email,firstName,lastName,password
+// @Tags        users
+// @Produce     json
+// @Param User body model.UpdateUser true "User Update" model.UserUpdate
+// @Success     200  {object} model.UserLogin
+// @Router      /update-user [post]
 func (base *Controller) UpdateUser(c *gin.Context) {
 	secretKey := config.GetConfig().Server.Secret
 	token := utility.ExtractToken(c)
