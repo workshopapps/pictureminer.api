@@ -1,4 +1,112 @@
 {
+
+  "basePath": "/api/v1",
+  "definitions": {
+    "model.Ping": {
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "utility.Response": {
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "data": {},
+        "error": {
+          "description": "for errors that occur even if request is successful"
+        },
+        "extra": {},
+        "message": {
+          "type": "string"
+        },
+        "name": {
+          "description": "name of the error",
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "host": "localhost:9000",
+  "info": {
+    "contact": {},
+    "description": "A picture mining service API in Go using Gin framework.",
+    "title": "Minergram",
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "description": "Responds with the server status as JSON.",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/utility.Response"
+            }
+          }
+        },
+        "summary": "Checks the status of the server",
+        "tags": ["health"]
+      },
+      "post": {
+        "description": "Send a dummy post request to test the status of the server",
+        "parameters": [
+          {
+            "description": "Ping JSON",
+            "in": "body",
+            "name": "ping",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/model.Ping"
+            }
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/utility.Response"
+            }
+          }
+        },
+        "summary": "Checks the status of the server",
+        "tags": ["health"]
+      }
+    },
+    "/admin/users/{username}": {
+      "delete": {
+        "tags": ["admin"],
+        "summary": "Delete a user",
+        "description": "Delete a user",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
     "schemes": [
         "https"
     ],
@@ -86,36 +194,20 @@
                         }
                     }
                 }
-            },
-            "post": {
-                "description": "Send a dummy post request to test the status of the server",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "health"
-                ],
-                "summary": "Checks the status of the server",
-                "parameters": [
-                    {
-                        "description": "Ping JSON",
-                        "name": "ping",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.Ping"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/utility.Response"
-                        }
-                    }
-                }
+              }
             }
+          },
+          "500": {
+            "description": "unable to delete user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+
+          }
         },
         "/batch-service/process-batch-api": {
             "post": {
@@ -307,8 +399,43 @@
                         }
                     }
                 }
-            }
+          }
+      }
+    },
+    "/admin/mined-images": {
+      "get": {
+        "tags": "admin",
+        "summary": "Get all mined Images",
+        "description": "Get all mined Images",
+        "operationId": "getmineImages",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "user successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+    "definitions": {
+        "model.MineImageResponse": {
+            "type": "object",
+            "properties": {
+                "date_created": {
+                    "type": "string"
+                },
+                "date_modified": {
+                    "type": "string"
+                },
+                "image_name": {
+                    "type": "string"
+                },
+                "image_path": {
+                    "type": "string"
+                },
+                "text_content": {
+                    "type": "string"
         },
+        
         "/update-user": {
             "patch": {
                 "description": "Updates a User's information - email,firstName,lastName,password- Bearer token and email required",
@@ -348,18 +475,15 @@
                     }
                 ],
                 "description": "Send a patch request containing a file to be updated and receives a response of its url path after upload.",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
-                    "Update-User-Profile"
+                    "users"
                 ],
                 "summary": "Updates a User profile picture image",
                 "parameters": [
                     {
                         "type": "file",
                         "description": "image",
-                        "name": "os.File",
+                        "name": "image",
                         "in": "formData",
                         "required": true
                     }
@@ -368,7 +492,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.UserResponse"
+                            "$ref": "#/definitions/utility.Response"
                         }
                     }
                 }
@@ -441,7 +565,16 @@
                 "email": {
                     "type": "string"
                 }
+              }
             }
+
+          },
+          "500": {
+            "description": "unable to delete user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
         },
         "model.UpdateUser": {
             "type": "object",
@@ -605,7 +738,9 @@
                 "status": {
                     "type": "string"
                 }
+              }
             }
+          }
         }
     },
     "securityDefinitions": {
@@ -615,4 +750,7 @@
             "in": "header \"Bearer \u003cadd access token here\u003e\""
         }
     }
+  },
+  "schemes": ["http"],
+  "swagger": "2.0"
 }

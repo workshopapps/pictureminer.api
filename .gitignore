@@ -22,4 +22,5 @@ config.yaml
 logs/
 pictureminer.api
 .github/
+.vscode/
 
