@@ -215,7 +215,7 @@ func (base *Controller) UpdateProfilePicture(c *gin.Context) {
 
 // Update User          godoc
 // @Summary		Update User
-// @Description Updates a User's information - email,firstName,lastName,password
+// @Description Updates a User's information - email,firstName,lastName,password- Bearer token and email required
 // @Tags        users
 // @Produce     json
 // @Param User body model.UpdateUser true "User Update" model.UserUpdate
