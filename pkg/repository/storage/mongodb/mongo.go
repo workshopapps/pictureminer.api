@@ -124,15 +124,6 @@ func SelectFromCollection(ctx context.Context, database, collection string, filt
 	return cursor, nil
 }
 
-func DeleteAllUsersFromCollection(ctx context.Context, database, collection string) (*mongo.DeleteResult, error){
-modelCollection := GetCollection(mongoClient, database, collection)
-deletedResults,err := modelCollection.DeleteMany(ctx,bson.M{})
-	if err != nil {
-		return nil, err
-	}
-	return deletedResults, err
-
-}
 
 func DeleteAUserFromCollection(ctx context.Context, database, collection string, filter bson.M)(*mongo.DeleteResult, error)  {
 	modelCollection := GetCollection(mongoClient, database, collection)
