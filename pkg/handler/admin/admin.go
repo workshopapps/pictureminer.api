@@ -60,7 +60,7 @@ func (base *Controller) DeleteUser(c *gin.Context){
 		return
 	}
 	userEmail := c.Param("email") //string
-	err := admin.DeleteUser(userEmail)
+	err = admin.DeleteUser(userEmail)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to delete user", err,nil)
 		c.JSON(http.StatusInternalServerError,rd)
