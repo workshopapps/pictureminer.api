@@ -15,6 +15,7 @@ type Controller struct {
 	Logger   *utility.Logger
 }
 
+
 // GetUsers godoc
 // @Summary      List all users
 // @Description  List all users
@@ -23,7 +24,16 @@ type Controller struct {
 // @Success      200  {object}  []model.User
 // @Router       /admin/users [get]
 // @Security BearerAuth
+
 func (base *Controller) GetUsers(c *gin.Context) {
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	_, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", gin.H{"error": err.Error()}, nil)
+	c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
 
 	users, err := admin.GetUsers()
 	if err != nil {
@@ -37,6 +47,30 @@ func (base *Controller) GetUsers(c *gin.Context) {
 
 }
 
+
+// Delete User
+func (base *Controller) DeleteUser(c *gin.Context){
+	// validate jwt token
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	_, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", gin.H{"error": err.Error()}, nil)
+	c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+	userEmail := c.Param("email") //string
+	err := admin.DeleteUser(userEmail)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to delete user", err,nil)
+		c.JSON(http.StatusInternalServerError,rd)
+		return
+	}
+	rd := utility.BuildSuccessResponse(http.StatusOK, "success", gin.H{"message" : "user deleted successfully"} )
+	c.JSON(http.StatusOK, rd)
+}
+
+// this returns the mined images of all users
 // GetAllMinedImages          godoc
 // @Summary     this returns the mined images of all users
 // @Description this returns the mined images of all users
