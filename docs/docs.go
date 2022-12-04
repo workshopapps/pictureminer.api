@@ -183,6 +183,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/mine-service/upload": {
+            "post": {
+                "description": "Send a post request containing a file an receives a response of its context content.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Mine-Service"
+                ],
+                "summary": "Mines an uploaded image",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "image",
+                        "name": "os.File",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.MineImageResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/reset": {
             "post": {
                 "description": "Send a post request to reset th password of the user",
@@ -209,35 +238,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/utility.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/mine-service/upload": {
-            "post": {
-                "description": "Send a post request containing a file an receives a response of its context content.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Mine-Service"
-                ],
-                "summary": "Mines an uploaded image",
-                "parameters": [
-                    {
-                        "type": "file",
-                        "description": "image",
-                        "name": "os.File",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.MineImageResponse"
                         }
                     }
                 }

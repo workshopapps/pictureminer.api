@@ -264,6 +264,26 @@ paths:
       summary: Login User
       tags:
       - users
+  /mine-service/upload:
+    post:
+      description: Send a post request containing a file an receives a response of
+        its context content.
+      parameters:
+      - description: image
+        in: formData
+        name: os.File
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MineImageResponse'
+      summary: Mines an uploaded image
+      tags:
+      - Mine-Service
   /reset:
     post:
       description: Send a post request to reset th password of the user
