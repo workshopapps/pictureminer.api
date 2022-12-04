@@ -176,8 +176,8 @@ func ProfilePictureServiceUpload(userId interface{}, image io.ReadCloser, filena
 	}
 
 	updateUserPicture := map[string]interface{}{
-		"profile_picture": imagePath,
-		"date_updated":    time.Now(),
+		"profile_url":  imagePath,
+		"date_updated": time.Now(),
 	}
 
 	update_response, err := mongodb.MongoUpdate(id, updateUserPicture, constants.UserCollection)
