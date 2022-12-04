@@ -211,3 +211,34 @@ func (base *Controller) DownloadCsv(c *gin.Context) {
 	defer os.Remove("filename.csv")
 
 }
+
+func (base *Controller) DeleteMinedImage(c *gin.Context) {
+
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	_, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	// get image key
+	imageKey := c.Param("key")
+	if imageKey == "" {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", gin.H{"error": "key field missing"}, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = mineservice.DeleteMinedImageService(imageKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not delete mined image", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "delete mined image success", gin.H{})
+	c.JSON(http.StatusOK, rd)
+
+}
