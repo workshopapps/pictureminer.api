@@ -42,8 +42,8 @@ func (base *Controller) GetUsers(c *gin.Context) {
 
 // Delete User
 func (base *Controller) DeleteUser(c *gin.Context){
-	username := c.Param("username") //string
-	err := admin.DeleteUser(username)
+	userEmail := c.Param("email") //string
+	err := admin.DeleteUser(userEmail)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to delete user", err,nil)
 		c.JSON(http.StatusInternalServerError,rd)
