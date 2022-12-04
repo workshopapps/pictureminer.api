@@ -44,21 +44,23 @@ response = filterTags(length,image_collection,tag,tags)
 
 func filterTags(length int, image_collection []model.ImageCollection ,tag []string,tags []string) []TagOne{
 
-  var tagone TagOne
-  var urlone UrlOne
   var str []TagOne
+
   for k := 0; k < length ; k++ {
+			var tagone TagOne
   for i , test:= range image_collection{
-
-    tagone.Tag = tag[k]
-    if tag[i] == tags[k]{
-      urlone.Url = test.Url
-      tagone.Data = append(tagone.Data , urlone )
-    }
-  }
+			tagone.Tag = tags[k]
+  if tag[i] == tags[k]{
+			fmt.Println(tag[i]+tags[k])
+			fmt.Println(test.Url)
+			 var urlone UrlOne
+	     urlone.Url = test.Url
+	     tagone.Data = append(tagone.Data , urlone )
+			fmt.Println(tagone.Data)
+    	}
+  	}
 	str = append(str, tagone)
-	fmt.Println(str)
-
   }
+
 return str
 }
