@@ -352,18 +352,15 @@ const docTemplate = `{
                     }
                 ],
                 "description": "Send a patch request containing a file to be updated and receives a response of its url path after upload.",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
-                    "Update-User-Profile"
+                    "users"
                 ],
                 "summary": "Updates a User profile picture image",
                 "parameters": [
                     {
                         "type": "file",
                         "description": "image",
-                        "name": "os.File",
+                        "name": "image",
                         "in": "formData",
                         "required": true
                     }
@@ -372,7 +369,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.UserResponse"
+                            "$ref": "#/definitions/utility.Response"
                         }
                     }
                 }

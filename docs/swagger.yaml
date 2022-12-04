@@ -378,21 +378,19 @@ paths:
       parameters:
       - description: image
         in: formData
-        name: os.File
+        name: image
         required: true
         type: file
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.UserResponse'
+            $ref: '#/definitions/utility.Response'
       security:
       - BearerAuth: []
       summary: Updates a User profile picture image
       tags:
-      - Update-User-Profile
+      - users
 schemes:
 - https
 securityDefinitions:
