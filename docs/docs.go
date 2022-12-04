@@ -314,8 +314,8 @@ const docTemplate = `{
             }
         },
         "/update-user": {
-            "post": {
-                "description": "Updates a User's information - email,firstName,lastName,password",
+            "patch": {
+                "description": "Updates a User's information - email,firstName,lastName,password- Bearer token and email required",
                 "produces": [
                     "application/json"
                 ],
@@ -339,6 +339,40 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/model.UserLogin"
+                        }
+                    }
+                }
+            }
+        },
+        "/update_user_picture": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Send a patch request containing a file to be updated and receives a response of its url path after upload.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Update-User-Profile"
+                ],
+                "summary": "Updates a User profile picture image",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "image",
+                        "name": "os.File",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.UserResponse"
                         }
                     }
                 }
