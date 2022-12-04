@@ -2,22 +2,12 @@ package mineservice
 
 import (
 	"encoding/csv"
-	"errors"
-	"io"
+	"mime/multipart"
 	"strings"
+	"os"
+
+	"github.com/workshopapps/pictureminer.api/internal/model"
 )
-
-// returns the index of the url
-func getUrlHeaderIndex(headers []string) (int, error) {
-	valid_headers := []string{"url", "urls", "image", "images"}
-
-	for i, head := range headers {
-		if head == valid_headers[0] || head == valid_headers[1] || head == valid_headers[2] || head == valid_headers[3] {
-			return i, nil
-		}
-	}
-	return 0, errors.New("no valid csv header present")
-}
 
 func checkExtension(url string) bool {
 	mime_types := []string{".png", ".jpg", ".jpeg"}
@@ -30,28 +20,15 @@ func checkExtension(url string) bool {
 	return false
 }
 
-func ParseCSVfile(file io.Reader) ([]string, error) {
+// func ParseCSVfile(file *os.File) []string {
+func ParseCSVfile(file multipart.File) ([]string, error) {
 
-	var urls []string // slice to store urls
+	var urls []string
 
 	// Read CSV file
 	reader := csv.NewReader(file)
 
 	records, err := reader.ReadAll()
-	if err != nil {
-		return []string{}, err
-	}
-
-	var headers []string // csv headers
-	for row, column := range records {
-		if row == 0 {
-			for _, v := range column {
-				headers = append(headers, v)
-			}
-		}
-	}
-
-	index, err := getUrlHeaderIndex(headers)
 	if err != nil {
 		return []string{}, err
 	}
@@ -62,8 +39,7 @@ func ParseCSVfile(file io.Reader) ([]string, error) {
 			continue
 		}
 
-		url := column[index]
-
+		url := column[0]
 		// check if url is blank, then skip
 		if url == "" {
 			continue
@@ -75,6 +51,28 @@ func ParseCSVfile(file io.Reader) ([]string, error) {
 		}
 
 	}
-
 	return urls, nil
+}
+
+func ParseImageResponseForDownload(dt []model.BatchImage, ) error{
+	//create the file
+	file, err := os.Create("filename.csv")
+	if err != nil{
+		return err
+	}
+	writer := csv.NewWriter(file)
+
+	var line []string
+	l:=append(line, "url")
+	l=append(l,"tag")
+	writer.Write(l)
+	//loop over the contents of the response
+	for _, value := range dt{
+		
+		x :=append(line, value.URL)
+		x =append(x, value.Tag)
+		writer.Write(x)
+	}
+	writer.Flush()
+	return nil
 }

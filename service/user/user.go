@@ -56,6 +56,8 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,
 		Email:        user.Email,
+		ProfileKey:   user.ProfileKey,
+		ProfileUrl:   user.ProfileUrl,
 		TokenType:    "bearer",
 		Token:        token,
 		ApiCallCount: 0,
@@ -92,6 +94,8 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,
 		Email:        user.Email,
+		ProfileKey:   user.ProfileKey,
+		ProfileUrl:   user.ProfileUrl,
 		TokenType:    "bearer",
 		Token:        token,
 		ApiCallCount: estCount,
@@ -172,8 +176,8 @@ func ProfilePictureServiceUpload(userId interface{}, image io.ReadCloser, filena
 	}
 
 	updateUserPicture := map[string]interface{}{
-		"profile_picture": imagePath,
-		"date_updated":    time.Now(),
+		"profile_url":  imagePath,
+		"date_updated": time.Now(),
 	}
 
 	update_response, err := mongodb.MongoUpdate(id, updateUserPicture, constants.UserCollection)

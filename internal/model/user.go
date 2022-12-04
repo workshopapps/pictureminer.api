@@ -20,20 +20,32 @@ type User struct {
 }
 
 type UserResponse struct {
-	Username       string
-	FirstName      string
-	LastName       string
-	Email          string
-	ProfilePicture string
-	Token          string
-	TokenType      string
-	ApiCallCount   int64
+	Username     string
+	FirstName    string
+	LastName     string
+	Email        string
+	ProfileKey   string
+	ProfileUrl   string
+	Token        string
+	TokenType    string
+	ApiCallCount int64
 }
 
 type UserLogin struct {
 	Email    string `bson:"email" json:"email" validate:"required"`
 	Password string `bson:"password" json:"password" validate:"required"`
 }
+
+// created this struct for swagger docs
+type UserSignUp struct {
+	Username    string             `bson:"username" json:"username" validate:"required"`
+	FirstName   string             `bson:"first_name" json:"first_name"`
+	LastName    string             `bson:"last_name" json:"last_name"`
+	Email       string             `bson:"email" json:"email" validate:"required,email"`
+	Password    string             `bson:"password" json:"password" validate:"required"`
+}
+
+
 
 type PasswordReset struct {
 	Email           string `bson:"email" json:"email" validate:"required"`

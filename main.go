@@ -22,13 +22,17 @@ func init() {
 	s3.ConnectAws()
 }
 
+
 // @title           Minergram
 // @version         1.0
 // @description     A picture mining service API in Go using Gin framework.
 
-// @host      localhost:9000
+// @host      discripto.hng.tech/api1
 // @BasePath  /api/v1/
-// @schemes http
+// @schemes https
+// @securityDefinitions.apikey BearerAuth
+// @in header "Bearer <add access token here>"
+// @name Authorization
 func main() {
 	//Load config
 	logger := utility.NewLogger()
