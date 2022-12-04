@@ -12,9 +12,6 @@ s3:
   AWSAccessKeyID: "AKIAXOMDBDAFLLTWLU4Y"
   AWSSecretAccessKey: "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"
   BucketName: "miner-pictures"
-  # Change when the microservice host for prompt is available
-  microserviceprompthost: "https://yiowpv.deta.dev/api/microservice/content"
-
   ProfilePictureBucketName : "miner-profile-pic"
 ImaggaAPI:
   URL: "https://api.imagga.com/v2/tags"
