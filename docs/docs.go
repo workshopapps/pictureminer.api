@@ -18,6 +18,11 @@ const docTemplate = `{
     "paths": {
         "/admin/mined-images": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "this returns the mined images of all users",
                 "produces": [
                     "application/json"
@@ -26,16 +31,6 @@ const docTemplate = `{
                     "admin"
                 ],
                 "summary": "this returns the mined images of all users",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "default": "Bearer \u003cAdd access token here\u003e",
-                        "description": "insert your access token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -51,6 +46,11 @@ const docTemplate = `{
         },
         "/admin/users": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "List all users",
                 "produces": [
                     "application/json"
@@ -185,6 +185,11 @@ const docTemplate = `{
         },
         "/mine-service/upload": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Send a post request containing a file an receives a response of its context content.",
                 "produces": [
                     "application/json"
@@ -497,6 +502,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header \"Bearer \u003cadd access token here\u003e\""
         }
     }
 }`
