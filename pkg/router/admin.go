@@ -2,7 +2,6 @@ package router
 
 import (
 	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/workshopapps/pictureminer.api/pkg/handler/admin"
@@ -18,6 +17,8 @@ func Admin(r *gin.Engine, validate *validator.Validate, ApiVersion string, logge
 	{
 		adminUrl.GET("/admin/users", admin.GetUsers)
 		adminUrl.GET("/admin/mined-images", admin.GetAllMinedImages)
+		adminUrl.DELETE("/admin/users/:email", admin.DeleteUser)
+		
 	}
 	return r
 }
