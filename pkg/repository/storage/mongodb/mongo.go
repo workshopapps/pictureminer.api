@@ -113,8 +113,6 @@ func getCollection(collection string) *mongo.Collection {
 	return c
 }
 
-// Delete 
-
 func SelectFromCollection(ctx context.Context, database, collection string, filter bson.M) (*mongo.Cursor, error) {
 	modelCollection := GetCollection(mongoClient, database, collection)
 	cursor, err := modelCollection.Find(ctx, filter)
@@ -122,22 +120,6 @@ func SelectFromCollection(ctx context.Context, database, collection string, filt
 		return cursor, err
 	}
 	return cursor, nil
-}
-
-
-func DeleteAUserFromCollection(ctx context.Context, database, collection string, filter bson.M)(*mongo.DeleteResult, error)  {
-	modelCollection := GetCollection(mongoClient, database, collection)
-	// To check if the user exist or not
-	user := modelCollection.FindOne(ctx,filter)
-	if user.Err() != nil {
-		return nil, user.Err()
-	}
-	deletedResult,err := modelCollection.DeleteOne(ctx,filter)
-	if err != nil {
-		return nil, err
-	}
-	return deletedResult, err
-	
 }
 
 func CountFromCollection(user_id primitive.ObjectID) (int64, error) {
