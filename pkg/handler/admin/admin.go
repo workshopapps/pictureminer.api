@@ -39,21 +39,6 @@ func (base *Controller) GetUsers(c *gin.Context) {
 
 }
 
-<
-// Delete ALL users
-func (base *Controller) DeleteUsers(c *gin.Context){
-	err := admin.DeleteUsers()
-	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "Unable to delete all users", err,nil)
-		c.JSON(http.StatusInternalServerError,rd)
-		return
-	}
-	rd := utility.BuildSuccessResponse(http.StatusOK, "success", gin.H{"message" : "All users deleted successfully"} )
-	c.JSON(http.StatusOK, rd)
-
-}
-
-
 
 // Delete User
 func (base *Controller) DeleteUser(c *gin.Context){
