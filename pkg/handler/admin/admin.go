@@ -71,7 +71,6 @@ func (base *Controller) DeleteUser(c *gin.Context){
 }
 
 // this returns the mined images of all users
-=======
 // GetAllMinedImages          godoc
 // @Summary     this returns the mined images of all users
 // @Description this returns the mined images of all users
