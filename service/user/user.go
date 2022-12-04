@@ -196,7 +196,6 @@ func ProfilePictureServiceUpload(userId interface{}, image io.ReadCloser, filena
 func UpdateUserService(user model.UpdateUser, userId interface{}) (int, error) {
 	string_id,_ := userId.(string)
 	string_id = string_id[10:len(string_id)-2]
-	fmt.Println(string_id)
 	id,_ := primitive.ObjectIDFromHex(string_id)
 	database := config.GetConfig().Mongodb.Database
 	filter := bson.D{{"_id", id}}
