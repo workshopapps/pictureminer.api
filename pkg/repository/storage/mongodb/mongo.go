@@ -144,21 +144,21 @@ func GetUserTags(user_id string,batch_id primitive.ObjectID) ([]string, int , er
   var tags []string
   var length int
 
-	batchImagesCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.BatchCollectionMe)
-	filter := bson.D{{"user_id", user_id},{"batch_id", batch_id}}
+	batchImagesCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.BatchCollection)
+	filter := bson.D{{"user_id", user_id},{"_id", batch_id}}
 
 	batch_collection, err := batchImagesCollection.Find(context.TODO(), filter)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	var results []model.BatchCollection
+	var results []model.Batch
 		if err := batch_collection.All(context.TODO(), &results); err != nil {
 			fmt.Println(err)
 		}
 
   for _, test := range results {
-        if test.User_id == user_id {
+        if test.UserID == user_id {
           tags =  test.Tags
           length = len(test.Tags)
         }
@@ -166,9 +166,9 @@ func GetUserTags(user_id string,batch_id primitive.ObjectID) ([]string, int , er
      return tags ,length ,err
 }
 
-func GetImageTags(batch_id string) ([]model.ImageCollection, []string, int, error){
+func GetImageTags(batch_id string) ([]model.BatchImage, []string, int, error){
   var tag []string
-	batchImagesCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.BatchMinedCollection)
+	batchImagesCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.BatchImageCollection)
 	filter := bson.D{{"batch_id", batch_id}}
 
 	image_collection, err := batchImagesCollection.Find(ctx, filter)
@@ -176,13 +176,13 @@ func GetImageTags(batch_id string) ([]model.ImageCollection, []string, int, erro
 		fmt.Println(err)
 	}
 
-	var results []model.ImageCollection
+	var results []model.BatchImage
 		if err := image_collection.All(context.TODO(), &results); err != nil {
 			fmt.Println(err)
 		}
 
   for _, test := range results {
-        if test.Batch_id == batch_id {
+        if test.BatchID == batch_id {
            tag = append(tag,test.Tag)
         }
     }
