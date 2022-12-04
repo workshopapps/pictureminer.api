@@ -50,6 +50,15 @@ func (base *Controller) GetUsers(c *gin.Context) {
 
 // Delete User
 func (base *Controller) DeleteUser(c *gin.Context){
+	// validate jwt token
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	_, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", gin.H{"error": err.Error()}, nil)
+	c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
 	userEmail := c.Param("email") //string
 	err := admin.DeleteUser(userEmail)
 	if err != nil {
