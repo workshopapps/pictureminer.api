@@ -28,14 +28,14 @@ func GetUsers() ([]model.User, error) {
 
 
 // Delete a user
-func DeleteUser(username string) error {
+func DeleteUser(email string) error {
 	d := time.Now().Add(1 * time.Minute)
 
 ctx, cancel := context.WithDeadline(context.Background(), d)
 defer cancel()
 
 	_, err := mongodb.DeleteAUserFromCollection(ctx, config.GetConfig().Mongodb.Database, constants.UserCollection,
-	bson.M{"username":username})
+	bson.M{"email":email})
 	if err != nil {
 		return err
 	}
