@@ -193,11 +193,17 @@ func ProfilePictureServiceUpload(userId interface{}, image io.ReadCloser, filena
 
 }
 
-func UpdateUserService(user model.UpdateUser) (int, error) {
+func UpdateUserService(user model.UpdateUser, userId interface{}) (int, error) {
+	string_id,_ := userId.(string)
+	string_id = string_id[10:len(string_id)-2]
+	id,_ := primitive.ObjectIDFromHex(string_id)
 	database := config.GetConfig().Mongodb.Database
-	filter := bson.D{{Key: "email", Value: user.Email}}
+	filter := bson.D{{"_id", id}}
+	
 	if len(user.LastName) > 0 {
-		update := bson.M{"$set": bson.M{"last_name": user.LastName}}
+		update := bson.D{
+			{"$set", bson.D{{"last_name", user.LastName}}},
+		}
 		err := UpdateFunc(database, filter, update)
 		if err != nil {
 			return 400, err
@@ -205,7 +211,9 @@ func UpdateUserService(user model.UpdateUser) (int, error) {
 	}
 
 	if len(user.FirstName) > 0 {
-		update := bson.M{"$set": bson.M{"first_name": user.FirstName}}
+		update := bson.D{
+			{"$set", bson.D{{"first_name", user.FirstName}}},
+		}
 		err := UpdateFunc(database, filter, update)
 		if err != nil {
 			return 400, err
@@ -213,7 +221,9 @@ func UpdateUserService(user model.UpdateUser) (int, error) {
 	}
 
 	if len(user.Email) > 0 {
-		update := bson.M{"$set": bson.M{"email": user.Email}}
+		update := bson.D{
+			{"$set", bson.D{{"email", user.Email}}},
+		}
 		err := UpdateFunc(database, filter, update)
 		if err != nil {
 			return 400, err
@@ -221,7 +231,9 @@ func UpdateUserService(user model.UpdateUser) (int, error) {
 	}
 
 	if len(user.UserName) > 0 {
-		update := bson.M{"$set": bson.M{"username": user.UserName}}
+		update := bson.D{
+			{"$set", bson.D{{"username", user.UserName}}},
+		}
 		err := UpdateFunc(database, filter, update)
 		if err != nil {
 			return 400, err
@@ -236,7 +248,9 @@ func UpdateUserService(user model.UpdateUser) (int, error) {
 
 		hash, _ := bcrypt.GenerateFromPassword([]byte(user.NewPassword), 10)
 		user.NewPassword = string(hash)
-		update := bson.M{"$set": bson.M{"password": user.NewPassword}}
+		update :=bson.D{
+			{"$set", bson.D{{"password", user.NewPassword}}},
+		}
 		err = UpdateFunc(database, filter, update)
 		if err != nil {
 			return 400, err
@@ -246,7 +260,7 @@ func UpdateUserService(user model.UpdateUser) (int, error) {
 	return 200, nil
 }
 
-func UpdateFunc(db string, filter bson.D, update bson.M) error {
+func UpdateFunc(db string, filter bson.D, update bson.D) error {
 	userCollection := mongodb.GetCollection(mongodb.Connection(), db, constants.UserCollection)
 	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
 	return err

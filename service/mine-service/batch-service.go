@@ -2,41 +2,42 @@ package mineservice
 
 import (
 	"fmt"
+	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
-  "github.com/workshopapps/pictureminer.api/internal/model"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-type UrlOne struct{
-  Url string `bson:"url" json:"url"`
+
+type UrlOne struct {
+	Url string `bson:"url" json:"url"`
 }
 
-//main
-type TagOne struct{
-  Tag string `bson:"tag" json:"tag"`
-  Data []UrlOne `bson:"data" json:"data"`
+// main
+type TagOne struct {
+	Tag  string   `bson:"tag" json:"tag"`
+	Data []UrlOne `bson:"data" json:"data"`
 }
 
 func GetbatchImages(userId string, batchId string) ([]TagOne, error) {
 
-batch_id_primitive , _ := primitive.ObjectIDFromHex(batchId)
-var response []TagOne
+	batch_id_primitive, _ := primitive.ObjectIDFromHex(batchId)
+	var response = make([]TagOne, 0)
 
-  tags, length , err := mongodb.GetUserTags(userId ,batch_id_primitive)
-  if err != nil {
-    return response, err
-  }
-  fmt.Println(tags)
-  fmt.Println(length)
+	tags, length, err := mongodb.GetUserTags(userId, batch_id_primitive)
+	if err != nil {
+		return response, err
+	}
+	fmt.Println(tags)
+	fmt.Println(length)
 
-  image_collection, tag, length1 , err := mongodb.GetImageTags(batchId)
-  if err != nil {
-    return response, err
-  }
+	image_collection, tag, length1, err := mongodb.GetImageTags(batchId)
+	if err != nil {
+		return response, err
+	}
 
-  fmt.Println(tag)
-  fmt.Println(length1)
+	fmt.Println(tag)
+	fmt.Println(length1)
 
-response = filterTags(length,image_collection,tag,tags)
+	response = filterTags(length, image_collection, tag, tags)
 
 	return response, nil
 
@@ -45,7 +46,7 @@ response = filterTags(length,image_collection,tag,tags)
 
 func filterTags(length int,image_collection []model.BatchImage,tag []string,tags []string) []TagOne{
 
-  var str []TagOne
+	str := make([]TagOne, 0)
 
   for k := 0; k < length ; k++ {
   var tagone TagOne

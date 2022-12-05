@@ -228,3 +228,28 @@ func (base *Controller) GetBatchImages(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 
 }
+
+func (base *Controller) DeleteBatch(c *gin.Context) {
+
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	_, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	batchID := c.Param("id")
+
+	err = batchservice.DeleteBatchService(batchID)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not delete batch", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "delete batch success", gin.H{})
+	c.JSON(http.StatusOK, rd)
+
+}
