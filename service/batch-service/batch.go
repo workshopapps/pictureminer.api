@@ -193,6 +193,33 @@ func parseDetails(file io.Reader) (map[string]string, []string, error) {
 	return dMap, body, nil
 }
 
+func DeleteBatchService(batchID string) error {
+	ctx := context.TODO()
+	db := config.GetConfig().Mongodb.Database
+
+	id, err := primitive.ObjectIDFromHex(batchID)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": id}
+	batchCol := mongodb.GetCollection(mongodb.Connection(), db, constants.BatchCollection)
+	_, err = batchCol.DeleteOne(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	// delete all images in the batch
+	filter = bson.M{"batch_id": id.Hex()}
+	batchImgCol := mongodb.GetCollection(mongodb.Connection(), db, constants.BatchImageCollection)
+	_, err = batchImgCol.DeleteMany(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func getDetails(file io.Reader) ([]string, []string) {
 	details, body := []string{}, []string{}
 
