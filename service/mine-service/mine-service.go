@@ -100,7 +100,7 @@ func GetMinedImages(userId interface{}) ([]model.MineImageResponse, error) {
 		return []model.MineImageResponse{}, err
 	}
 
-	var minedImages []model.MineImageResponse
+	minedImages := make([]model.MineImageResponse, 0)
 	cursor.All(ctx, &minedImages)
 
 	return minedImages, nil

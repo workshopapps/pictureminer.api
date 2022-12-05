@@ -20,7 +20,7 @@ func GetBatchesService(userID string) ([]model.Batch, error) {
 		return nil, err
 	}
 
-	batches := []model.Batch{}
+	batches := make([]model.Batch, 0)
 	cursor.All(ctx, &batches)
 
 	return batches, nil
@@ -86,7 +86,7 @@ func GetImagesInBatch(batchId string) ([]model.BatchImage, error) {
 		return nil, err
 	}
 
-	batchImages := []model.BatchImage{}
+	batchImages := make([]model.BatchImage, 0)
 	cursor.All(ctx, &batchImages)
 
 	return batchImages, nil

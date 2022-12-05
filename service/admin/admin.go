@@ -20,29 +20,28 @@ func GetUsers() ([]model.User, error) {
 		return []model.User{}, err
 	}
 
-	var users []model.User
+	var users = make([]model.User, 0)
 	cursor.All(ctx, &users)
 
 	return users, nil
 }
 
-
 // Delete a user
 func DeleteUser(email string) error {
 	d := time.Now().Add(1 * time.Minute)
 
-ctx, cancel := context.WithDeadline(context.Background(), d)
-defer cancel()
+	ctx, cancel := context.WithDeadline(context.Background(), d)
+	defer cancel()
 
 	_, err := mongodb.DeleteAUserFromCollection(ctx, config.GetConfig().Mongodb.Database, constants.UserCollection,
-	bson.M{"email":email})
+		bson.M{"email": email})
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func GetMinedImages() ([]model.MinedImage, error){
+func GetMinedImages() ([]model.MinedImage, error) {
 
 	ctx := context.TODO()
 	cursor, err := mongodb.SelectFromCollection(ctx, config.GetConfig().Mongodb.Database, constants.ImageCollection, bson.M{})
@@ -51,7 +50,7 @@ func GetMinedImages() ([]model.MinedImage, error){
 		return []model.MinedImage{}, err
 	}
 
-	var minedImages []model.MinedImage
+	var minedImages = make([]model.MinedImage, 0)
 	cursor.All(ctx, &minedImages)
 
 	return minedImages, nil
