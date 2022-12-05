@@ -4,9 +4,6 @@ import (
 	"encoding/csv"
 	"mime/multipart"
 	"strings"
-	"os"
-
-	"github.com/workshopapps/pictureminer.api/internal/model"
 )
 
 func checkExtension(url string) bool {
@@ -52,27 +49,4 @@ func ParseCSVfile(file multipart.File) ([]string, error) {
 
 	}
 	return urls, nil
-}
-
-func ParseImageResponseForDownload(dt []model.BatchImage, ) error{
-	//create the file
-	file, err := os.Create("filename.csv")
-	if err != nil{
-		return err
-	}
-	writer := csv.NewWriter(file)
-
-	var line []string
-	l:=append(line, "url")
-	l=append(l,"tag")
-	writer.Write(l)
-	//loop over the contents of the response
-	for _, value := range dt{
-		
-		x :=append(line, value.URL)
-		x =append(x, value.Tag)
-		writer.Write(x)
-	}
-	writer.Flush()
-	return nil
 }
