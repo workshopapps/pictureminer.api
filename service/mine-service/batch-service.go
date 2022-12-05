@@ -42,7 +42,7 @@ response = filterTags(length,image_collection,tag,tags)
 
 }
 
-func filterTags(length int, image_collection []model.ImageCollection ,tag []string,tags []string) []TagOne{
+func filterTags(length int, image_collection []model.BatchImage ,tag []string,tags []string) []TagOne{
 
   var str []TagOne
 
@@ -52,9 +52,9 @@ func filterTags(length int, image_collection []model.ImageCollection ,tag []stri
 			tagone.Tag = tags[k]
   if tag[i] == tags[k]{
 			fmt.Println(tag[i]+tags[k])
-			fmt.Println(test.Url)
+			fmt.Println(test.URL)
 			 var urlone UrlOne
-	     urlone.Url = test.Url
+	     urlone.Url = test.URL
 	     tagone.Data = append(tagone.Data , urlone )
 			fmt.Println(tagone.Data)
     	}
