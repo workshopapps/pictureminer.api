@@ -43,17 +43,17 @@ response = filterTags(length,image_collection,tag,tags)
 }
 
 
-func FilterTags(length int,image_collection []models.Image,tag []string,tags []string) []models.TagOne{
+func filterTags(length int,image_collection []model.BatchImage,tag []string,tags []string) []TagOne{
 
-  var str []models.TagOne
+  var str []TagOne
 
   for k := 0; k < length ; k++ {
-  var tagone models.TagOne
+  var tagone TagOne
   tagone.Tag = tags[k]
   for i , test:= range image_collection{
     if tag[i] == tags[k]{
-      var urlone models.UrlOne
-      urlone.Url = test.Url
+      var urlone UrlOne
+      urlone.Url = test.URL
       tagone.Data = append(tagone.Data , urlone )
     }
   }
@@ -66,15 +66,15 @@ func FilterTags(length int,image_collection []models.Image,tag []string,tags []s
   diff := missing(DistagsBatch, DisttagImage)
 
   fmt.Println(diff)
-  var tagone models.TagOne
+  var tagone TagOne
   tagone.Tag = "untagged"
   for p := 0; p < len(diff) ; p++ {
       for _ , test:= range image_collection{
           if diff[p] == test.Tag {
-            var urlTwo models.UrlOne
-            urlTwo.Url = test.Url
+            var urlTwo UrlOne
+            urlTwo.Url = test.URL
             tagone.Data = append(tagone.Data , urlTwo)
-            fmt.Println(test.Url)
+            fmt.Println(test.URL)
           }
         }
       }
