@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func GetBatchesService(userID string) ([]model.Batch, error) {
+func GetBatchesService(userID string) (interface{}, error) {
 	db := config.GetConfig().Mongodb.Database
 	ctx := context.Background()
 	filter := bson.M{"user_id": userID}
@@ -20,7 +20,7 @@ func GetBatchesService(userID string) ([]model.Batch, error) {
 		return nil, err
 	}
 
-	batches := make([]model.Batch, 0)
+	batches := []model.BatchResponse{}
 	cursor.All(ctx, &batches)
 
 	return batches, nil
