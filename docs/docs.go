@@ -315,7 +315,7 @@ const docTemplate = `{
         },
         "/update-user": {
             "patch": {
-                "description": "Updates a User's information - email,firstName,lastName,password- Bearer token and email required",
+                "description": "Updates a User's information - email,firstName,lastName,password - Bearer token required - To change password, current_password, new_password and confirm_password(repeat of the new password) are required",
                 "produces": [
                     "application/json"
                 ],
@@ -336,10 +336,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.UserLogin"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -446,9 +443,6 @@ const docTemplate = `{
         },
         "model.UpdateUser": {
             "type": "object",
-            "required": [
-                "email"
-            ],
             "properties": {
                 "confirm_password": {
                     "type": "string"
