@@ -15,6 +15,7 @@ type Configuration struct {
 	Python      MicroserviceConfiguration
 	ImaggaAPI   ImmaggaConfiguration
 	NotifyEmail NotifyEmail
+	Sentry  SentryConfiguration
 }
 
 // Setup initialize configuration
