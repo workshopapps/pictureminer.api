@@ -21,4 +21,10 @@ NotifyEmail:
   Password: "pzajnkgwvsrnxhdj"
 python: 
   microservicehost: "http://178.128.242.94/caption-generator"
+sentry:
+  Dsn: "https://cc6d7cd5ce5643b89c965e72b3a73f09@o4504260711743488.ingest.sentry.io/4504260716265472"
+  Debug: true
+  Environment: ""
+  TracesSampleRate: 1.0
+  ProfilePictureBucketName : "miner-profile-pic"
  
