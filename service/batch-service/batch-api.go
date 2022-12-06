@@ -36,7 +36,7 @@ func ProcessBatchAPI(userID string, req *http.Request) (*model.ProcessBatchAPIRe
 			return nil, ERRNoURLsInJSON
 		}
 
-		urls, err = parseCSVURLs(csvFile)
+		urls, err = parseCSVfile(csvFile)
 		if err != nil {
 			return nil, err
 		}

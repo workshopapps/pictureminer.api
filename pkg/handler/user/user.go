@@ -17,6 +17,14 @@ func (base *Controller) CreateUser(c *gin.Context) {
 
 }
 
+// Signup          godoc
+// @Summary		Signs Up a User
+// @Description Creates an account for a new user
+// @Tags        users
+// @Produce     json
+// @Param User body model.UserSignUp true "User Signup" model.User
+// @Success     200  {object} model.UserResponse
+// @Router      /signup [post]
 func (base *Controller) Signup(c *gin.Context) {
 
 	// bind userdetails to User struct
@@ -46,6 +54,14 @@ func (base *Controller) Signup(c *gin.Context) {
 	c.JSON(200, object)
 }
 
+// Login          godoc
+// @Summary		Login User
+// @Description Logs in a User
+// @Tags        users
+// @Produce     json
+// @Param User body model.UserLogin true "User Login" model.UserLogin
+// @Success     200  {object} model.UserLogin
+// @Router      /login [post]
 func (base *Controller) Login(c *gin.Context) {
 	// bind user login details to User struct
 	var User model.UserLogin
@@ -74,6 +90,14 @@ func (base *Controller) Login(c *gin.Context) {
 	c.JSON(200, object)
 }
 
+// Post             godoc
+// @Summary     Resests the password of the user
+// @Description Send a post request to reset th password of the user
+// @Tags        users
+// @Produce     json
+// @Param       ping body     model.PasswordReset true "Ping JSON"
+// @Success     200  {object} utility.Response
+// @Router      /reset [post]
 func (base *Controller) ResetPassword(c *gin.Context) {
 	// bind password reset details to User struct
 	var reqBody model.PasswordReset
@@ -102,6 +126,14 @@ func (base *Controller) ResetPassword(c *gin.Context) {
 	c.JSON(200, object)
 }
 
+// Post             godoc
+// @Summary     Checks the status of the forgot passoword
+// @Description Send a dummy post request to test the status of the server
+// @Tags        Forgot Password
+// @Produce     json
+// @Param       ping body     model.PasswordForgot true "Ping JSON"
+// @Success     200  {object} utility.Response
+// @Router      /forgot-password [post]
 func (base *Controller) ForgotPassword(c *gin.Context) {
 	// validate jwt token
 	// secretKey := config.GetConfig().Server.Secret
@@ -139,6 +171,14 @@ func (base *Controller) ForgotPassword(c *gin.Context) {
 	c.JSON(200, object)
 }
 
+// Update Profile Pic             godoc
+// @Summary     Updates a User profile picture image
+// @Description Send a patch request containing a file to be updated and receives a response of its url path after upload.
+// @Tags        users
+// @Param       image formData file true "image"
+// @Success     200  {object} utility.Response
+// @Router      /update_user_picture [patch]
+// @Security BearerAuth
 func (base *Controller) UpdateProfilePicture(c *gin.Context) {
 
 	secretKey := config.GetConfig().Server.Secret
@@ -181,10 +221,18 @@ func (base *Controller) UpdateProfilePicture(c *gin.Context) {
 	c.JSON(http.StatusOK, rd)
 }
 
+// Update User          godoc
+// @Summary		Update User
+// @Description Updates a User's information - email,firstName,lastName,password - Bearer token required - To change password, current_password, new_password and confirm_password(repeat of the new password) are required
+// @Tags        users
+// @Produce     json
+// @Param User body model.UpdateUser true "User Update" model.UserUpdate
+// @Success     200  
+// @Router      /update-user [patch]
 func (base *Controller) UpdateUser(c *gin.Context) {
 	secretKey := config.GetConfig().Server.Secret
 	token := utility.ExtractToken(c)
-	_, err := utility.GetKey("id", token, secretKey)
+	userId, err := utility.GetKey("id", token, secretKey)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
 		c.JSON(http.StatusUnauthorized, rd)
@@ -205,7 +253,7 @@ func (base *Controller) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	statusCode, err := user.UpdateUserService(reqBody)
+	statusCode, err := user.UpdateUserService(reqBody,userId)
 	if err != nil {
 		rd := utility.BuildErrorResponse(statusCode, "error", "user update failed", gin.H{"error": err.Error()}, nil)
 		c.JSON(statusCode, rd)

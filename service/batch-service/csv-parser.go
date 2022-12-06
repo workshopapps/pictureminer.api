@@ -12,7 +12,8 @@ func getUrlHeaderIndex(headers []string) (int, error) {
 	valid_headers := []string{"url", "urls", "image", "images"}
 
 	for i, head := range headers {
-		if head == valid_headers[0] || head == valid_headers[1] || head == valid_headers[2] || head == valid_headers[3] {
+		switch strings.ToLower(head) {
+		case valid_headers[0], valid_headers[1], valid_headers[2], valid_headers[3]:
 			return i, nil
 		}
 	}

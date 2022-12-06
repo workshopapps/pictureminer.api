@@ -20,6 +20,7 @@ func GetImageContent(file io.ReadCloser, filename string) (*model.MicroserviceRe
 	if err != nil {
 		return nil, err
 	}
+	req.Close = true
 
 	client := &http.Client{Timeout: 120 * time.Second}
 	resp, err := client.Do(req)
@@ -29,6 +30,7 @@ func GetImageContent(file io.ReadCloser, filename string) (*model.MicroserviceRe
 
 	defer resp.Body.Close()
 
+	fmt.Println(resp.StatusCode)
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("%s", resp.Body)
 	}

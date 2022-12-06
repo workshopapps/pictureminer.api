@@ -18,6 +18,7 @@ type MinedImage struct {
 }
 
 type MineImageResponse struct {
+	ImageKey     string    `bson:"image_key" json:"image_key,omitempty"`
 	ImageName    string    `bson:"image_name" json:"image_name,omitempty"`
 	ImagePath    string    `bson:"image_path" json:"image_path,omitempty"`
 	TextContent  string    `bson:"text_content" json:"text_content"`

@@ -52,12 +52,17 @@ func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string)
 		return nil, err
 	}
 
+	image, imageCopy, err = duplicateFile(image)
+	if err != nil {
+		return nil, err
+	}
+
 	imagePath, err := s3.UploadImage(image, imageHash+filepath.Ext(filename))
 	if err != nil {
 		return nil, err
 	}
 
-	content, err := microservice.GetImageContent(image, filename)
+	content, err := microservice.GetImageContent(imageCopy, filename)
 	if err != nil {
 		return nil, err
 	}
@@ -95,10 +100,24 @@ func GetMinedImages(userId interface{}) ([]model.MineImageResponse, error) {
 		return []model.MineImageResponse{}, err
 	}
 
-	var minedImages []model.MineImageResponse
+	minedImages := make([]model.MineImageResponse, 0)
 	cursor.All(ctx, &minedImages)
 
 	return minedImages, nil
+}
+
+func DeleteMinedImageService(imageKey string) error {
+	ctx := context.TODO()
+	db := config.GetConfig().Mongodb.Database
+
+	filter := bson.M{"image_key": imageKey}
+	minedImageCol := mongodb.GetCollection(mongodb.Connection(), db, constants.ImageCollection)
+	_, err := minedImageCol.DeleteOne(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func duplicateFile(f io.ReadCloser) (io.ReadCloser, io.ReadCloser, error) {
@@ -117,6 +136,7 @@ func getMineImageResponse(minedImage *model.MinedImage, filename string) (*model
 
 	response := &model.MineImageResponse{
 		ImageName:    filename,
+		ImageKey:     minedImage.ImageKey,
 		ImagePath:    minedImage.ImagePath,
 		TextContent:  minedImage.TextContent,
 		DateCreated:  minedImage.DateCreated,

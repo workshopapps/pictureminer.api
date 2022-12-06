@@ -49,6 +49,14 @@ func (base *Controller) DemoMineImage(c *gin.Context) {
 	c.JSON(http.StatusOK, rd)
 }
 
+// Post             godoc
+// @Summary     Mines an uploaded image
+// @Description Send a post request containing a file an receives a response of its context content.
+// @Tags        Mine-Service
+// @Param       image formData file true "image"
+// @Success     200  {object} utility.Response
+// @Router      /mine-service/upload [post]
+// @Security BearerAuth
 func (base *Controller) MineImageUpload(c *gin.Context) {
 
 	secretKey := config.GetConfig().Server.Secret
@@ -171,4 +179,35 @@ func (base *Controller) GetMinedImages(c *gin.Context) {
 
 func getFileName(url string) string {
 	return url[strings.LastIndex(url, "/")+1:]
+}
+
+func (base *Controller) DeleteMinedImage(c *gin.Context) {
+
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	_, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	// get image key
+	imageKey := c.Param("key")
+	if imageKey == "" {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", gin.H{"error": "key field missing"}, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = mineservice.DeleteMinedImageService(imageKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not delete mined image", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "delete mined image success", gin.H{})
+	c.JSON(http.StatusOK, rd)
+
 }

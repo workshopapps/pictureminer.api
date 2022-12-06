@@ -1,12 +1,72 @@
-basePath: /api/v1/
+basePath: /api/v1
 definitions:
+  model.MinedImage:
+    properties:
+      dateCreated:
+        type: string
+      dateModified:
+        type: string
+      id:
+        type: string
+      imageKey:
+        type: string
+      imageName:
+        type: string
+      imagePath:
+        type: string
+      textContent:
+        type: string
+      userID:
+        type: string
+    type: object
+  model.PasswordForgot:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  model.PasswordReset:
+    properties:
+      confirm_password:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - confirm_password
+    - email
+    - password
+    type: object
   model.Ping:
     properties:
       email:
         type: string
     type: object
+  model.UpdateUser:
+    properties:
+      confirm_password:
+        type: string
+      current_password:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      new_password:
+        type: string
+      username:
+        type: string
+    type: object
   model.User:
     properties:
+      date_created:
+        type: string
+      date_updated:
+        type: string
       email:
         type: string
       first_name:
@@ -20,6 +80,54 @@ definitions:
       profile_key:
         type: string
       profile_url:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  model.UserLogin:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  model.UserResponse:
+    properties:
+      apiCallCount:
+        type: integer
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      profileKey:
+        type: string
+      profileUrl:
+        type: string
+      token:
+        type: string
+      tokenType:
+        type: string
+      username:
+        type: string
+    type: object
+  model.UserSignUp:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
         type: string
       username:
         type: string
@@ -44,13 +152,30 @@ definitions:
       status:
         type: string
     type: object
-host: localhost:9000
+host: discripto.hng.tech/api1
 info:
   contact: {}
   description: A picture mining service API in Go using Gin framework.
   title: Minergram
   version: "1.0"
 paths:
+  /admin/mined-images:
+    get:
+      description: this returns the mined images of all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.MinedImage'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: this returns the mined images of all users
+      tags:
+      - admin
   /admin/users:
     get:
       description: List all users
@@ -63,22 +188,122 @@ paths:
             items:
               $ref: '#/definitions/model.User'
             type: array
+      security:
+      - BearerAuth: []
       summary: List all users
       tags:
-      - users
+      - admin
   /api/v1/health:
     get:
       description: Responds with the server status as JSON.
       produces:
-      - application/json
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/utility.Response"
+      summary: Checks the status of the server
+      tags:
+        - health
+    post:
+      description: Send a dummy post request to test the status of the server
+      parameters:
+        - description: Ping JSON
+          in: body
+          name: ping
+          required: true
+          schema:
+            $ref: "#/definitions/model.Ping"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/utility.Response"
+      summary: Checks the status of the server
+      tags:
+        - health
+  /admin/users/{username}:
+    delete:
+      tags:
+        - admin
+      summary: Delete a user
+      description: Delete a user
+      operationId: deleteUser
+      parameters:
+        - name: username
+          in: path
+          description: ""
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: user successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+
+        "500":
+          description: unable to delete user
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /admin/mined-images:
+    get:
+      tags: -a
+      summary: Get all mined Images
+      description: Get all mined Images
+      operationId: getmineImages
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: user successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+        "500":
+          description: unable to delete user
+          content:
+            application/json:
+              schema:
+                type: object
+
+schemes:
+  - http
+
+      - health
+  /batch-service/process-batch-api:
+    post:
+      description: Process a list of images as a batch
+      parameters:
+      - description: json
+        in: formData
+        name: json
+        required: true
+        type: file
+      - description: csv
+        in: formData
+        name: csv
+        type: file
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/utility.Response'
-      summary: Checks the status of the server
+      security:
+      - BearerAuth: []
+      summary: Processes a batch of images
       tags:
-      - health
+      - batch-api
+  /forgot-password:
     post:
       description: Send a dummy post request to test the status of the server
       parameters:
@@ -87,7 +312,7 @@ paths:
         name: ping
         required: true
         schema:
-          $ref: '#/definitions/model.Ping'
+          $ref: '#/definitions/model.PasswordForgot'
       produces:
       - application/json
       responses:
@@ -95,9 +320,134 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/utility.Response'
-      summary: Checks the status of the server
+      summary: Checks the status of the forgot passoword
       tags:
-      - health
+      - Forgot Password
+  /login:
+    post:
+      description: Logs in a User
+      parameters:
+      - description: User Login
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserLogin'
+      summary: Login User
+      tags:
+      - users
+  /mine-service/upload:
+    post:
+      description: Send a post request containing a file an receives a response of
+        its context content.
+      parameters:
+      - description: image
+        in: formData
+        name: image
+        required: true
+        type: file
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utility.Response'
+      security:
+      - BearerAuth: []
+      summary: Mines an uploaded image
+      tags:
+      - Mine-Service
+  /reset:
+    post:
+      description: Send a post request to reset th password of the user
+      parameters:
+      - description: Ping JSON
+        in: body
+        name: ping
+        required: true
+        schema:
+          $ref: '#/definitions/model.PasswordReset'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utility.Response'
+      summary: Resests the password of the user
+      tags:
+      - users
+  /signup:
+    post:
+      description: Creates an account for a new user
+      parameters:
+      - description: User Signup
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserSignUp'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserResponse'
+      summary: Signs Up a User
+      tags:
+      - users
+  /update-user:
+    patch:
+      description: Updates a User's information - email,firstName,lastName,password
+        - Bearer token required - To change password, current_password, new_password
+        and confirm_password(repeat of the new password) are required
+      parameters:
+      - description: User Update
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Update User
+      tags:
+      - users
+  /update_user_picture:
+    patch:
+      description: Send a patch request containing a file to be updated and receives
+        a response of its url path after upload.
+      parameters:
+      - description: image
+        in: formData
+        name: image
+        required: true
+        type: file
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utility.Response'
+      security:
+      - BearerAuth: []
+      summary: Updates a User profile picture image
+      tags:
+      - users
 schemes:
-- http
+- https
+securityDefinitions:
+  BearerAuth:
+    in: header "Bearer <add access token here>"
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

@@ -5,4 +5,6 @@ const (
 	ImageCollection      = "mined_images"
 	BatchCollection      = "batches"
 	BatchImageCollection = "batch_images"
+	// BatchCollectionMe = "batchCollection"
+	// BatchMinedCollection = "batchimageCollection"
 )

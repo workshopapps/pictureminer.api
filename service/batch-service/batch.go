@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -193,6 +194,33 @@ func parseDetails(file io.Reader) (map[string]string, []string, error) {
 	return dMap, body, nil
 }
 
+func DeleteBatchService(batchID string) error {
+	ctx := context.TODO()
+	db := config.GetConfig().Mongodb.Database
+
+	id, err := primitive.ObjectIDFromHex(batchID)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": id}
+	batchCol := mongodb.GetCollection(mongodb.Connection(), db, constants.BatchCollection)
+	_, err = batchCol.DeleteOne(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	// delete all images in the batch
+	filter = bson.M{"batch_id": id.Hex()}
+	batchImgCol := mongodb.GetCollection(mongodb.Connection(), db, constants.BatchImageCollection)
+	_, err = batchImgCol.DeleteMany(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func getDetails(file io.Reader) ([]string, []string) {
 	details, body := []string{}, []string{}
 
@@ -300,4 +328,27 @@ func getUserEmail(userID string) (string, int, error) {
 		return "", http.StatusInternalServerError, err
 	}
 	return user.Email, http.StatusOK, nil
+}
+
+func ParseImageResponseForDownload(dt []model.BatchImage) error {
+	//create the file
+	file, err := os.Create("filename.csv")
+	if err != nil {
+		return err
+	}
+	writer := csv.NewWriter(file)
+
+	var line []string
+	l := append(line, "url")
+	l = append(l, "tag")
+	writer.Write(l)
+	//loop over the contents of the response
+	for _, value := range dt {
+
+		x := append(line, value.URL)
+		x = append(x, value.Tag)
+		writer.Write(x)
+	}
+	writer.Flush()
+	return nil
 }

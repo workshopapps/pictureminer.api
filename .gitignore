@@ -19,7 +19,9 @@
 config.yaml
 
 .env
+.idea/
 logs/
 pictureminer.api
 .github/
+.vscode/
 
