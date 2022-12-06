@@ -113,7 +113,7 @@ func getCollection(collection string) *mongo.Collection {
 	return c
 }
 
-// Delete 
+// Delete
 
 func SelectFromCollection(ctx context.Context, database, collection string, filter bson.M) (*mongo.Cursor, error) {
 	modelCollection := GetCollection(mongoClient, database, collection)
@@ -124,24 +124,23 @@ func SelectFromCollection(ctx context.Context, database, collection string, filt
 	return cursor, nil
 }
 
-
-func DeleteAUserFromCollection(ctx context.Context, database, collection string, filter bson.M)(*mongo.DeleteResult, error)  {
+func DeleteAUserFromCollection(ctx context.Context, database, collection string, filter bson.M) (*mongo.DeleteResult, error) {
 	modelCollection := GetCollection(mongoClient, database, collection)
 	// To check if the user exist or not
-	user := modelCollection.FindOne(ctx,filter)
+	user := modelCollection.FindOne(ctx, filter)
 	if user.Err() != nil {
 		return nil, user.Err()
 	}
-	deletedResult,err := modelCollection.DeleteOne(ctx,filter)
+	deletedResult, err := modelCollection.DeleteOne(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 	return deletedResult, err
-	
+
 }
 
 func CountFromCollection(user_id primitive.ObjectID) (int64, error) {
-	userCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.ImageCollection)
+	userCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database, constants.ImageCollection)
 	filter := bson.D{{"user_id", user_id}}
 	count, err := userCollection.CountDocuments(context.TODO(), filter)
 	if err != nil {
@@ -157,13 +156,12 @@ func CountFromCollection(user_id primitive.ObjectID) (int64, error) {
 	return count, nil
 }
 
+func GetUserTags(user_id string, batch_id primitive.ObjectID) ([]string, int, error) {
+	var tags []string
+	var length int
 
-func GetUserTags(user_id string,batch_id primitive.ObjectID) ([]string, int , error){
-  var tags []string
-  var length int
-
-	batchImagesCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.BatchCollection)
-	filter := bson.D{{"user_id", user_id},{"_id", batch_id}}
+	batchImagesCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database, constants.BatchCollection)
+	filter := bson.D{{"user_id", user_id}, {"_id", batch_id}}
 
 	batch_collection, err := batchImagesCollection.Find(context.TODO(), filter)
 	if err != nil {
@@ -171,22 +169,22 @@ func GetUserTags(user_id string,batch_id primitive.ObjectID) ([]string, int , er
 	}
 
 	var results []model.Batch
-		if err := batch_collection.All(context.TODO(), &results); err != nil {
-			fmt.Println(err)
-		}
+	if err := batch_collection.All(context.TODO(), &results); err != nil {
+		fmt.Println(err)
+	}
 
-  for _, test := range results {
-        if test.UserID == user_id {
-          tags =  test.Tags
-          length = len(test.Tags)
-        }
-    }
-     return tags ,length ,err
+	for _, test := range results {
+		if test.UserID == user_id {
+			tags = test.Tags
+			length = len(test.Tags)
+		}
+	}
+	return tags, length, err
 }
 
-func GetImageTags(batch_id string) ([]model.BatchImage, []string, int, error){
-  var tag []string
-	batchImagesCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database , constants.BatchImageCollection)
+func GetImageTags(batch_id string) ([]model.BatchImage, []string, int, error) {
+	var tag []string
+	batchImagesCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database, constants.BatchImageCollection)
 	filter := bson.D{{"batch_id", batch_id}}
 
 	image_collection, err := batchImagesCollection.Find(ctx, filter)
@@ -195,33 +193,45 @@ func GetImageTags(batch_id string) ([]model.BatchImage, []string, int, error){
 	}
 
 	var results []model.BatchImage
-		if err := image_collection.All(context.TODO(), &results); err != nil {
-			fmt.Println(err)
-		}
+	if err := image_collection.All(context.TODO(), &results); err != nil {
+		fmt.Println(err)
+	}
 
-  for _, test := range results {
-        if test.BatchID == batch_id {
-           tag = append(tag,test.Tag)
-        }
-    }
-     return results, tag,len(tag), err
+	for _, test := range results {
+		if test.BatchID == batch_id {
+			tag = append(tag, test.Tag)
+		}
+	}
+	return results, tag, len(tag), err
 }
 
 func MongoUpdate(id string, updateEntries map[string]interface{}, collection string) (*mongo.UpdateResult, error) {
 	c := getCollection(collection)
+	apiCallCount := "api_call_count"
 	user_id, err := primitive.ObjectIDFromHex(id)
-
 	if err != nil {
 		return nil, err
 	}
 
-	update := make(bson.M)
+	if value, ok := updateEntries[apiCallCount]; ok {
+		_, err := c.UpdateByID(ctx, user_id, bson.M{"$inc": bson.M{apiCallCount: value}}, options.Update().SetUpsert(true))
+		if err != nil {
+			return nil, err
+		}
 
+		delete(updateEntries, apiCallCount)
+		if len(updateEntries) == 0 {
+			return nil, nil
+		}
+	}
+
+	update := make(bson.M, 0)
 	for i, j := range updateEntries {
 		update[i] = j
 	}
 
 	db_data := bson.M{"$set": update}
+
 	result, err := c.UpdateByID(context.TODO(), user_id, db_data)
 
 	if err != nil {

@@ -63,7 +63,7 @@ func ProcessBatchAPI(userID string, req *http.Request) (*model.ProcessBatchAPIRe
 	response := prepareResponse(batchID.Hex(), jsonReq, time)
 
 	// start processing image urls in background
-	go processBatch(userEmail, response.Name, response.Description, batchID, response.Tags, jsonReq.Images)
+	go processBatch(userEmail, response.Name, response.Description, userID, batchID, response.Tags, jsonReq.Images)
 
 	return response, nil
 }
