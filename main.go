@@ -40,17 +40,18 @@ func main() {
 		// Set TracesSampleRate to 1.0 to capture 100%
 		// of transactions for performance monitoring.
 		// We recommend adjusting this value in production,
-		TracesSampleRate: 1.0,
-		// TracesSampler: sentry.TracesSamplerFunc(func(ctx sentry.SamplingContext) sentry.Sampled {
-		// 	return sentry.SampledTrue
-		// }),
+		// TracesSampleRate: 1.0,
+		TracesSampler: sentry.TracesSamplerFunc(func(ctx sentry.SamplingContext) sentry.Sampled {
+			return sentry.SampledTrue
+		}),
 	})
 	if err != nil {
 		log.Fatalf("sentry.Init: %s", err)
 	}
 	// Flush buffered events before the program terminates.
 	defer sentry.Flush(2 * time.Second)
-
+	// sentry.CaptureException(err)
+	// sentry.CaptureMessage("It works!")
 	//Load config
 	logger := utility.NewLogger()
 	getConfig := config.GetConfig()
