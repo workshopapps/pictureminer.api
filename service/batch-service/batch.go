@@ -84,7 +84,7 @@ func ProcessBatchCSVService(userID string, file io.Reader) (interface{}, int, er
 	}
 
 	// run goroutine in background to process batch
-	go processBatch(uEmail, bName, desc, batch.ID, tags, urls)
+	go processBatch(uEmail, bName, desc, userID, batch.ID, tags, urls)
 
 	// return success message
 	res := model.BatchResponse{
@@ -160,7 +160,7 @@ func ProcessBatchService(userID, batchName, desc, tagsStr string, csvFile io.Rea
 	}
 
 	// run goroutine in background to process batch
-	go processBatch(uEmail, batchName, desc, batch.ID, tags, urls)
+	go processBatch(uEmail, batchName, desc, userID, batch.ID, tags, urls)
 
 	// return success message
 	res := model.BatchResponse{

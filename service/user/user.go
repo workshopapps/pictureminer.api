@@ -82,12 +82,6 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 		return model.UserResponse{}, fmt.Sprintf("unable to create token: %v", err.Error()), 500, err
 	}
 
-	// implementaton code
-	estCount, err := mongodb.CountFromCollection(user.ID)
-	if err != nil {
-		return model.UserResponse{}, "error reading number of documents", 500, err
-	}
-
 	// build user response
 	userResponse := model.UserResponse{
 		Username:     user.Username,
@@ -98,7 +92,7 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 		ProfileUrl:   user.ProfileUrl,
 		TokenType:    "bearer",
 		Token:        token,
-		ApiCallCount: estCount,
+		ApiCallCount: user.ApiCallCount,
 	}
 
 	return userResponse, "", 0, nil
@@ -194,12 +188,12 @@ func ProfilePictureServiceUpload(userId interface{}, image io.ReadCloser, filena
 }
 
 func UpdateUserService(user model.UpdateUser, userId interface{}) (int, error) {
-	string_id,_ := userId.(string)
-	string_id = string_id[10:len(string_id)-2]
-	id,_ := primitive.ObjectIDFromHex(string_id)
+	string_id, _ := userId.(string)
+	string_id = string_id[10 : len(string_id)-2]
+	id, _ := primitive.ObjectIDFromHex(string_id)
 	database := config.GetConfig().Mongodb.Database
 	filter := bson.D{{"_id", id}}
-	
+
 	if len(user.LastName) > 0 {
 		update := bson.D{
 			{"$set", bson.D{{"last_name", user.LastName}}},
@@ -248,7 +242,7 @@ func UpdateUserService(user model.UpdateUser, userId interface{}) (int, error) {
 
 		hash, _ := bcrypt.GenerateFromPassword([]byte(user.NewPassword), 10)
 		user.NewPassword = string(hash)
-		update :=bson.D{
+		update := bson.D{
 			{"$set", bson.D{{"password", user.NewPassword}}},
 		}
 		err = UpdateFunc(database, filter, update)
