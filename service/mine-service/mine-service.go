@@ -79,7 +79,7 @@ func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string)
 		DateModified: time,
 	}
 
-	response, err := getMineImageResponse(minedImage, filename)
+	response, err := saveMinedImage(minedImage, filename)
 	if err != nil {
 		return nil, err
 	}
@@ -128,9 +128,16 @@ func duplicateFile(f io.ReadCloser) (io.ReadCloser, io.ReadCloser, error) {
 	return io.NopCloser(bytes.NewReader(contents)), io.NopCloser(bytes.NewReader(contents)), nil
 }
 
-func getMineImageResponse(minedImage *model.MinedImage, filename string) (*model.MineImageResponse, error) {
+func saveMinedImage(minedImage *model.MinedImage, filename string) (*model.MineImageResponse, error) {
 	_, err := mongodb.MongoPost(constants.ImageCollection, *minedImage)
 	if err != nil {
+		return nil, err
+	}
+
+	// Update API count
+	if _, err = mongodb.MongoUpdate(minedImage.UserID[10:len(minedImage.UserID)-2], map[string]interface{}{
+		"api_call_count": 1,
+	}, constants.UserCollection); err != nil {
 		return nil, err
 	}
 

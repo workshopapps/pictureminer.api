@@ -7,17 +7,17 @@ import (
 )
 
 type User struct {
-
-	ID          primitive.ObjectID `bson:"_id, omitempty"`
-	Username    string             `bson:"username" json:"username" validate:"required"`
-	FirstName   string             `bson:"first_name" json:"first_name"`
-	LastName    string             `bson:"last_name" json:"last_name"`
-	Email       string             `bson:"email" json:"email" validate:"required,email"`
-	Password    string             `bson:"password" json:"password" validate:"required"`
-	ProfileKey  string             `bson:"profile_key" json:"profile_key"`
-	ProfileUrl  string             `bson:"profile_url" json:"profile_url"`
-	DateCreated time.Time          `bson:"date_created" json:"date_created"`
-	DateUpdated time.Time          `bson:"date_updated" json:" date_updated"`
+	ID           primitive.ObjectID `bson:"_id, omitempty"`
+	Username     string             `bson:"username" json:"username" validate:"required"`
+	FirstName    string             `bson:"first_name" json:"first_name"`
+	LastName     string             `bson:"last_name" json:"last_name"`
+	Email        string             `bson:"email" json:"email" validate:"required,email"`
+	Password     string             `bson:"password" json:"password" validate:"required"`
+	ProfileKey   string             `bson:"profile_key" json:"profile_key"`
+	ProfileUrl   string             `bson:"profile_url" json:"profile_url"`
+	DateCreated  time.Time          `bson:"date_created" json:"date_created"`
+	DateUpdated  time.Time          `bson:"date_updated" json:"date_updated"`
+	ApiCallCount int64              `bson:"api_call_count" json:"api_call_count"`
 }
 
 type UserResponse struct {
@@ -39,14 +39,12 @@ type UserLogin struct {
 
 // created this struct for swagger docs
 type UserSignUp struct {
-	Username    string             `bson:"username" json:"username" validate:"required"`
-	FirstName   string             `bson:"first_name" json:"first_name"`
-	LastName    string             `bson:"last_name" json:"last_name"`
-	Email       string             `bson:"email" json:"email" validate:"required,email"`
-	Password    string             `bson:"password" json:"password" validate:"required"`
+	Username  string `bson:"username" json:"username" validate:"required"`
+	FirstName string `bson:"first_name" json:"first_name"`
+	LastName  string `bson:"last_name" json:"last_name"`
+	Email     string `bson:"email" json:"email" validate:"required,email"`
+	Password  string `bson:"password" json:"password" validate:"required"`
 }
-
-
 
 type PasswordReset struct {
 	Email           string `bson:"email" json:"email" validate:"required"`

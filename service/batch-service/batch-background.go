@@ -14,6 +14,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.uber.org/multierr"
 )
 
 type Result struct {
@@ -48,15 +49,28 @@ const (
 	statusComplete = "completed"
 )
 
-func processBatch(email, bName, desc string, batchID primitive.ObjectID, tags, urls []string) {
+func processBatch(email, bName, desc, userID string, batchID primitive.ObjectID, tags, urls []string) {
+	var err error
 	// labels for each url
 	labels := fetchLabelsForURLS(urls)
+
+	//Update API Call count
+	_, UErr := mongodb.MongoUpdate(userID[10:len(userID)-2], map[string]interface{}{
+		"api_call_count": len(labels),
+	}, constants.UserCollection)
+	if UErr != nil {
+		err = multierr.Append(err, UErr)
+	}
 
 	// classify label to matching tag
 	batchImgs := classifyLabels(batchID.Hex(), labels, tags)
 
 	// save to db
-	err := saveToDB(batchImgs)
+	SErr := saveToDB(batchImgs)
+	if SErr != nil {
+		err = multierr.Append(err, SErr)
+	}
+
 	if err != nil {
 		warnUser(email, bName, err.Error())
 	}
@@ -210,7 +224,6 @@ func warnUser(email, batchName, msg string) {
 	utility.EmailSender(from, password, []string{email}, "Process Batch Failed", body)
 }
 
-
 /*--------------------*/
 
 func classifyAlgorithm(resultId string, label Label, tagMap map[string]bool) model.BatchImage {
@@ -255,5 +268,3 @@ func labelClassifier(resultId string, labels []Label, tags []string) []model.Bat
 
 	return batchImgs
 }
-
-

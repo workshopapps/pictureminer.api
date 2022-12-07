@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -84,7 +85,7 @@ func ProcessBatchCSVService(userID string, file io.Reader) (interface{}, int, er
 	}
 
 	// run goroutine in background to process batch
-	go processBatch(uEmail, bName, desc, batch.ID, tags, urls)
+	go processBatch(uEmail, bName, desc, userID, batch.ID, tags, urls)
 
 	// return success message
 	res := model.BatchResponse{
@@ -160,7 +161,7 @@ func ProcessBatchService(userID, batchName, desc, tagsStr string, csvFile io.Rea
 	}
 
 	// run goroutine in background to process batch
-	go processBatch(uEmail, batchName, desc, batch.ID, tags, urls)
+	go processBatch(uEmail, batchName, desc, userID, batch.ID, tags, urls)
 
 	// return success message
 	res := model.BatchResponse{
@@ -327,4 +328,27 @@ func getUserEmail(userID string) (string, int, error) {
 		return "", http.StatusInternalServerError, err
 	}
 	return user.Email, http.StatusOK, nil
+}
+
+func ParseImageResponseForDownload(dt []model.BatchImage) error {
+	//create the file
+	file, err := os.Create("filename.csv")
+	if err != nil {
+		return err
+	}
+	writer := csv.NewWriter(file)
+
+	var line []string
+	l := append(line, "url")
+	l = append(l, "tag")
+	writer.Write(l)
+	//loop over the contents of the response
+	for _, value := range dt {
+
+		x := append(line, value.URL)
+		x = append(x, value.Tag)
+		writer.Write(x)
+	}
+	writer.Flush()
+	return nil
 }

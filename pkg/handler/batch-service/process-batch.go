@@ -2,6 +2,7 @@ package batch
 
 import (
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -251,5 +252,34 @@ func (base *Controller) DeleteBatch(c *gin.Context) {
 
 	rd := utility.BuildSuccessResponse(http.StatusOK, "delete batch success", gin.H{})
 	c.JSON(http.StatusOK, rd)
+
+}
+
+func (base *Controller) DownloadCsv(c *gin.Context) {
+
+	// secretKey := config.GetConfig().Server.Secret
+	// token := utility.ExtractToken(c)
+	// userId, err := utility.GetKey("id", token, secretKey)
+	// if err != nil {
+	// 	rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+	// 	c.JSON(http.StatusUnauthorized, rd)
+	// 	return
+	// }
+	batchId := c.Param("batchid")
+	var dummySlice, err = batchservice.GetImagesInBatch(batchId)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not get images for this batch id", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+	errr := batchservice.ParseImageResponseForDownload(dummySlice)
+	if errr != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not generate csv for download", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	c.FileAttachment("filename.csv", batchId + ".csv")
+	defer os.Remove("filename.csv")
 
 }
