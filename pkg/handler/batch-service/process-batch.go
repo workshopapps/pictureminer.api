@@ -5,11 +5,13 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	batchservice "github.com/workshopapps/pictureminer.api/service/batch-service"
+	mineservice "github.com/workshopapps/pictureminer.api/service/mine-service"
 	"github.com/workshopapps/pictureminer.api/utility"
 )
 
@@ -282,4 +284,27 @@ func (base *Controller) DownloadCsv(c *gin.Context) {
 	c.FileAttachment("filename.csv", batchId + ".csv")
 	defer os.Remove("filename.csv")
 
+}
+
+
+func (base *Controller) CountProcess(c *gin.Context) {
+
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	userId, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+  UserIdstr := fmt.Sprintf("%v", userId)
+
+	processCount, err := mineservice.ProcessCount(UserIdstr)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not get count", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+	c.JSON(http.StatusOK, processCount)
 }

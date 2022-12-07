@@ -152,3 +152,38 @@ func saveMinedImage(minedImage *model.MinedImage, filename string) (*model.MineI
 
 	return response, nil
 }
+
+
+func ProcessCount(userId string) (model.ProcessCallCount, error) {
+
+	var response model.ProcessCallCount
+
+	batchCount, err := mongodb.MainCountFromCollection(userId, constants.BatchCollection)
+	if err != nil {
+		return response, err
+	}
+
+	imageCount, err := mongodb.MainCountFromCollection(userId, constants.ImageCollection)
+	if err != nil {
+		return response, err
+	}
+
+	var status bool
+
+	if batchCount != 0 || imageCount != 0 {
+		status = true
+	}else{
+		status = false
+	}
+
+	response = model.ProcessCallCount{
+		ImageCount:    imageCount,
+		BatchCount:     batchCount,
+		Status:    status,
+	}
+
+
+
+	return response, nil
+
+}
