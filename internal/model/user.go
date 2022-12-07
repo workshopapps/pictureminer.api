@@ -67,3 +67,9 @@ type UpdateUser struct {
 	NewPassword     string `bson:"new_password" json:"new_password"`
 	ConfirmPassword string `bson:"confirm_password" json:"confirm_password"`
 }
+
+type SubscriberEmail struct {
+	ID          primitive.ObjectID `bson:"_id" json:"_id"`
+	Email       string             `bson:"email" json:"email" validate:"required,email"`
+	Subscribed  bool              `bson:"subscribed" json:"subscribed"`
+}
