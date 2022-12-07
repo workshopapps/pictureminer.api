@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/service/user"
 	"github.com/workshopapps/pictureminer.api/utility"
@@ -15,7 +14,7 @@ func (base *Controller) SubscriberEmail(c *gin.Context) {
 
 	// bind emails to SubscriberEmail struct
 	var subscriberEmail model.SubscriberEmail
-	err := c.Bind(&SubscriberEmail)
+	err := c.Bind(&subscriberEmail)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Unable to bind subscriber email details", err, nil)
 		c.JSON(http.StatusBadRequest, rd)
