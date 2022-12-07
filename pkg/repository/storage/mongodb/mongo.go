@@ -156,6 +156,24 @@ func CountFromCollection(user_id primitive.ObjectID) (int64, error) {
 	return count, nil
 }
 
+func MainCountFromCollection(user_id string, collection string) (int64, error) {
+	countCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database, collection)
+	filter := bson.D{{"user_id", user_id}}
+	count, err := countCollection.CountDocuments(context.TODO(), filter)
+	if err != nil {
+		return count, err
+	}
+
+	// implementaton code
+	// count , err := MainCountFromCollection("637f3cb921187c6a016f2087")
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error":"error reading number of documents"})
+	// }
+	
+	return count, nil
+}
+
+
 func GetUserTags(user_id string, batch_id primitive.ObjectID) ([]string, int, error) {
 	var tags []string
 	var length int
