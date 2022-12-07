@@ -42,3 +42,9 @@ type MineImagePromptResponse struct {
 	DateCreated  time.Time `bson:"date_created" json:"date_created"`
 	DateModified time.Time `bson:"date_modified" json:"date_modified"`
 }
+
+type ProcessCallCount struct {
+	ImageCount    int64    `bson:"image_count" json:"image_count"`
+	BatchCount    int64    `bson:"batch_count" json:"batch_count"`
+	Status			bool	`bson:"status" json:"status"`
+}

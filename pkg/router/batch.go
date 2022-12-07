@@ -21,6 +21,7 @@ func ProcessBatch(r *gin.Engine, validate *validator.Validate, ApiVersion string
 		authUrl.GET("/batch-service/images/:batch_id", batch.GetBatchImages)
 		authUrl.GET("/batch-service/download/:batchid", batch.DownloadCsv)
 		authUrl.DELETE("/batch-service/delete/:id", batch.DeleteBatch)
+		authUrl.GET("/batch-service/count-process", batch.CountProcess)
 	}
 
 	return r
