@@ -235,7 +235,7 @@ func UpdateUserService(user model.UpdateUser, userId interface{}) (int, error) {
 	}
 
 	if len(user.NewPassword) > 0 {
-		err := CheckPasswords(user)
+		err := CheckPasswords(user,id)
 		if err != nil {
 			return 400, err
 		}
@@ -260,7 +260,7 @@ func UpdateFunc(db string, filter bson.D, update bson.D) error {
 	return err
 }
 
-func CheckPasswords(user model.UpdateUser) error {
+func CheckPasswords(user model.UpdateUser, id primitive.ObjectID) error {
 	var userDocument model.User
 	database := config.GetConfig().Mongodb.Database
 	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
