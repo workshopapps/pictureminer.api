@@ -3,55 +3,27 @@ package router
 import (
 	"fmt"
 	"net/http"
-	"time"
 
-	"github.com/getsentry/sentry-go"
-	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	newrelic "github.com/newrelic/go-agent"
+	"github.com/newrelic/go-agent/_integrations/nrgin/v1"
 	"github.com/workshopapps/pictureminer.api/pkg/middleware"
 	"github.com/workshopapps/pictureminer.api/utility"
 )
 
 func Setup(validate *validator.Validate, logger *utility.Logger) *gin.Engine {
 
-	// To initialize Sentry's handler, you need to initialize Sentry itself beforehand
-	if err := sentry.Init(sentry.ClientOptions{
-		Dsn: "https://419447b5b02e42dc8b277f5af67e565f@o4504279417421824.ingest.sentry.io/4504279420305408",
-		// Set TracesSampleRate to 1.0 to capture 100%
-		// of transactions for performance monitoring.
-		// We recommend adjusting this value in production,
-		TracesSampleRate: 1.0,
-	}); err != nil {
-		fmt.Printf("Sentry initialization failed: %v\n", err)
+	cfg := newrelic.NewConfig("discripto_api", "23e1bbb04e4fd6b88bdedb97fde89345ee8cNRAL")
+
+	app, err := newrelic.NewApplication(cfg)
+	if nil != err {
+		fmt.Println(err)
 	}
 
-	// Flush buffered events before the program terminates.
-	defer sentry.Flush(2 * time.Second)
-
-	sentry.CaptureMessage("It works fine o!")
-
 	r := gin.New()
-
-	r.Use(sentrygin.New(sentrygin.Options{}))
-
-	r.Use(func(ctx *gin.Context) {
-		if hub := sentrygin.GetHubFromContext(ctx); hub != nil {
-			hub.Scope().SetTag("someRandomTag", "maybeYouNeedIt")
-		}
-		ctx.Next()
-	})
-
-	r.GET("/testing", func(ctx *gin.Context) {
-		if hub := sentrygin.GetHubFromContext(ctx); hub != nil {
-			hub.WithScope(func(scope *sentry.Scope) {
-				scope.SetExtra("unwantedQuery", "someQueryDataMaybe")
-				hub.CaptureMessage("User provided unwanted query string, but we recovered just fine")
-			})
-		}
-		ctx.Status(http.StatusOK)
-	})
+	r.Use(nrgin.Middleware(app))
 
 	// Middlewares
 	// r.Use(gin.Logger())
@@ -70,7 +42,6 @@ func Setup(validate *validator.Validate, logger *utility.Logger) *gin.Engine {
 	MineService(r, validate, ApiVersion, logger)
 	Admin(r, validate, ApiVersion, logger)
 	SwaggerDocs(r, ApiVersion)
-	Feedback(r, validate, ApiVersion, logger)
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{
