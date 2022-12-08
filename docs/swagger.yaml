@@ -1,5 +1,36 @@
-basePath: /api/v1
+basePath: /api/v1/
 definitions:
+  model.Feedback:
+    properties:
+      date_created:
+        type: string
+      feedback:
+        type: string
+      id:
+        type: string
+      image_key:
+        type: string
+      is_helpful:
+        type: boolean
+      reviewer_email:
+        type: string
+    type: object
+  model.FeedbackCreatedResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  model.FeedbackRequest:
+    properties:
+      feedback:
+        type: string
+      image_key:
+        type: string
+      is_helpful:
+        type: boolean
+      reviewer_email:
+        type: string
+    type: object
   model.MinedImage:
     properties:
       dateCreated:
@@ -60,33 +91,6 @@ definitions:
         type: string
       username:
         type: string
-    type: object
-  model.User:
-    properties:
-      date_created:
-        type: string
-      date_updated:
-        type: string
-      email:
-        type: string
-      first_name:
-        type: string
-      id:
-        type: string
-      last_name:
-        type: string
-      password:
-        type: string
-      profile_key:
-        type: string
-      profile_url:
-        type: string
-      username:
-        type: string
-    required:
-    - email
-    - password
-    - username
     type: object
   model.UserLogin:
     properties:
@@ -176,109 +180,37 @@ paths:
       summary: this returns the mined images of all users
       tags:
       - admin
-  /admin/users:
+  /api/v1/health:
     get:
-      description: List all users
+      description: Responds with the server status as JSON.
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/model.User'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: List all users
-      tags:
-      - admin
-  /api/v1/health:
-    get:
-      description: Responds with the server status as JSON.
-      produces:
-        - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: "#/definitions/utility.Response"
+            $ref: '#/definitions/utility.Response'
       summary: Checks the status of the server
       tags:
-        - health
+      - health
     post:
       description: Send a dummy post request to test the status of the server
       parameters:
-        - description: Ping JSON
-          in: body
-          name: ping
-          required: true
-          schema:
-            $ref: "#/definitions/model.Ping"
+      - description: Ping JSON
+        in: body
+        name: ping
+        required: true
+        schema:
+          $ref: '#/definitions/model.Ping'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/utility.Response"
+            $ref: '#/definitions/utility.Response'
       summary: Checks the status of the server
       tags:
-        - health
-  /admin/users/{username}:
-    delete:
-      tags:
-        - admin
-      summary: Delete a user
-      description: Delete a user
-      operationId: deleteUser
-      parameters:
-        - name: username
-          in: path
-          description: ""
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: user successfully deleted
-          content:
-            application/json:
-              schema:
-                type: object
-
-        "500":
-          description: unable to delete user
-          content:
-            application/json:
-              schema:
-                type: object
-
-  /admin/mined-images:
-    get:
-      tags: -a
-      summary: Get all mined Images
-      description: Get all mined Images
-      operationId: getmineImages
-      produces:
-        - application/json
-      responses:
-        "200":
-          description: user successfully deleted
-          content:
-            application/json:
-              schema:
-                type: object
-        "500":
-          description: unable to delete user
-          content:
-            application/json:
-              schema:
-                type: object
-
-schemes:
-  - http
-
       - health
   /batch-service/process-batch-api:
     post:
@@ -303,6 +235,45 @@ schemes:
       summary: Processes a batch of images
       tags:
       - batch-api
+  /feedback:
+    post:
+      description: Send feedback to discripto
+      parameters:
+      - description: Create feedback
+        in: body
+        name: Feedback
+        required: true
+        schema:
+          $ref: '#/definitions/model.FeedbackRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.FeedbackCreatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utility.Response'
+      summary: Sends feedback to discripto
+      tags:
+      - Feedback
+  /feedback/all:
+    get:
+      description: Gets all feedback sent to discripto
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Feedback'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utility.Response'
+      summary: Gets all feedback sent discripto
+      tags:
+      - Feedback
   /forgot-password:
     post:
       description: Send a dummy post request to test the status of the server
