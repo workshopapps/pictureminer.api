@@ -104,3 +104,19 @@ func (base *Controller) GetAllMinedImages(c *gin.Context) {
 	c.JSON(http.StatusOK, rd)
 
 }
+
+
+func (base *Controller) GetSubscribers(c *gin.Context) {
+
+
+	subscribers, err := admin.GetSubscribers()
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", err.Error(), err, nil)
+		c.JSON(http.StatusInternalServerError, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "success", gin.H{"data": subscribers})
+	c.JSON(http.StatusOK, rd)
+
+}

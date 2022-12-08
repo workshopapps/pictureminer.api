@@ -18,7 +18,8 @@ func Admin(r *gin.Engine, validate *validator.Validate, ApiVersion string, logge
 		adminUrl.GET("/admin/users", admin.GetUsers)
 		adminUrl.GET("/admin/mined-images", admin.GetAllMinedImages)
 		adminUrl.DELETE("/admin/users/:email", admin.DeleteUser)
-		
+		adminUrl.GET("/admin/subscribers", admin.GetSubscribers)
+
 	}
 	return r
 }
