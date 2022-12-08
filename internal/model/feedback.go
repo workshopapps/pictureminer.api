@@ -14,6 +14,12 @@ type Feedback struct{
 	DateCreated  time.Time `bson:"date_created" json:"date_created"`
 }
 
+type FeedbackRequest struct {
+	ReviewerEmail string `bson:"reviewer_email" json:"reviewer_email"`
+	ImageKey string `bson:"image_id" json:"image_key"`
+	IsHelpful  bool `bson:"is_helpful" json:"is_helpful"`
+	Feedback string `bson:"feedback" json:"feedback"`
+}
 type FeedbackCreatedResponse struct {
 	Message string `json:"message"`
 }

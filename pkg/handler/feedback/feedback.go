@@ -15,6 +15,14 @@ type Controller struct {
 	Logger   *utility.Logger
 }
 
+// Post             godoc
+// @Summary    Sends feedback to discripto
+// @Description Send feedback to discripto
+// @Tags        Feedback
+// @Param       Feedback body model.FeedbackRequest true "Create feedback" model.Feedback
+// @Success     200  {object} model.FeedbackCreatedResponse
+// @Failure  	400 {object} utility.Response
+// @Router      /feedback [post]
 func (base *Controller) AcceptFeedback(c *gin.Context){
 	var Feedback model.Feedback
 
@@ -34,6 +42,13 @@ func (base *Controller) AcceptFeedback(c *gin.Context){
 	c.JSON(http.StatusCreated, feedback)
 }
 
+// Get             godoc
+// @Summary     Gets all feedback sent discripto
+// @Description Gets all feedback sent to discripto
+// @Tags        Feedback
+// @Success     200  {object} []model.Feedback
+// @Failure  	400 {object} utility.Response
+// @Router      /feedback/all [get]
 func (base *Controller) GetAllFeedback(c *gin.Context){
 	reviews, err := feedback.GetAllFeedback()
 
