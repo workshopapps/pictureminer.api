@@ -6,4 +6,5 @@ const (
 	BatchCollection      = "batches"
 	BatchImageCollection = "batch_images"
 	SubscriberEmail = "subscribers"
+	FeedbackCollection = "reviews"
 )
