@@ -55,3 +55,19 @@ func GetMinedImages() ([]model.MinedImage, error) {
 
 	return minedImages, nil
 }
+
+
+func GetSubscribers() ([]model.SubscriberEmail , error){
+
+	ctx := context.TODO()
+	cursor, err := mongodb.SelectFromCollection(ctx, config.GetConfig().Mongodb.Database, constants.SubscriberEmail, bson.M{})
+
+	if err != nil {
+		return []model.SubscriberEmail{}, err
+	}
+
+	var subscribers []model.SubscriberEmail
+	cursor.All(ctx, &subscribers)
+
+	return subscribers, nil
+}
