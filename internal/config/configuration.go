@@ -7,13 +7,15 @@ import (
 	"github.com/workshopapps/pictureminer.api/utility"
 )
 
-
 type Configuration struct {
-	Server  ServerConfiguration
-	Mongodb MongodbConfiguration
-	Redis   RedisConfiguration
-	S3      S3StorageConfiguration
-	Python  MicroserviceConfiguration
+	Server      ServerConfiguration
+	Mongodb     MongodbConfiguration
+	Redis       RedisConfiguration
+	S3          S3StorageConfiguration
+	Python      MicroserviceConfiguration
+	ImaggaAPI   ImmaggaConfiguration
+	NotifyEmail NotifyEmail
+	Sentry  SentryConfiguration
 }
 
 // Setup initialize configuration

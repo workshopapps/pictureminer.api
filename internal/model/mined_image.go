@@ -18,8 +18,9 @@ type MinedImage struct {
 }
 
 type MineImageResponse struct {
-	ImageName    string    `bson:"image_name" json:"image_name"`
-	ImagePath    string    `bson:"image_path" json:"image_path"`
+	ImageKey     string    `bson:"image_key" json:"image_key,omitempty"`
+	ImageName    string    `bson:"image_name" json:"image_name,omitempty"`
+	ImagePath    string    `bson:"image_path" json:"image_path,omitempty"`
 	TextContent  string    `bson:"text_content" json:"text_content"`
 	DateCreated  time.Time `bson:"date_created" json:"date_created"`
 	DateModified time.Time `bson:"date_modified" json:"date_modified"`
@@ -40,4 +41,10 @@ type MineImagePromptResponse struct {
 	CheckResult  bool      `bson:"check_result" json:"check_result"`
 	DateCreated  time.Time `bson:"date_created" json:"date_created"`
 	DateModified time.Time `bson:"date_modified" json:"date_modified"`
+}
+
+type ProcessCallCount struct {
+	ImageCount    int64    `bson:"image_count" json:"image_count"`
+	BatchCount    int64    `bson:"batch_count" json:"batch_count"`
+	Status			bool	`bson:"status" json:"status"`
 }
