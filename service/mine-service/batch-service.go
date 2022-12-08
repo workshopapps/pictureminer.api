@@ -46,7 +46,7 @@ func GetbatchImages(userId string, batchId string) ([]TagOne, error) {
 
 func filterTags(length int,image_collection []model.BatchImage,tag []string,tags []string) []TagOne{
 
-	str := make([]TagOne, 0)
+	 var str []TagOne
 
   for k := 0; k < length ; k++ {
   var tagone TagOne
