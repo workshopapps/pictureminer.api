@@ -2,7 +2,6 @@ package mineservice
 
 import (
 	"net/http"
-	"path/filepath"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -18,10 +17,51 @@ type Controller struct {
 	Logger   *utility.Logger
 }
 
+func (base *Controller) DemoMineImage(c *gin.Context) {
+	if c.ContentType() != "multipart/form-data" {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "file is not present"})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	image, imageHeader, err := c.Request.FormFile("image")
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not parse file", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+	defer image.Close()
+
+	if !utility.ValidImageFormat(imageHeader.Filename) {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file", nil, gin.H{"error": "file is not an image"})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	minedImage, err := mineservice.DemoMineImage(image, imageHeader.Filename)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "undefined error", nil, err.Error())
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "mine image successful", minedImage)
+	c.JSON(http.StatusOK, rd)
+}
+
+// Post             godoc
+// @Summary     Mines an uploaded image
+// @Description Send a post request containing a file an receives a response of its context content.
+// @Tags        Mine-Service
+// @Param       image formData file true "image"
+// @Success     200  {object} utility.Response
+// @Router      /mine-service/upload [post]
+// @Security BearerAuth
 func (base *Controller) MineImageUpload(c *gin.Context) {
 
-	token := extractToken(c)
-	userId, err := getKey("id", token)
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	userId, err := utility.GetKey("id", token, secretKey)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
 		c.JSON(http.StatusUnauthorized, rd)
@@ -42,7 +82,7 @@ func (base *Controller) MineImageUpload(c *gin.Context) {
 	}
 	defer image.Close()
 
-	if !validImageFormat(imageHeader.Filename) {
+	if !utility.ValidImageFormat(imageHeader.Filename) {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file", nil, gin.H{"error": "file is not an image"})
 		c.JSON(http.StatusBadRequest, rd)
 		return
@@ -61,8 +101,9 @@ func (base *Controller) MineImageUpload(c *gin.Context) {
 
 func (base *Controller) MineImageUrl(c *gin.Context) {
 
-	token := extractToken(c)
-	userId, err := getKey("id", token)
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	userId, err := utility.GetKey("id", token, secretKey)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
 		c.JSON(http.StatusUnauthorized, rd)
@@ -97,7 +138,7 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 
 	filename := getFileName(req.Url)
 
-	if !validImageFormat(filename) {
+	if !utility.ValidImageFormat(filename) {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid file", nil, gin.H{"error": "file is not an image"})
 		c.JSON(http.StatusBadRequest, rd)
 		return
@@ -116,8 +157,9 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 
 func (base *Controller) GetMinedImages(c *gin.Context) {
 
-	token := extractToken(c)
-	userId, err := getKey("id", token)
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	userId, err := utility.GetKey("id", token, secretKey)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
 		c.JSON(http.StatusUnauthorized, rd)
@@ -135,32 +177,37 @@ func (base *Controller) GetMinedImages(c *gin.Context) {
 
 }
 
-func extractToken(c *gin.Context) string {
-	token := c.Query("token")
-	if token != "" {
-		return token
-	}
-	token = c.Request.Header.Get("authorization")
-	slice := strings.Split(token, " ")
-	if len(slice) == 2 {
-		return slice[1]
-	}
-	return ""
-}
-
-func getKey(key, token string) (interface{}, error) {
-	claims, err := utility.DecodeToken(token, config.GetConfig().Server.Secret)
-	if err != nil {
-		return "", err
-	}
-	return claims[key], nil
-}
-
-func validImageFormat(filename string) bool {
-	ext := strings.ToLower(filepath.Ext(filename))
-	return ext == ".png" || ext == ".jpg" || ext == ".jpeg"
-}
-
 func getFileName(url string) string {
 	return url[strings.LastIndex(url, "/")+1:]
+}
+
+func (base *Controller) DeleteMinedImage(c *gin.Context) {
+
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	_, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	// get image key
+	imageKey := c.Param("key")
+	if imageKey == "" {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", gin.H{"error": "key field missing"}, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = mineservice.DeleteMinedImageService(imageKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not delete mined image", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "delete mined image success", gin.H{})
+	c.JSON(http.StatusOK, rd)
+
 }

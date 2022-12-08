@@ -6,6 +6,7 @@
 *.so
 *.dylib
 *.api
+*.csv
 
 # Test binary, built with `go test -c`
 *.test
@@ -18,6 +19,9 @@
 config.yaml
 
 .env
+.idea/
 logs/
 pictureminer.api
 .github/
+.vscode/
+

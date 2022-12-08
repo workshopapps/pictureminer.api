@@ -19,6 +19,23 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+func DemoMineImage(image io.ReadCloser, filename string) (*model.MineImageResponse, error) {
+	content, err := microservice.GetImageContent(image, filename)
+	if err != nil {
+		return nil, err
+	}
+
+	time := time.Now()
+	response := &model.MineImageResponse{
+		ImageName:    filename,
+		TextContent:  content.Content,
+		DateCreated:  time,
+		DateModified: time,
+	}
+
+	return response, nil
+}
+
 func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string) (*model.MineImageResponse, error) {
 	id, ok := userId.(string)
 	if !ok {
@@ -35,18 +52,23 @@ func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string)
 		return nil, err
 	}
 
+	image, imageCopy, err = duplicateFile(image)
+	if err != nil {
+		return nil, err
+	}
+
 	imagePath, err := s3.UploadImage(image, imageHash+filepath.Ext(filename))
 	if err != nil {
 		return nil, err
 	}
 
-	content, err := microservice.GetImageContent(image, filename)
+	content, err := microservice.GetImageContent(imageCopy, filename)
 	if err != nil {
 		return nil, err
 	}
 
 	time := time.Now()
-	minedImage := model.MinedImage{
+	minedImage := &model.MinedImage{
 		ID:           primitive.NewObjectID(),
 		UserID:       id,
 		ImageName:    filename,
@@ -57,17 +79,9 @@ func MineServiceUpload(userId interface{}, image io.ReadCloser, filename string)
 		DateModified: time,
 	}
 
-	_, err = mongodb.MongoPost(constants.ImageCollection, minedImage)
+	response, err := saveMinedImage(minedImage, filename)
 	if err != nil {
 		return nil, err
-	}
-
-	response := &model.MineImageResponse{
-		ImageName:    filename,
-		ImagePath:    imagePath,
-		TextContent:  content.Content,
-		DateCreated:  time,
-		DateModified: time,
 	}
 
 	return response, nil
@@ -86,10 +100,24 @@ func GetMinedImages(userId interface{}) ([]model.MineImageResponse, error) {
 		return []model.MineImageResponse{}, err
 	}
 
-	var minedImages []model.MineImageResponse
+	minedImages := make([]model.MineImageResponse, 0)
 	cursor.All(ctx, &minedImages)
 
 	return minedImages, nil
+}
+
+func DeleteMinedImageService(imageKey string) error {
+	ctx := context.TODO()
+	db := config.GetConfig().Mongodb.Database
+
+	filter := bson.M{"image_key": imageKey}
+	minedImageCol := mongodb.GetCollection(mongodb.Connection(), db, constants.ImageCollection)
+	_, err := minedImageCol.DeleteOne(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func duplicateFile(f io.ReadCloser) (io.ReadCloser, io.ReadCloser, error) {
@@ -98,4 +126,64 @@ func duplicateFile(f io.ReadCloser) (io.ReadCloser, io.ReadCloser, error) {
 		return nil, nil, err
 	}
 	return io.NopCloser(bytes.NewReader(contents)), io.NopCloser(bytes.NewReader(contents)), nil
+}
+
+func saveMinedImage(minedImage *model.MinedImage, filename string) (*model.MineImageResponse, error) {
+	_, err := mongodb.MongoPost(constants.ImageCollection, *minedImage)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update API count
+	if _, err = mongodb.MongoUpdate(minedImage.UserID[10:len(minedImage.UserID)-2], map[string]interface{}{
+		"api_call_count": 1,
+	}, constants.UserCollection); err != nil {
+		return nil, err
+	}
+
+	response := &model.MineImageResponse{
+		ImageName:    filename,
+		ImageKey:     minedImage.ImageKey,
+		ImagePath:    minedImage.ImagePath,
+		TextContent:  minedImage.TextContent,
+		DateCreated:  minedImage.DateCreated,
+		DateModified: minedImage.DateModified,
+	}
+
+	return response, nil
+}
+
+
+func ProcessCount(userId string) (model.ProcessCallCount, error) {
+
+	var response model.ProcessCallCount
+
+	batchCount, err := mongodb.MainCountFromCollection(userId, constants.BatchCollection)
+	if err != nil {
+		return response, err
+	}
+
+	imageCount, err := mongodb.MainCountFromCollection(userId, constants.ImageCollection)
+	if err != nil {
+		return response, err
+	}
+
+	var status bool
+
+	if batchCount != 0 || imageCount != 0 {
+		status = true
+	}else{
+		status = false
+	}
+
+	response = model.ProcessCallCount{
+		ImageCount:    imageCount,
+		BatchCount:     batchCount,
+		Status:    status,
+	}
+
+
+
+	return response, nil
+
 }
