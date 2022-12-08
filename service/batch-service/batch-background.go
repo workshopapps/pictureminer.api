@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"strings"
 
@@ -54,10 +55,9 @@ type (
 )
 
 const (
-	Threshold      = "30"
-	Limit          = "10"
-	Untagged       = "untagged"
-	statusComplete = "completed"
+	UntaggedThreshold = 20
+	Untagged          = "untagged"
+	statusComplete    = "completed"
 )
 
 func processBatch(email, bName, desc, userID string, batchID primitive.ObjectID, tags, urls []string) {
@@ -65,6 +65,9 @@ func processBatch(email, bName, desc, userID string, batchID primitive.ObjectID,
 	labels := fetchLabelsForURLS(urls)
 
 	// classify label to matching tag
+	for i := 0; i < len(tags); i++ {
+		tags[i] = strings.TrimSpace(tags[i])
+	}
 	batchImgs := classifyLabels(batchID.Hex(), labels, tags)
 
 	// save to db
@@ -98,7 +101,7 @@ func fetchLabelsForURLS(urls []string) []Label {
 	AuthToken := config.GetConfig().ImaggaAPI.Auth
 	httpClient := &http.Client{}
 	for _, url := range urls {
-		label, err := getLabel(httpClient, ImaggaURL, url, AuthToken, Limit, Threshold)
+		label, err := getLabel(httpClient, ImaggaURL, url, AuthToken)
 		if err == nil {
 			labels = append(labels, label)
 		}
@@ -106,12 +109,10 @@ func fetchLabelsForURLS(urls []string) []Label {
 	return labels
 }
 
-func getLabel(client *http.Client, imaggaURL, url, authToken, limit, threshold string) (Label, error) {
+func getLabel(client *http.Client, imaggaURL, url, authToken string) (Label, error) {
 	req, _ := http.NewRequest("GET", imaggaURL, nil)
 	req.Header.Set("Authorization", authToken)
 	q := req.URL.Query()
-	q.Add("limit", limit)
-	q.Add("threshold", threshold)
 	q.Add("image_url", url)
 	req.URL.RawQuery = q.Encode()
 
@@ -148,16 +149,88 @@ func classifyLabels(batchID string, labels []Label, tags []string) []model.Batch
 		fieldTags = append(fieldTags, strings.Fields(tag)...)
 	}
 	for _, tag := range fieldTags {
-		tagsMap[tag] = getSynonymsAPI(tag)
+		tagsMap[strings.ToLower(tag)] = getSynonymsAPI(tag)
 	}
 
 	// get best matching tag for each label
 	var batchImgs []model.BatchImage
 	for _, label := range labels {
-		batchImgs = append(batchImgs, classifyLabel(batchID, label, tagsMap))
+		batchImgs = append(batchImgs, classifyLabelImproved(batchID, label, tags, tagsMap))
 	}
 
 	return batchImgs
+}
+
+func classifyLabelImproved(batchID string, label Label, tags []string, tagsMap map[string][]string) model.BatchImage {
+	type MatchResult struct {
+		tag      string
+		score    float64
+		scoreAux float64
+	}
+	matchResults := []MatchResult{}
+
+	for _, tag := range tags {
+		score, scoreAux, tagTokens := 0.0, 0.0, strings.Fields(tag)
+		for _, token := range tagTokens {
+			a, b := matchTag(label.Results, token, tagsMap)
+			score, scoreAux = score+a, scoreAux+b
+		}
+		matchResults = append(matchResults, MatchResult{tag: tag, score: score, scoreAux: scoreAux})
+	}
+
+	choice, score := Untagged, 0.0
+	for _, res := range matchResults {
+		if res.score > score {
+			choice = res.tag
+			score = res.score
+		}
+	}
+
+	// consider second choice: synonyms score
+	if choice == Untagged || score < UntaggedThreshold {
+		choice = Untagged
+		for _, res := range matchResults {
+			if res.score > score {
+				choice = res.tag
+				score = res.score
+			}
+		}
+	}
+
+	batchImage := model.BatchImage{
+		ID:      primitive.NewObjectID(),
+		BatchID: batchID,
+		URL:     label.URL,
+		Tag:     choice,
+	}
+	return batchImage
+}
+
+func matchTag(results []Result, tag string, tagsMap map[string][]string) (float64, float64) {
+	mscore := 0.0
+	// simple match criteria: equality, substring, superstring
+	for _, res := range results {
+		name, tag := strings.ToLower(res.Name), strings.ToLower(tag)
+		if name == tag {
+			mscore = math.Max(mscore, res.Score)
+		}
+		if strings.Contains(name, tag) || strings.Contains(name, tag) {
+			mscore = math.Max(mscore, res.Score)
+		}
+	}
+
+	// complex match criteria: synonym with equality, substring, superstring
+	mscoreSynonym := 0.0
+	for _, res := range results {
+		name := strings.ToLower(res.Name)
+		for _, synonym := range tagsMap[tag] {
+			ok := synonym != "" && (name == synonym || strings.Contains(name, synonym) || strings.Contains(synonym, name))
+			if ok {
+				mscoreSynonym = math.Max(mscoreSynonym, res.Score)
+			}
+		}
+	}
+	return mscore, mscoreSynonym
 }
 
 func classifyLabel(batchID string, label Label, tagsMap map[string][]string) model.BatchImage {
