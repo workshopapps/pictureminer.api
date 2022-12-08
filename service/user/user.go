@@ -241,7 +241,7 @@ func UpdateUserService(user model.UpdateUser, userId interface{}) (int, error) {
 	}
 
 	if len(user.NewPassword) > 0 {
-		err := CheckPasswords(user)
+		err := CheckPasswords(user,id)
 		if err != nil {
 			return 400, err
 		}
@@ -266,8 +266,17 @@ func UpdateFunc(db string, filter bson.D, update bson.D) error {
 	return err
 }
 
-func CheckPasswords(user model.UpdateUser) error {
-	userDocument, err := getUserFromDB(user.Email)
+func CheckPasswords(user model.UpdateUser, id primitive.ObjectID) error {
+	var userDocument model.User
+	database := config.GetConfig().Mongodb.Database
+	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
+	result := userCollection.FindOne(context.TODO(), bson.M{"_id": id})
+
+	err := result.Decode(&userDocument)
+	if err != nil {
+		return err
+	}
+
 	if len(user.CurrentPassword) < 0 {
 		err := errors.New("Provide current password")
 		return err
