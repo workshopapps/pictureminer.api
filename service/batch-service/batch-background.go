@@ -14,8 +14,19 @@ import (
 	"github.com/workshopapps/pictureminer.api/utility"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.uber.org/multierr"
 )
+
+type ResponseSynonymAPI struct {
+	Results []struct {
+		HasCategories []string `json:"hasCategories,omitempty"`
+		MemberOf      string   `json:"memberOf,omitempty"`
+		Synonyms      []string `json:"synonyms,omitempty"`
+		TypeOf        []string `json:"typeOf,omitempty"`
+		HasTypes      []string `json:"hasTypes,omitempty"`
+		Derivation    []string `json:"derivation,omitempty"`
+		VerbGroup     []string `json:"verbGroup,omitempty"`
+	} `json:"results,omitempty"`
+}
 
 type Result struct {
 	Name  string
@@ -50,27 +61,14 @@ const (
 )
 
 func processBatch(email, bName, desc, userID string, batchID primitive.ObjectID, tags, urls []string) {
-	var err error
 	// labels for each url
 	labels := fetchLabelsForURLS(urls)
-
-	//Update API Call count
-	_, UErr := mongodb.MongoUpdate(userID[10:len(userID)-2], map[string]interface{}{
-		"api_call_count": len(labels),
-	}, constants.UserCollection)
-	if UErr != nil {
-		err = multierr.Append(err, UErr)
-	}
 
 	// classify label to matching tag
 	batchImgs := classifyLabels(batchID.Hex(), labels, tags)
 
 	// save to db
-	SErr := saveToDB(batchImgs)
-	if SErr != nil {
-		err = multierr.Append(err, SErr)
-	}
-
+	err := saveToDB(batchImgs)
 	if err != nil {
 		warnUser(email, bName, err.Error())
 	}
@@ -87,7 +85,7 @@ func updateBatchStatusDB(batchID primitive.ObjectID, email, bName string) {
 	database := config.GetConfig().Mongodb.Database
 	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.BatchCollection)
 	filter := bson.M{"_id": batchID}
-	update := bson.D{{"$set", bson.D{{"status", statusComplete}}}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "status", Value: statusComplete}}}}
 	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		warnUser(email, bName, err.Error())
@@ -144,9 +142,13 @@ func getLabel(client *http.Client, imaggaURL, url, authToken, limit, threshold s
 
 func classifyLabels(batchID string, labels []Label, tags []string) []model.BatchImage {
 	// for O(1) lookups
-	tagsMap := make(map[string]bool)
+	tagsMap := make(map[string][]string)
+	fieldTags := []string{}
 	for _, tag := range tags {
-		tagsMap[smoothify(tag)] = true
+		fieldTags = append(fieldTags, strings.Fields(tag)...)
+	}
+	for _, tag := range fieldTags {
+		tagsMap[tag] = getSynonymsAPI(tag)
 	}
 
 	// get best matching tag for each label
@@ -158,13 +160,13 @@ func classifyLabels(batchID string, labels []Label, tags []string) []model.Batch
 	return batchImgs
 }
 
-func classifyLabel(batchID string, label Label, tagsMap map[string]bool) model.BatchImage {
+func classifyLabel(batchID string, label Label, tagsMap map[string][]string) model.BatchImage {
 	var filtered []Result
 
 	// filter for results that match with atleast one tag
 	for _, res := range label.Results {
 		name := smoothify(res.Name)
-		if tagsMap[name] {
+		if _, ok := tagsMap[name]; ok {
 			filtered = append(filtered, res)
 		}
 	}
@@ -184,6 +186,31 @@ func classifyLabel(batchID string, label Label, tagsMap map[string]bool) model.B
 		Tag:     bestTag,
 	}
 	return batchImage
+}
+
+func getSynonymsAPI(word string) []string {
+	synonyms := []string{}
+	URL := config.GetConfig().WordsAPIConfig.URL
+	trailer := config.GetConfig().WordsAPIConfig.Trailer
+
+	resp, err := http.Get(URL + word + trailer)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		return synonyms
+	}
+
+	respAPI := ResponseSynonymAPI{}
+	json.NewDecoder(resp.Body).Decode(&respAPI)
+
+	for _, val := range respAPI.Results {
+		synonyms = append(synonyms, val.Synonyms...)
+		synonyms = append(synonyms, val.HasTypes...)
+		synonyms = append(synonyms, val.TypeOf...)
+		synonyms = append(synonyms, val.HasCategories...)
+		synonyms = append(synonyms, val.MemberOf)
+		synonyms = append(synonyms, val.VerbGroup...)
+	}
+
+	return synonyms
 }
 
 func smoothify(str string) string {
