@@ -21,6 +21,9 @@ NotifyEmail:
   Password: "pzajnkgwvsrnxhdj"
 python: 
   microservicehost: "http://178.128.242.94/caption-generator"
+WordsAPIConfig:
+  URL: "https://www.wordsapi.com/mashape/words/"
+  Trailer: "?when=2022-12-07T20:39:47.672Z&encrypted=8cfdb188e723919bea9607bdef58bdb0aeb42a0936f895b8"
 sentry:
   Dsn: "https://cc6d7cd5ce5643b89c965e72b3a73f09@o4504260711743488.ingest.sentry.io/4504260716265472"
   Debug: true
