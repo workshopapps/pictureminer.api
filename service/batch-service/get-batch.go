@@ -2,6 +2,8 @@ package batchservice
 
 import (
 	"context"
+	"fmt"
+	"net/http"
 
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/constants"
@@ -92,6 +94,27 @@ func GetImagesInBatch(batchId string) ([]model.BatchImage, error) {
 	return batchImages, nil
 }
 
-func CountBatchesService(userId string) (interface{}, int, error) {
+func CountBatchesService(userID string) (interface{}, int, error) {
+	db := config.GetConfig().Mongodb.Database
+	ctx := context.Background()
+	filter := bson.M{"user_id": userID}
+
+	// get cursor for all batches
+	bcursor, err := mongodb.SelectFromCollection(ctx, db, constants.BatchCollection, filter)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+	defer bcursor.Close(ctx)
+
+	for bcursor.Next(ctx) {
+		var b model.Batch
+		err := bcursor.Decode(&b)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(b)
+		}
+	}
+
 	return nil, 0, nil
 }
