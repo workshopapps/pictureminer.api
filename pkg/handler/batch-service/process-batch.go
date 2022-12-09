@@ -303,7 +303,12 @@ func (base *Controller) CountBatches(c *gin.Context) {
 		return
 	}
 
-	resp, err := batchservice.CountBatchesService(userID)
+	resp, code, err := batchservice.CountBatchesService(userID)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "failed", "could not retrieve batches counts", gin.H{"error": err.Error()}, nil)
+		c.JSON(code, rd)
+		return
+	}
 
 	rd := utility.BuildSuccessResponse(http.StatusOK, "get batches count success", resp)
 	c.JSON(http.StatusOK, rd)
