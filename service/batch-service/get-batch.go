@@ -2,6 +2,7 @@ package batchservice
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/constants"
@@ -9,6 +10,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func GetBatchesService(userID string) (interface{}, error) {
@@ -90,4 +92,80 @@ func GetImagesInBatch(batchId string) ([]model.BatchImage, error) {
 	cursor.All(ctx, &batchImages)
 
 	return batchImages, nil
+}
+
+func CountBatchesService(userID string) (interface{}, int, error) {
+	db := config.GetConfig().Mongodb.Database
+	ctx := context.Background()
+
+	// get all user's  batches
+	filter := bson.M{"user_id": userID}
+	bcursor, err := mongodb.SelectFromCollection(ctx, db, constants.BatchCollection, filter)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+	defer bcursor.Close(ctx)
+	batchesMap := map[string]bool{}
+	for bcursor.Next(ctx) {
+		var b model.Batch
+		bcursor.Decode(&b)
+		batchesMap[b.ID.Hex()] = true
+	}
+	
+
+	// get cursor for all images
+	icursor, err := mongodb.SelectFromCollection(ctx, db, constants.BatchImageCollection, bson.M{})
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	taggedTotal, untaggedTotal := 0, 0
+	// decode and process N images at a time to prevent high memory usage
+    N := 1_000_000
+	for icursor.Next(ctx) {
+		imgs := decodeNImages(ctx, icursor, N)
+		for _, img := range imgs {
+			if !batchesMap[img.BatchID] {
+				continue
+			}
+			if img.Tag == Untagged {
+				untaggedTotal += 1					
+			} else {
+				taggedTotal += 1
+			}
+		}
+	}
+
+	resp := model.BatchesCountResponse{
+		Total:    taggedTotal + untaggedTotal,
+		Tagged:   taggedTotal,
+		Untagged: untaggedTotal,
+	}
+
+	return resp, http.StatusOK, nil
+}
+
+func decodeNImages(ctx context.Context, cursor *mongo.Cursor , N int) []model.BatchImage {
+	imgs := []model.BatchImage{}
+	for i := 0; i < N && cursor.Next(ctx); i++ {
+		var img model.BatchImage
+		cursor.Decode(&img)
+		imgs = append(imgs, img)
+	}
+	return imgs
+}
+
+func countImageTags(ctx context.Context, b model.Batch, coll *mongo.Collection) (int, int) {
+	filter := bson.M{"batch_id": b.ID.Hex()}
+	icursor, _ := coll.Find(ctx, filter)
+	images := []model.BatchImage{}
+	icursor.All(ctx, &images)
+
+	untagged := 0
+	for _, img := range images {
+		if img.Tag == Untagged {
+			untagged += 1
+		}
+	}
+	return len(images) - untagged, untagged
 }
