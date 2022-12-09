@@ -1,12 +1,9 @@
 package batchservice
 
 import (
-	"encoding/csv"
 	"encoding/json"
-	"io"
 	"mime/multipart"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/workshopapps/pictureminer.api/internal/constants"
@@ -66,46 +63,6 @@ func ProcessBatchAPI(userID string, req *http.Request) (*model.ProcessBatchAPIRe
 	go processBatch(userEmail, response.Name, response.Description, userID, batchID, response.Tags, jsonReq.Images)
 
 	return response, nil
-}
-
-func parseCSVURLs(csvFile io.ReadCloser) ([]string, error) {
-	csvReader := csv.NewReader(csvFile)
-	csvFields, err := csvReader.ReadAll()
-	if err != nil {
-		return nil, err
-	}
-
-	urls := make([]string, 0)
-
-	urlFieldNumber := -1
-	for index1, val1 := range csvFields {
-		for index2, val2 := range val1 {
-
-			if index1 == 0 {
-				switch strings.ToLower(val2) {
-				case "urls", "images", "url", "image":
-					urlFieldNumber = index2
-					continue
-				}
-			} else {
-				if urlFieldNumber < 0 {
-					return nil, ERRURLFieldNotPresent
-				}
-
-				if index2 == urlFieldNumber {
-					if utility.ValidImageFormat(val2) {
-						urls = append(urls, val2)
-					}
-				}
-
-				if index2 > urlFieldNumber {
-					continue
-				}
-			}
-		}
-	}
-
-	return urls, nil
 }
 
 func saveBatch(uID string, pb *model.ProcessBatchAPIRequest, time time.Time) (interface{}, error) {

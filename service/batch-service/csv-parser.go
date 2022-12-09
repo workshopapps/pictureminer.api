@@ -23,6 +23,12 @@ func getUrlHeaderIndex(headers []string) (int, error) {
 func checkExtension(url string) bool {
 	mime_types := []string{".png", ".jpg", ".jpeg"}
 
+	// check if extension contains query params
+	idx := strings.LastIndex(url, "?")
+	if idx != -1 {
+		url = url[:idx]
+	}
+
 	for _, mime_type := range mime_types {
 		if strings.HasSuffix(url, mime_type) {
 			return true

@@ -280,6 +280,13 @@ func isValidURL(url string) bool {
 	}
 
 	ext := strings.ToLower(filepath.Ext(url))
+
+	// check if extension contains query parameters
+	idx := strings.LastIndex(ext, "?")
+	if idx != -1 {
+		ext = ext[:idx]
+	}
+
 	return ext == ".png" || ext == ".jpg" || ext == ".jpeg"
 }
 
