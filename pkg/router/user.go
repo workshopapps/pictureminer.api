@@ -24,6 +24,7 @@ func Auth(r *gin.Engine, validate *validator.Validate, ApiVersion string, logger
 		authUrl.PATCH("/update-user", auth.UpdateUser)
 		authUrl.POST("/subscriber-email", auth.SubscriberEmail)
 		authUrl.PATCH("/verify_email", auth.VerifyEmail)
+		authUrl.GET("/subscription", auth.GetSubscription)
 	}
 	return r
 }

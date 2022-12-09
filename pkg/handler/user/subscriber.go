@@ -10,6 +10,15 @@ import (
 	"github.com/workshopapps/pictureminer.api/utility"
 )
 
+// Create Subscription godoc
+// @Summary      Create Subscription
+// @Description  create a user subscription
+// @Tags         users
+// @Produce      json
+// @Param User body model.SubscriptionRequest true "User Subscription" model.SubscriberEmail
+// @Success      200  {object}   model.SubscriberEmail
+// @Failure      400  {object}  utility.Response
+// @Router       /subscription [post]
 func (base *Controller) SubscriberEmail(c *gin.Context) {
 
 	// bind emails to SubscriberEmail struct
@@ -35,7 +44,37 @@ func (base *Controller) SubscriberEmail(c *gin.Context) {
 		return
 	}
 
-	object := utility.BuildSuccessResponse(200, "Email Submission successful", SubscriberEmailResponse)
+	object := utility.BuildSuccessResponse(200, "Email Subcription successful", SubscriberEmailResponse)
+	c.JSON(200, object)
+}
+
+// Fetch Subscription godoc
+// @Summary      Fetch Subscription
+// @Description  get subscription status information
+// @Tags         users
+// @Produce      json
+// @Param        user    query     string  false  "email of the user"  Format(email)
+// @Success      200  {object}   model.SubscriberEmail
+// @Failure      400  {object}  utility.Response
+// @Router       /subscription [get]
+func (base *Controller) GetSubscription(c *gin.Context) {
+
+	// bind emails to SubscriberEmail struct
+	email, ok := c.GetQuery("user")
+	if !ok {
+		rd := utility.BuildErrorResponse(400, "error", "please supply the user email", "", nil)
+		c.JSON(400, rd)
+		return
+	}
+
+	sub, err := user.GetUserSubscription(email)
+	if err != nil {
+		rd := utility.BuildErrorResponse(400, "error", "USer may not have subscription", err, nil)
+		c.JSON(400, rd)
+		return
+	}
+
+	object := utility.BuildSuccessResponse(200, "User subscription retrieved sucessfully", sub)
 	c.JSON(200, object)
 }
 
