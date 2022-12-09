@@ -38,3 +38,24 @@ func (base *Controller) SubscriberEmail(c *gin.Context) {
 	object := utility.BuildSuccessResponse(200, "Email Submission successful", SubscriberEmailResponse)
 	c.JSON(200, object)
 }
+
+func (base *Controller) GetSubscribtion(c *gin.Context) {
+
+	// bind emails to SubscriberEmail struct
+	email, ok:= c.GetQuery("user")
+	if !ok {
+		rd := utility.BuildErrorResponse(400, "error", "please supply the user email", "", nil)
+		c.JSON(400, rd)
+		return
+	}
+
+	sub, err:= user.GetUserSubscribtion(email)
+	if err != nil {
+		rd := utility.BuildErrorResponse(400, "error", "USer may not have subscribtion", err, nil)
+		c.JSON(400, rd)
+		return
+	}
+
+	object := utility.BuildSuccessResponse(200, "Email Submission successful", sub)
+	c.JSON(200, object)
+}
