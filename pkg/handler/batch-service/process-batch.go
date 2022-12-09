@@ -286,6 +286,33 @@ func (base *Controller) DownloadCsv(c *gin.Context) {
 
 }
 
+func (base *Controller) CountBatches(c *gin.Context) {
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	userId, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", gin.H{"error": err.Error()}, nil)
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	userID, ok := userId.(string)
+	if !ok {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", gin.H{"error": "invalid token type"}, nil)
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	resp, code, err := batchservice.CountBatchesService(userID)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "failed", "could not retrieve batches counts", gin.H{"error": err.Error()}, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "get batches count success", resp)
+	c.JSON(http.StatusOK, rd)
+}
 
 func (base *Controller) CountProcess(c *gin.Context) {
 
