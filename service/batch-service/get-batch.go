@@ -91,3 +91,7 @@ func GetImagesInBatch(batchId string) ([]model.BatchImage, error) {
 
 	return batchImages, nil
 }
+
+func CountBatchesService(userId string) (interface{}, error) {
+	return nil, nil
+}
