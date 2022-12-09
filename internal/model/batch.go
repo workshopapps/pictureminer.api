@@ -48,7 +48,7 @@ type ProcessBatchAPIResponse struct {
 	DateCreated time.Time `bson:"date_created"`
 }
 
-type BatchDetailsResponse struct {
+type BatchesCountResponse struct {
 	Total    int `json:"total"`
 	Tagged   int `json:"tagged"`
 	Untagged int `json:"untagged"`

@@ -2,7 +2,6 @@ package batchservice
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/workshopapps/pictureminer.api/internal/config"
@@ -11,6 +10,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongodb"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func GetBatchesService(userID string) (interface{}, error) {
@@ -106,15 +106,27 @@ func CountBatchesService(userID string) (interface{}, int, error) {
 	}
 	defer bcursor.Close(ctx)
 
+	bImgCol := mongodb.GetCollection(mongodb.Connection(), db, constants.BatchImageCollection)
+	taggedTotal, untaggedTotal := 0, 0
+	
+
 	for bcursor.Next(ctx) {
 		var b model.Batch
-		err := bcursor.Decode(&b)
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			fmt.Println(b)
-		}
+		bcursor.Decode(&b)
+		tagged, untagged := countImageTags(b, bImgCol)
+		taggedTotal += tagged
+		untaggedTotal += untagged
 	}
 
-	return nil, 0, nil
+	resp := model.BatchesCountResponse{
+		Total: taggedTotal + untaggedTotal,
+		Tagged: taggedTotal,
+		Untagged: untaggedTotal,
+	}
+
+	return resp, http.StatusOK, nil
+}
+
+func countImageTags(b model.Batch, coll *mongo.Collection) (int, int) {
+	return 0, 0
 }
