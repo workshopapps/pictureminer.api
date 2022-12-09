@@ -75,6 +75,34 @@ definitions:
       email:
         type: string
     type: object
+  model.SubscriberEmail:
+    properties:
+      _id:
+        type: string
+      email:
+        type: string
+      expires_at:
+        type: string
+      price:
+        type: number
+      subscribed:
+        type: boolean
+      subscription_type:
+        type: string
+    required:
+    - email
+    type: object
+  model.SubscriptionRequest:
+    properties:
+      email:
+        type: string
+      price:
+        type: number
+      subscription_type:
+        type: string
+    required:
+    - email
+    type: object
   model.UpdateUser:
     properties:
       confirm_password:
@@ -372,6 +400,52 @@ paths:
           schema:
             $ref: '#/definitions/model.UserResponse'
       summary: Signs Up a User
+      tags:
+      - users
+  /subscription:
+    get:
+      description: get subscription status information
+      parameters:
+      - description: email of the user
+        format: email
+        in: query
+        name: user
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SubscriberEmail'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utility.Response'
+      summary: Fetch Subscription
+      tags:
+      - users
+    post:
+      description: create a user subscription
+      parameters:
+      - description: User Subscription
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/model.SubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SubscriberEmail'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utility.Response'
+      summary: Create Subscription
       tags:
       - users
   /update-user:

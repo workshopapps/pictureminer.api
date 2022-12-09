@@ -341,6 +341,76 @@
                 }
             }
         },
+        "/subscription": {
+            "get": {
+                "description": "get subscription status information",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Fetch Subscription",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "email",
+                        "description": "email of the user",
+                        "name": "user",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.SubscriberEmail"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utility.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "create a user subscription",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Create Subscription",
+                "parameters": [
+                    {
+                        "description": "User Subscription",
+                        "name": "User",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.SubscriptionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.SubscriberEmail"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utility.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/update-user": {
             "patch": {
                 "description": "Updates a User's information - email,firstName,lastName,password - Bearer token required - To change password, current_password, new_password and confirm_password(repeat of the new password) are required",
@@ -513,6 +583,49 @@
             "type": "object",
             "properties": {
                 "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.SubscriberEmail": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "subscribed": {
+                    "type": "boolean"
+                },
+                "subscription_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.SubscriptionRequest": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "subscription_type": {
                     "type": "string"
                 }
             }

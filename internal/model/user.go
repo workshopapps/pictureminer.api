@@ -70,4 +70,13 @@ type SubscriberEmail struct {
 	ID          primitive.ObjectID `bson:"_id" json:"_id"`
 	Email       string             `bson:"email" json:"email" validate:"required,email"`
 	Subscribed  bool              `bson:"subscribed" json:"subscribed"`
+	Price 		float64				`bson:"price" json:"price"`
+	SubscriptionType    string `bson:"subscription_type" json:"subscription_type"`
+	ExpiresAt   time.Time	`bson:"expires_at" json:"expires_at"`
+}
+
+type SubscriptionRequest struct {
+	Email           string `bson:"email" json:"email" validate:"required"`
+	Price 		float64				`bson:"price" json:"price"`
+	SubscriptionType    string `bson:"subscription_type" json:"subscription_type"`
 }
