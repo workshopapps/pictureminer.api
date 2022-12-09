@@ -68,10 +68,25 @@ func MongoPost(collection string, data interface{}) (*mongo.InsertOneResult, err
 	return result, nil
 }
 
-func MongoGet(collection string, filter map[string]interface{}) ([]interface{}, error) {
+func MongoGetOne(collection string, filter map[string]interface{}) (*mongo.SingleResult, error) {
+	c := getCollection(collection)
+	f := make(bson.M)
+	for k, v := range filter {
+		f = bson.M{k: v}
+	}
+
+	result := c.FindOne(context.TODO(), f)
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+
+	return result, nil
+}
+
+func MongoGet(collection string, filter map[string]interface{}) (*mongo.Cursor, error) {
 	c := getCollection(collection)
 
-	f := make(bson.M, 0)
+	f := make(bson.M)
 
 	if len(filter) == 1 {
 		for k, v := range filter {
@@ -91,18 +106,7 @@ func MongoGet(collection string, filter map[string]interface{}) ([]interface{}, 
 		return nil, err
 	}
 
-	results := make([]interface{}, 0)
-
-	for cursor.Next(ctx) {
-		var result interface{}
-		err := cursor.Decode(&result)
-		if err != nil {
-			return nil, err
-		}
-		results = append(results, result)
-	}
-
-	return results, nil
+	return cursor, nil
 }
 
 func getCollection(collection string) *mongo.Collection {
@@ -169,10 +173,9 @@ func MainCountFromCollection(user_id string, collection string) (int64, error) {
 	// if err != nil {
 	// 	c.JSON(http.StatusInternalServerError, gin.H{"error":"error reading number of documents"})
 	// }
-	
+
 	return count, nil
 }
-
 
 func GetUserTags(user_id string, batch_id primitive.ObjectID) ([]string, int, error) {
 	var tags []string

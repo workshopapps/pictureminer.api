@@ -18,6 +18,7 @@ type User struct {
 	DateCreated  time.Time          `bson:"date_created" json:"date_created"`
 	DateUpdated  time.Time          `bson:"date_updated" json:"date_updated"`
 	ApiCallCount int64              `bson:"api_call_count" json:"api_call_count"`
+	IsVerified   bool               `bson:"is_verified" json:"is_verified"`
 }
 
 type UserResponse struct {
@@ -67,7 +68,7 @@ type UpdateUser struct {
 }
 
 type SubscriberEmail struct {
-	ID          primitive.ObjectID `bson:"_id" json:"_id"`
-	Email       string             `bson:"email" json:"email" validate:"required,email"`
-	Subscribed  bool              `bson:"subscribed" json:"subscribed"`
+	ID         primitive.ObjectID `bson:"_id" json:"_id"`
+	Email      string             `bson:"email" json:"email" validate:"required,email"`
+	Subscribed bool               `bson:"subscribed" json:"subscribed"`
 }

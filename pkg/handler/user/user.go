@@ -227,7 +227,7 @@ func (base *Controller) UpdateProfilePicture(c *gin.Context) {
 // @Tags        users
 // @Produce     json
 // @Param User body model.UpdateUser true "User Update" model.UserUpdate
-// @Success     200  
+// @Success     200
 // @Router      /update-user [patch]
 func (base *Controller) UpdateUser(c *gin.Context) {
 	secretKey := config.GetConfig().Server.Secret
@@ -253,7 +253,7 @@ func (base *Controller) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	statusCode, err := user.UpdateUserService(reqBody,userId)
+	statusCode, err := user.UpdateUserService(reqBody, userId)
 	if err != nil {
 		rd := utility.BuildErrorResponse(statusCode, "error", "user update failed", gin.H{"error": err.Error()}, nil)
 		c.JSON(statusCode, rd)

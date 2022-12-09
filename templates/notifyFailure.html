@@ -8,8 +8,11 @@
           <td>
             <p>Hi {{ .UserName}},</p>
             <p>
-              Forgot password? Send a PATCH request to with your password and
-              passwordConfirm to {{.URL}}
+              Unfortunately, Batch <b>{{ .BatchName}}</b> processing could not be completed! <br>
+              Process terminated with the following error: <em>{{ .Error}}</em>
+            </p>
+            <p>
+              Login into your dashboard to send another request!
             </p>
             <table
               role="presentation"
@@ -31,7 +34,7 @@
                         <tr>
                           <td>
                             <a href="{{.URL}}" target="_blank">
-                              Reset password
+                              Login
                             </a>
                           </td>
                         </tr>
@@ -41,7 +44,6 @@
                 </tr>
               </tbody>
             </table>
-            <p>Kindly ignore if you did not request for a password reset</p>
           </td>
         </tr>
       </table>

@@ -3,7 +3,6 @@ package batchservice
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"math"
 	"net/http"
 	"strings"
@@ -73,17 +72,17 @@ func processBatch(email, bName, desc, userID string, batchID primitive.ObjectID,
 	// save to db
 	err := saveToDB(batchImgs)
 	if err != nil {
-		warnUser(email, bName, err.Error())
+		warnUser(email, bName, err.Error(), userID)
 	}
 
 	// on complete, notify user through email
-	notifyUser(email, bName)
+	notifyUser(email, bName, userID)
 
 	// update batch status
-	updateBatchStatusDB(batchID, email, bName)
+	updateBatchStatusDB(batchID, email, bName, userID)
 }
 
-func updateBatchStatusDB(batchID primitive.ObjectID, email, bName string) {
+func updateBatchStatusDB(batchID primitive.ObjectID, email, bName, userID string) {
 	// update batch status in db
 	database := config.GetConfig().Mongodb.Database
 	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.BatchCollection)
@@ -91,7 +90,7 @@ func updateBatchStatusDB(batchID primitive.ObjectID, email, bName string) {
 	update := bson.D{{Key: "$set", Value: bson.D{{Key: "status", Value: statusComplete}}}}
 	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		warnUser(email, bName, err.Error())
+		warnUser(email, bName, err.Error(), userID)
 	}
 }
 
@@ -308,20 +307,36 @@ func saveToDB(batchImgs []model.BatchImage) error {
 	return nil
 }
 
-func notifyUser(email, batchName string) {
+func notifyUser(email, batchName, userID string) {
 	from := config.GetConfig().NotifyEmail.Email
-	password := config.GetConfig().NotifyEmail.Email
-	body := fmt.Sprintf("Hello, batch <b>%v</b> processing is complete!", batchName)
+	password := config.GetConfig().NotifyEmail.Password
+	username := config.GetConfig().NotifyEmail.Username
 
-	utility.EmailSender(from, password, []string{email}, "Process Batch Complete", body)
+	user, _, _ := GetUserFromID(userID)
+
+	utility.SendMail(from, username, password, email, "notifySuccess.html", &utility.EmailData{
+		Subject:   "Batch Process Result",
+		UserName:  user.Username,
+		BatchName: batchName,
+		URL:       constants.LoginURL,
+	})
 }
 
-func warnUser(email, batchName, msg string) {
+func warnUser(email, batchName, msg, userID string) {
 	from := config.GetConfig().NotifyEmail.Email
-	password := config.GetConfig().NotifyEmail.Email
-	body := fmt.Sprintf("Hello, batch <b>%v</b> processing is failed!<br>error: %v", batchName, msg)
+	password := config.GetConfig().NotifyEmail.Password
+	username := config.GetConfig().NotifyEmail.Username
+	// body := fmt.Sprintf("Hello, batch <b>%v</b> processing is failed!<br>error: %v", batchName, msg)
 
-	utility.EmailSender(from, password, []string{email}, "Process Batch Failed", body)
+	user, _, _ := GetUserFromID(userID)
+
+	utility.SendMail(from, username, password, email, "notifyFailure.html", &utility.EmailData{
+		Subject:   "Batch Process Result",
+		UserName:  user.Username,
+		Error:     msg,
+		BatchName: batchName,
+		URL:       constants.LoginURL,
+	})
 }
 
 /*--------------------*/

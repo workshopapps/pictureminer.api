@@ -9,6 +9,7 @@ import (
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	mineservice "github.com/workshopapps/pictureminer.api/service/mine-service"
+	"github.com/workshopapps/pictureminer.api/service/user"
 	"github.com/workshopapps/pictureminer.api/utility"
 )
 
@@ -68,6 +69,19 @@ func (base *Controller) MineImageUpload(c *gin.Context) {
 		return
 	}
 
+	ok, err := user.IsVerified(userId.(string))
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	if !ok {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "user is not verified"})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
 	if c.ContentType() != "multipart/form-data" {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "file is not present"})
 		c.JSON(http.StatusBadRequest, rd)
@@ -107,6 +121,19 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
 		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	ok, err := user.IsVerified(userId.(string))
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	if !ok {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "user is not verified"})
+		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
 
