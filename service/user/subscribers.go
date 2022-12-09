@@ -14,7 +14,7 @@ import (
 )
 
 func SubscriberEmailResponse(subscriberEmail model.SubscriberEmail) (model.SubscriberEmail, string, int, error) {
-	//create subscribtion time
+	//create subscription time
 	now:= time.Now()
 	oneMonthLater:= now.AddDate(0,1,1)
 	oneYearLater:= now.AddDate(1,0,0)
@@ -49,7 +49,7 @@ func SubscriberEmailResponse(subscriberEmail model.SubscriberEmail) (model.Subsc
 	return subscriberResponse, "", 0, nil
 }
 
-func GetUserSubscribtion(email string)(model.SubscriberEmail, error){
+func GetUserSubscription(email string)(model.SubscriberEmail, error){
 
 	var subcribtion model.SubscriberEmail 
 	//fetch from database
