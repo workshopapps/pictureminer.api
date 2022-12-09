@@ -1,29 +1,31 @@
 package router
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	newrelic "github.com/newrelic/go-agent"
-	"github.com/newrelic/go-agent/_integrations/nrgin/v1"
+	"go.atatus.com/agent/module/atgin"
+
+	// newrelic "github.com/newrelic/go-agent"
+	// "github.com/newrelic/go-agent/_integrations/nrgin/v1"
 	"github.com/workshopapps/pictureminer.api/pkg/middleware"
 	"github.com/workshopapps/pictureminer.api/utility"
 )
 
 func Setup(validate *validator.Validate, logger *utility.Logger) *gin.Engine {
 
-	cfg := newrelic.NewConfig("discripto_api", "23e1bbb04e4fd6b88bdedb97fde89345ee8cNRAL")
+	// cfg := newrelic.NewConfig("discripto_api", "23e1bbb04e4fd6b88bdedb97fde89345ee8cNRAL")
 
-	app, err := newrelic.NewApplication(cfg)
-	if nil != err {
-		fmt.Println(err)
-	}
+	// app, err := newrelic.NewApplication(cfg)
+	// if nil != err {
+	// 	fmt.Println(err)
+	// }
 
 	r := gin.New()
-	r.Use(nrgin.Middleware(app))
+	r.Use(atgin.Middleware(r))
+	// r.Use(nrgin.Middleware(app))
 
 	// Middlewares
 	// r.Use(gin.Logger())
@@ -42,7 +44,6 @@ func Setup(validate *validator.Validate, logger *utility.Logger) *gin.Engine {
 	MineService(r, validate, ApiVersion, logger)
 	Admin(r, validate, ApiVersion, logger)
 	SwaggerDocs(r, ApiVersion)
-	Feedback(r, validate, ApiVersion, logger)
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{
