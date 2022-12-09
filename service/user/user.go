@@ -82,6 +82,13 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 		return model.UserResponse{}, fmt.Sprintf("unable to create token: %v", err.Error()), 500, err
 	}
 
+	//update user's last login time
+	database := config.GetConfig().Mongodb.Database
+	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
+	filter := bson.M{"email": user.Email}
+	update := bson.D{{"$set", bson.D{{"last_login", time.Now()}}}}
+	_, err = userCollection.UpdateOne(context.TODO(), filter, update)
+
 	// build user response
 	userResponse := model.UserResponse{
 		Username:     user.Username,
@@ -93,6 +100,7 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 		TokenType:    "bearer",
 		Token:        token,
 		ApiCallCount: user.ApiCallCount,
+		LastLogin: user.LastLogin,
 	}
 
 	return userResponse, "", 0, nil
