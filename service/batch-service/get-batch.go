@@ -108,25 +108,35 @@ func CountBatchesService(userID string) (interface{}, int, error) {
 
 	bImgCol := mongodb.GetCollection(mongodb.Connection(), db, constants.BatchImageCollection)
 	taggedTotal, untaggedTotal := 0, 0
-	
 
 	for bcursor.Next(ctx) {
 		var b model.Batch
 		bcursor.Decode(&b)
-		tagged, untagged := countImageTags(b, bImgCol)
+		tagged, untagged := countImageTags(ctx, b, bImgCol)
 		taggedTotal += tagged
 		untaggedTotal += untagged
 	}
 
 	resp := model.BatchesCountResponse{
-		Total: taggedTotal + untaggedTotal,
-		Tagged: taggedTotal,
+		Total:    taggedTotal + untaggedTotal,
+		Tagged:   taggedTotal,
 		Untagged: untaggedTotal,
 	}
 
 	return resp, http.StatusOK, nil
 }
 
-func countImageTags(b model.Batch, coll *mongo.Collection) (int, int) {
-	return 0, 0
+func countImageTags(ctx context.Context, b model.Batch, coll *mongo.Collection) (int, int) {
+	filter := bson.M{"batch_id": b.ID.Hex()}
+	icursor, _ := coll.Find(ctx, filter)
+	images := []model.BatchImage{}
+	icursor.All(ctx, &images)
+
+	untagged := 0
+	for _, img := range images {
+		if img.Tag == Untagged {
+			untagged += 1
+		}
+	}
+	return len(images) - untagged, untagged
 }
