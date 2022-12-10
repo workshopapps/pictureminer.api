@@ -154,18 +154,3 @@ func decodeNImages(ctx context.Context, cursor *mongo.Cursor , N int) []model.Ba
 	}
 	return imgs
 }
-
-func countImageTags(ctx context.Context, b model.Batch, coll *mongo.Collection) (int, int) {
-	filter := bson.M{"batch_id": b.ID.Hex()}
-	icursor, _ := coll.Find(ctx, filter)
-	images := []model.BatchImage{}
-	icursor.All(ctx, &images)
-
-	untagged := 0
-	for _, img := range images {
-		if img.Tag == Untagged {
-			untagged += 1
-		}
-	}
-	return len(images) - untagged, untagged
-}
