@@ -39,6 +39,16 @@ func (base *Controller) ProcessBatchAPI(c *gin.Context) {
 		return
 	}
 
+	UserIdstr := fmt.Sprintf("%v", userId)
+
+	count, _ := mineservice.GetMonthlylimit(UserIdstr)
+	if count != true {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Monthly limit exceeded", nil , gin.H{"error":" you have exceeded monthly limit of 10 Mine requests"})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+
 	if c.ContentType() != "multipart/form-data" {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "file is not present"})
 		c.JSON(http.StatusBadRequest, rd)
@@ -63,6 +73,15 @@ func (base *Controller) ProcessBatch(c *gin.Context) {
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "unable to verify token", gin.H{"error": err.Error()}, nil)
 		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	UserIdstr := fmt.Sprintf("%v", userID)
+
+	count, _ := mineservice.GetMonthlylimit(UserIdstr)
+	if count != true {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Monthly limit exceeded", nil , gin.H{"error":" you have exceeded monthly limit of 10 Mine requests"})
+		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
 
@@ -130,6 +149,15 @@ func (base *Controller) ProcessBatchCSV(c *gin.Context) {
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "unable to verify token", gin.H{"error": err.Error()}, nil)
 		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	UserIdstr := fmt.Sprintf("%v", userID)
+
+	count, _ := mineservice.GetMonthlylimit(UserIdstr)
+	if count != true {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Monthly limit exceeded", nil , gin.H{"error":" you have exceeded monthly limit of 10 Mine requests"})
+		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
 
@@ -326,6 +354,7 @@ func (base *Controller) CountProcess(c *gin.Context) {
 	}
 
 	UserIdstr := fmt.Sprintf("%v", userId)
+
 
 	processCount, err := mineservice.ProcessCount(UserIdstr)
 	if err != nil {

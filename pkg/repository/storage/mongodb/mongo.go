@@ -1,6 +1,7 @@
 package mongodb
 
 import (
+	"time"
 	"context"
 	"fmt"
 	"log"
@@ -260,4 +261,95 @@ func MongoUpdate(id string, updateEntries map[string]interface{}, collection str
 	}
 
 	return result, nil
+}
+
+
+
+func GetUserPlan(user_id string) (string , error) {
+
+	user_id_primitive, _ := primitive.ObjectIDFromHex(user_id)
+	var plan string
+	userCollection := GetCollection(mongoClient, config.GetConfig().Mongodb.Database, constants.UserCollection)
+	filter := bson.D{{"user_id", user_id_primitive}}
+
+	userCollectionPlan, err := userCollection.Find(context.TODO(), filter)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var results []model.User
+	if err := userCollectionPlan.All(context.TODO(), &results); err != nil {
+		fmt.Println(err)
+	}
+
+	for _, test := range results {
+		if test.ID == user_id_primitive {
+			plan = test.Plan
+		}
+	}
+	return plan, err
+}
+
+func GetMinedTime(user_id string) ([]model.MinedImage, []time.Time, int, error) {
+	var times []time.Time
+	MinedImageinfo := GetCollection(mongoClient, config.GetConfig().Mongodb.Database, constants.ImageCollection)
+
+	filter := bson.D{{"user_id", user_id}}
+
+	image_time_collection, err := MinedImageinfo.Find(ctx, filter)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var results []model.MinedImage
+	if err := image_time_collection.All(context.TODO(), &results); err != nil {
+		fmt.Println(err)
+	}
+
+	for _, test := range results {
+		localTime := time.Now().Local()
+		toSubtract := -720 * time.Hour
+		SubDate := localTime.Add(toSubtract)
+
+		dateCreated := test.DateCreated
+
+		if   SubDate.Before(dateCreated) {
+			times = append(times, test.DateCreated)
+		}
+	}
+	
+	return results, times, len(times), err
+}
+
+
+func GetBatchTime(user_id string) ([]model.Batch, []time.Time, int, error) {
+	var times []time.Time
+	BatchImageinfo := GetCollection(mongoClient, config.GetConfig().Mongodb.Database, constants.BatchCollection)
+
+
+	filter := bson.D{{"user_id", user_id}}
+	// currentTime := time.Now()
+
+	batch_time_collection, err := BatchImageinfo.Find(ctx, filter)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var results []model.Batch
+	if err := batch_time_collection.All(context.TODO(), &results); err != nil {
+		fmt.Println(err)
+	}
+
+	for _, test := range results {
+		localTime := time.Now().Local()
+		toSubtract := -720 * time.Hour
+		SubDate := localTime.Add(toSubtract)
+
+		dateCreated := test.DateCreated
+
+		if   SubDate.Before(dateCreated) {
+			times = append(times, test.DateCreated)
+		}
+	}
+	return results, times, len(times), err
 }

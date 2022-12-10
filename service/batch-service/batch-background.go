@@ -54,7 +54,7 @@ type (
 )
 
 const (
-	UntaggedThreshold = 20
+	UntaggedThreshold = 5
 	Untagged          = "untagged"
 	statusComplete    = "completed"
 )
@@ -174,6 +174,7 @@ func classifyLabelImproved(batchID string, label Label, tags []string, tagsMap m
 			a, b := matchTag(label.Results, token, tagsMap)
 			score, scoreAux = score+a, scoreAux+b
 		}
+		// fmt.Println(MatchResult{tag: tag, score: score, scoreAux: scoreAux})
 		matchResults = append(matchResults, MatchResult{tag: tag, score: score, scoreAux: scoreAux})
 	}
 
@@ -213,7 +214,7 @@ func matchTag(results []Result, tag string, tagsMap map[string][]string) (float6
 		if name == tag {
 			mscore = math.Max(mscore, res.Score)
 		}
-		if strings.Contains(name, tag) || strings.Contains(name, tag) {
+		if strings.Contains(name, tag) || strings.Contains(tag, name) {
 			mscore = math.Max(mscore, res.Score)
 		}
 	}

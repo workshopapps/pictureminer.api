@@ -1,6 +1,7 @@
 package mineservice
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -68,19 +69,12 @@ func (base *Controller) MineImageUpload(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, rd)
 		return
 	}
+	UserIdstr := fmt.Sprintf("%v", userId)
 
-	ok, err := user.IsVerified(userId.(string))
-	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": err.Error()})
-		c.JSON(http.StatusBadRequest, rd)
-		return
-	}
-
-	if !ok {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "user is not verified"})
-		c.JSON(http.StatusBadRequest, rd)
-		return
-	}
+	count, _ := mineservice.GetMonthlylimit(UserIdstr)
+	if count != true {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Monthly limit exceeded", nil , gin.H{"error":" you have exceeded monthly limit of 10 Mine requests"})
+	
 
 	if c.ContentType() != "multipart/form-data" {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "file is not present"})
@@ -121,6 +115,15 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
 		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	UserIdstr := fmt.Sprintf("%v", userId)
+
+	count, _ := mineservice.GetMonthlylimit(UserIdstr)
+	if count != true {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Monthly limit exceeded", nil , gin.H{"error":" you have exceeded monthly limit of 10 Mine requests"})
+		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
 
