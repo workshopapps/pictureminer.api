@@ -44,9 +44,7 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 	user.Plan = FreePlan
 
 	// save to DB
-	database := config.GetConfig().Mongodb.Database
-	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
-	_, err = userCollection.InsertOne(context.TODO(), user)
+	_, err = mongodb.MongoPost(constants.UserCollection, user)
 	if err != nil {
 		return model.UserResponse{}, "Unable to save user to database", 500, err
 	}
@@ -56,6 +54,9 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 	if err != nil {
 		return model.UserResponse{}, fmt.Sprintf("unable to create token: %v", err.Error()), 500, err
 	}
+
+	// Send verification email
+	sendVerficationEmail(token, &user)
 
 	// build user response
 	userResponse := model.UserResponse{
@@ -300,4 +301,22 @@ func CheckPasswords(user model.UpdateUser, id primitive.ObjectID) error {
 		return err
 	}
 	return err
+}
+
+func sendVerficationEmail(token string, user *model.User) error {
+	from := config.GetConfig().NotifyEmail.Email
+	password := config.GetConfig().NotifyEmail.Password
+	username := config.GetConfig().NotifyEmail.Username
+
+	data := &utility.EmailData{
+		Subject:  "Verify Email for Discripto",
+		URL:      constants.VerifyEmailURL + "?token=" + token,
+		UserName: user.Username,
+	}
+
+	if err := utility.SendMail(from, username, password, user.Email, "verifyEmail.html", data); err != nil {
+		return err
+	}
+
+	return nil
 }

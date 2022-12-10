@@ -21,6 +21,7 @@ type User struct {
 	DateUpdated  time.Time `bson:"date_updated" json:"date_updated"`
 	ApiCallCount int64     `bson:"api_call_count" json:"api_call_count"`
 	LastLogin    time.Time `bson:"last_login" json:"last_login"`
+  IsVerified   bool      `bson:"is_verified" json:"is_verified"`
 }
 
 type UserResponse struct {

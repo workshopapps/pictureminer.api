@@ -8,8 +8,7 @@
           <td>
             <p>Hi {{ .UserName}},</p>
             <p>
-              Forgot password? Send a PATCH request to with your password and
-              passwordConfirm to {{.URL}}
+              Click the link below to verify your email
             </p>
             <table
               role="presentation"
@@ -31,7 +30,7 @@
                         <tr>
                           <td>
                             <a href="{{.URL}}" target="_blank">
-                              Reset password
+                              Verify Email
                             </a>
                           </td>
                         </tr>
@@ -41,7 +40,7 @@
                 </tr>
               </tbody>
             </table>
-            <p>Kindly ignore if you did not request for a password reset</p>
+            <p>Kindly ignore if you do not recognize this activity</p>
           </td>
         </tr>
       </table>

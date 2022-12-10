@@ -1,34 +1,104 @@
 package utility
 
 import (
+	"bytes"
+	"crypto/tls"
 	"fmt"
 	"html/template"
-	"net/smtp"
+	"log"
 	"os"
 	"path/filepath"
+	"time"
 
-	"github.com/joho/godotenv"
+	mail "github.com/xhit/go-simple-mail/v2"
 )
 
-func EmailSender(senderEmail string, password string, receiverEmail []string, subject string, body string) Response {
-	//connect
-	godotenv.Load(".env", "sample.env")
-	host := os.Getenv("host")
-	port := os.Getenv("port")
-	address := host + ":" + port
+type EmailData struct {
+	URL       string
+	UserName  string
+	Subject   string
+	Error     string
+	BatchName string
+}
 
-	//	message
-	message := []byte(fmt.Sprintf("To: %s \r\n"+"Subject: %s \r\n"+"%s", receiverEmail, subject, body))
-	//Authentication
-	auth := smtp.PlainAuth("", senderEmail, password, host)
+type MailerConfig struct {
+	timeout      time.Duration
+	host         string
+	port         int
+	username     string
+	password     string
+	sender       string
+	templatePath string
+}
 
-	//Send Email
-	err := smtp.SendMail(address, auth, senderEmail, receiverEmail, message)
-	if err != nil {
-		rd := BuildErrorResponse(550, "error", "Unable to send email", err, nil)
-		return rd
+var tmpl *template.Template
+
+var mailConfig = MailerConfig{
+	host:         "email-smtp.us-east-2.amazonaws.com",
+	port:         2587,
+	templatePath: "templates/*html",
+	timeout:      10 * time.Second,
+}
+
+func init() {
+	tmpl = template.Must(template.ParseGlob(mailConfig.templatePath))
+}
+
+func SendMail(from, username, password, receiverEmail string, template string, data *EmailData) error {
+	// SMTP Server
+	server := mail.SMTPServer{
+		Host:           mailConfig.host,
+		Port:           mailConfig.port,
+		Username:       username,
+		Password:       password,
+		Encryption:     mail.EncryptionSTARTTLS,
+		ConnectTimeout: 10 * time.Second,
+		SendTimeout:    10 * time.Second,
+		TLSConfig:      &tls.Config{InsecureSkipVerify: true},
 	}
-	return BuildSuccessResponse(250, "Email sent successfully", nil)
+
+	// SMTP client
+	smtpClient, err := server.Connect()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	body, err := parseTemplate(template, data)
+	if err != nil {
+		return err
+	}
+
+	email := mail.NewMSG()
+	email.SetFrom(from).AddTo(receiverEmail).SetSubject(data.Subject)
+	email.SetBody(mail.TextHTML, body)
+
+	// always check error after send
+	if email.Error != nil {
+		return email.Error
+	}
+
+	// Call Send and pass the client
+	err = email.Send(smtpClient)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func parseTemplate(template string, data *EmailData) (string, error) {
+	tmpl, err := tmpl.ParseGlob(mailConfig.templatePath)
+	if err != nil {
+		return "", err
+	}
+
+	body := new(bytes.Buffer)
+	err = tmpl.ExecuteTemplate(body, template, data)
+	if err != nil {
+		return "", err
+	}
+
+	return body.String(), nil
 }
 
 func ParseTemplateDir(dir string) (*template.Template, error) {
@@ -50,10 +120,4 @@ func ParseTemplateDir(dir string) (*template.Template, error) {
 	}
 
 	return template.ParseFiles(paths...)
-}
-
-type EmailData struct {
-	URL       string
-	FirstName string
-	Subject   string
 }

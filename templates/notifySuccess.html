@@ -7,9 +7,10 @@
         <tr>
           <td>
             <p>Hi {{ .UserName}},</p>
+            <p> We're done cooking! </p>
             <p>
-              Forgot password? Send a PATCH request to with your password and
-              passwordConfirm to {{.URL}}
+              Batch <b>{{ .BatchName}}</b> processing is complete!
+              You can now visit your dashboard and view its batch analytics.
             </p>
             <table
               role="presentation"
@@ -31,7 +32,7 @@
                         <tr>
                           <td>
                             <a href="{{.URL}}" target="_blank">
-                              Reset password
+                              Login
                             </a>
                           </td>
                         </tr>
@@ -41,7 +42,6 @@
                 </tr>
               </tbody>
             </table>
-            <p>Kindly ignore if you did not request for a password reset</p>
           </td>
         </tr>
       </table>
