@@ -124,19 +124,6 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 		return
 	}
 
-	ok, err := user.IsVerified(userId.(string))
-	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": err.Error()})
-		c.JSON(http.StatusBadRequest, rd)
-		return
-	}
-
-	if !ok {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "user is not verified"})
-		c.JSON(http.StatusBadRequest, rd)
-		return
-	}
-
 	var req model.MineImageUrlRequest
 
 	err = c.Bind(&req)

@@ -48,9 +48,8 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 		return model.UserResponse{}, fmt.Sprintf("unable to create token: %v", err.Error()), 500, err
 	}
 
-	if err = sendVerficationEmail(token, &user); err != nil {
-		return model.UserResponse{}, err.Error(), 500, err
-	}
+	// Send verification email
+	sendVerficationEmail(token, &user)
 
 	// build user response
 	userResponse := model.UserResponse{
@@ -102,7 +101,7 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 		TokenType:    "bearer",
 		Token:        token,
 		ApiCallCount: user.ApiCallCount,
-		LastLogin: user.LastLogin,
+		LastLogin:    user.LastLogin,
 	}
 
 	return userResponse, "", 0, nil
@@ -302,7 +301,7 @@ func sendVerficationEmail(token string, user *model.User) error {
 
 	data := &utility.EmailData{
 		Subject:  "Verify Email for Discripto",
-		URL:      constants.VerifyEmailURL,
+		URL:      constants.VerifyEmailURL + "?token=" + token,
 		UserName: user.Username,
 	}
 
