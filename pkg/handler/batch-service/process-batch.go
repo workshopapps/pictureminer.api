@@ -1,11 +1,11 @@
 package batch
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -309,7 +309,7 @@ func (base *Controller) DownloadCsv(c *gin.Context) {
 		return
 	}
 
-	c.FileAttachment("filename.csv", batchId + ".csv")
+	c.FileAttachment("filename.csv", batchId+".csv")
 	defer os.Remove("filename.csv")
 
 }
@@ -353,7 +353,7 @@ func (base *Controller) CountProcess(c *gin.Context) {
 		return
 	}
 
-  UserIdstr := fmt.Sprintf("%v", userId)
+	UserIdstr := fmt.Sprintf("%v", userId)
 
 
 	processCount, err := mineservice.ProcessCount(UserIdstr)

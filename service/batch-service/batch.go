@@ -79,9 +79,16 @@ func ProcessBatchCSVService(userID string, file io.Reader) (interface{}, int, er
 		return nil, http.StatusInternalServerError, fmt.Errorf("%s: %s", "Unable to save user to database", err.Error())
 	}
 
-	uEmail, code, err := getUserEmail(userID)
+	user, code, err := GetUserFromID(userID)
 	if err != nil {
 		return nil, code, err
+	}
+	uEmail := user.Email
+
+	// Update API call count
+	_, err = mongodb.MongoUpdate(userID[10:len(userID)-2], map[string]interface{}{"api_call_count": 1}, constants.UserCollection)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
 	}
 
 	// run goroutine in background to process batch
@@ -155,9 +162,16 @@ func ProcessBatchService(userID, batchName, desc, tagsStr string, csvFile io.Rea
 		return nil, http.StatusInternalServerError, fmt.Errorf("%s: %s", "Unable to save user to database", err.Error())
 	}
 
-	uEmail, code, err := getUserEmail(userID)
+	user, code, err := GetUserFromID(userID)
 	if err != nil {
 		return nil, code, err
+	}
+	uEmail := user.Email
+
+	// Update API call count
+	_, err = mongodb.MongoUpdate(userID[10:len(userID)-2], map[string]interface{}{"api_call_count": 1}, constants.UserCollection)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
 	}
 
 	// run goroutine in background to process batch
@@ -312,29 +326,26 @@ func validateBatchDetails(dMap map[string]string) (string, string, []string, err
 	return strings.TrimSpace(name), strings.TrimSpace(description), tags, nil
 }
 
-func getUserEmail(userID string) (string, int, error) {
+func GetUserFromID(userID string) (*model.User, int, error) {
 	var user model.User
-
-	database := config.GetConfig().Mongodb.Database
-	userCollection := mongodb.GetCollection(mongodb.Connection(), database, constants.UserCollection)
 
 	// convert "ObjectID('<id hex>') => '<id hex>'"
 	id, err := primitive.ObjectIDFromHex(userID[10 : len(userID)-2])
 	if err != nil {
-		return "", http.StatusBadRequest, err
+		return nil, http.StatusBadRequest, err
 	}
 
-	result := userCollection.FindOne(context.TODO(), bson.M{"_id": id})
-	err = result.Err()
+	result, err := mongodb.MongoGetOne(constants.UserCollection, map[string]interface{}{"_id": id})
 	if err != nil {
-		return "", http.StatusNotFound, err
+		return nil, http.StatusNotFound, err
 	}
 
 	err = result.Decode(&user)
 	if err != nil {
-		return "", http.StatusInternalServerError, err
+		return nil, http.StatusInternalServerError, err
 	}
-	return user.Email, http.StatusOK, nil
+
+	return &user, http.StatusOK, nil
 }
 
 func ParseImageResponseForDownload(dt []model.BatchImage) error {

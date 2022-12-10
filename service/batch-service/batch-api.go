@@ -49,10 +49,11 @@ func ProcessBatchAPI(userID string, req *http.Request) (*model.ProcessBatchAPIRe
 		return nil, err
 	}
 
-	userEmail, _, err := getUserEmail(userID)
+	user, _, err := GetUserFromID(userID)
 	if err != nil {
 		return nil, err
 	}
+	userEmail := user.Email
 
 	batchID := id.(primitive.ObjectID)
 
@@ -77,6 +78,11 @@ func saveBatch(uID string, pb *model.ProcessBatchAPIRequest, time time.Time) (in
 	}
 
 	result, err := mongodb.MongoPost(constants.BatchCollection, batch)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = mongodb.MongoUpdate(uID[10:len(uID)-2], map[string]interface{}{"api_call_count": 1}, constants.UserCollection)
 	if err != nil {
 		return nil, err
 	}

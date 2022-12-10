@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	"github.com/workshopapps/pictureminer.api/service/user"
 	"github.com/workshopapps/pictureminer.api/utility"
@@ -47,7 +48,6 @@ func (base *Controller) SubscriberEmail(c *gin.Context) {
 	c.JSON(200, object)
 }
 
-
 // Fetch Subscription godoc
 // @Summary      Fetch Subscription
 // @Description  get subscription status information
@@ -60,14 +60,14 @@ func (base *Controller) SubscriberEmail(c *gin.Context) {
 func (base *Controller) GetSubscription(c *gin.Context) {
 
 	// bind emails to SubscriberEmail struct
-	email, ok:= c.GetQuery("user")
+	email, ok := c.GetQuery("user")
 	if !ok {
 		rd := utility.BuildErrorResponse(400, "error", "please supply the user email", "", nil)
 		c.JSON(400, rd)
 		return
 	}
 
-	sub, err:= user.GetUserSubscription(email)
+	sub, err := user.GetUserSubscription(email)
 	if err != nil {
 		rd := utility.BuildErrorResponse(400, "error", "USer may not have subscription", err, nil)
 		c.JSON(400, rd)
@@ -76,4 +76,24 @@ func (base *Controller) GetSubscription(c *gin.Context) {
 
 	object := utility.BuildSuccessResponse(200, "User subscription retrieved sucessfully", sub)
 	c.JSON(200, object)
+}
+
+func (base *Controller) VerifyEmail(c *gin.Context) {
+	secretKey := config.GetConfig().Server.Secret
+	token := utility.ExtractToken(c)
+	userId, err := utility.GetKey("id", token, secretKey)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	if err := user.VerifyEmail(userId); err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "could not verify token", nil, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusAccepted, "email successfully verified", nil)
+	c.JSON(http.StatusOK, rd)
 }
