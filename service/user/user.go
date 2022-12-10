@@ -20,6 +20,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var (
+	FreePlan    = "free"
+	StarterPlan = "starter"
+	PremiumPlan = "premium"
+)
+
 func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 	// check if user already exists
 	_, err := getUserFromDB(user.Email)
@@ -35,6 +41,7 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 	user.ID = primitive.NewObjectID()
 	user.ProfileUrl = profile_url
 	user.ProfileKey = profile_key
+	user.Plan = FreePlan
 
 	// save to DB
 	database := config.GetConfig().Mongodb.Database
@@ -56,6 +63,7 @@ func SignUpUser(user model.User) (model.UserResponse, string, int, error) {
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,
 		Email:        user.Email,
+		Plan:         user.Plan,
 		ProfileKey:   user.ProfileKey,
 		ProfileUrl:   user.ProfileUrl,
 		TokenType:    "bearer",
@@ -95,12 +103,13 @@ func LoginUser(userLoginObject model.UserLogin) (model.UserResponse, string, int
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,
 		Email:        user.Email,
+		Plan:         user.Plan,
 		ProfileKey:   user.ProfileKey,
 		ProfileUrl:   user.ProfileUrl,
 		TokenType:    "bearer",
 		Token:        token,
 		ApiCallCount: user.ApiCallCount,
-		LastLogin: user.LastLogin,
+		LastLogin:    user.LastLogin,
 	}
 
 	return userResponse, "", 0, nil
@@ -243,7 +252,7 @@ func UpdateUserService(user model.UpdateUser, userId interface{}) (int, error) {
 	}
 
 	if len(user.NewPassword) > 0 {
-		err := CheckPasswords(user,id)
+		err := CheckPasswords(user, id)
 		if err != nil {
 			return 400, err
 		}

@@ -7,20 +7,20 @@ import (
 )
 
 type User struct {
-	ID           primitive.ObjectID `bson:"_id, omitempty"`
-	Username     string             `bson:"username" json:"username" validate:"required"`
-	FirstName    string             `bson:"first_name" json:"first_name"`
-	LastName     string             `bson:"last_name" json:"last_name"`
-	Email        string             `bson:"email" json:"email" validate:"required,email"`
-	Plan  string             `bson:"plan" json:"plan"`
-	//plan can be "free","paid"
-	Password     string             `bson:"password" json:"password" validate:"required"`
-	ProfileKey   string             `bson:"profile_key" json:"profile_key"`
-	ProfileUrl   string             `bson:"profile_url" json:"profile_url"`
-	DateCreated  time.Time          `bson:"date_created" json:"date_created"`
-	DateUpdated  time.Time          `bson:"date_updated" json:"date_updated"`
-	ApiCallCount int64              `bson:"api_call_count" json:"api_call_count"`
-	LastLogin    time.Time			`bson:"last_login" json:"last_login"`
+	ID        primitive.ObjectID `bson:"_id, omitempty"`
+	Username  string             `bson:"username" json:"username" validate:"required"`
+	FirstName string             `bson:"first_name" json:"first_name"`
+	LastName  string             `bson:"last_name" json:"last_name"`
+	Email     string             `bson:"email" json:"email" validate:"required,email"`
+	Plan      string             `bson:"plan" json:"plan"`
+	//plan can be "free","starter" or "premium"
+	Password     string    `bson:"password" json:"password" validate:"required"`
+	ProfileKey   string    `bson:"profile_key" json:"profile_key"`
+	ProfileUrl   string    `bson:"profile_url" json:"profile_url"`
+	DateCreated  time.Time `bson:"date_created" json:"date_created"`
+	DateUpdated  time.Time `bson:"date_updated" json:"date_updated"`
+	ApiCallCount int64     `bson:"api_call_count" json:"api_call_count"`
+	LastLogin    time.Time `bson:"last_login" json:"last_login"`
 }
 
 type UserResponse struct {
@@ -28,6 +28,7 @@ type UserResponse struct {
 	FirstName    string
 	LastName     string
 	Email        string
+	Plan         string
 	ProfileKey   string
 	ProfileUrl   string
 	Token        string
@@ -71,16 +72,16 @@ type UpdateUser struct {
 }
 
 type SubscriberEmail struct {
-	ID          primitive.ObjectID `bson:"_id" json:"_id"`
-	Email       string             `bson:"email" json:"email" validate:"required,email"`
-	Subscribed  bool              `bson:"subscribed" json:"subscribed"`
-	Price 		float64				`bson:"price" json:"price"`
-	SubscriptionType    string `bson:"subscription_type" json:"subscription_type"`
-	ExpiresAt   time.Time	`bson:"expires_at" json:"expires_at"`
+	ID               primitive.ObjectID `bson:"_id" json:"_id"`
+	Email            string             `bson:"email" json:"email" validate:"required,email"`
+	Subscribed       bool               `bson:"subscribed" json:"subscribed"`
+	Price            float64            `bson:"price" json:"price"`
+	SubscriptionType string             `bson:"subscription_type" json:"subscription_type"`
+	ExpiresAt        time.Time          `bson:"expires_at" json:"expires_at"`
 }
 
 type SubscriptionRequest struct {
-	Email           string `bson:"email" json:"email" validate:"required"`
-	Price 		float64				`bson:"price" json:"price"`
-	SubscriptionType    string `bson:"subscription_type" json:"subscription_type"`
+	Email            string  `bson:"email" json:"email" validate:"required"`
+	Price            float64 `bson:"price" json:"price"`
+	SubscriptionType string  `bson:"subscription_type" json:"subscription_type"`
 }
