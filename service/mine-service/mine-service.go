@@ -176,7 +176,34 @@ func ProcessCount(userId string) (model.ProcessCallCount, error) {
 		status = false
 	}
 
+	plan, err := mongodb.GetUserPlan(userId)
+if err != nil {
+	return response, err
+}
+
+_, time_collection , _ , err := mongodb.GetMinedTime(userId)
+if err != nil {
+	return response, err
+}
+
+
+_, time_batch_collection , _ , err := mongodb.GetBatchTime(userId)
+if err != nil {
+	return response, err
+}
+
+
+totalMined := len(time_collection) + len(time_batch_collection)
+var remaining int
+if plan == "free" || plan == "" {
+    remaining = 10 - totalMined
+  }else{
+    remaining = 100 - totalMined
+  }
+
 	response = model.ProcessCallCount{
+		MinedThisMonth: totalMined,
+		RemainingTomine: remaining,
 		ImageCount:    imageCount,
 		BatchCount:     batchCount,
 		Status:    status,
