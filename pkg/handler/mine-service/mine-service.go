@@ -10,7 +10,6 @@ import (
 	"github.com/workshopapps/pictureminer.api/internal/config"
 	"github.com/workshopapps/pictureminer.api/internal/model"
 	mineservice "github.com/workshopapps/pictureminer.api/service/mine-service"
-	"github.com/workshopapps/pictureminer.api/service/user"
 	"github.com/workshopapps/pictureminer.api/utility"
 )
 
@@ -73,8 +72,10 @@ func (base *Controller) MineImageUpload(c *gin.Context) {
 
 	count, _ := mineservice.GetMonthlylimit(UserIdstr)
 	if count != true {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Monthly limit exceeded", nil , gin.H{"error":" you have exceeded monthly limit of 10 Mine requests"})
-	
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Monthly limit exceeded", nil, gin.H{"error": " you have exceeded monthly limit of 10 Mine requests"})
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
 
 	if c.ContentType() != "multipart/form-data" {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", nil, gin.H{"error": "file is not present"})
@@ -108,7 +109,6 @@ func (base *Controller) MineImageUpload(c *gin.Context) {
 }
 
 func (base *Controller) MineImageUrl(c *gin.Context) {
-
 	secretKey := config.GetConfig().Server.Secret
 	token := utility.ExtractToken(c)
 	userId, err := utility.GetKey("id", token, secretKey)
@@ -119,16 +119,14 @@ func (base *Controller) MineImageUrl(c *gin.Context) {
 	}
 
 	UserIdstr := fmt.Sprintf("%v", userId)
-
 	count, _ := mineservice.GetMonthlylimit(UserIdstr)
 	if count != true {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Monthly limit exceeded", nil , gin.H{"error":" you have exceeded monthly limit of 10 Mine requests"})
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Monthly limit exceeded", nil, gin.H{"error": " you have exceeded monthly limit of 10 Mine requests"})
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
 
 	var req model.MineImageUrlRequest
-
 	err = c.Bind(&req)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "Unable to bind url parameter", nil, err.Error())
