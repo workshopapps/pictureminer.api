@@ -44,7 +44,9 @@ type MineImagePromptResponse struct {
 }
 
 type ProcessCallCount struct {
-	ImageCount    int64    `bson:"image_count" json:"image_count"`
-	BatchCount    int64    `bson:"batch_count" json:"batch_count"`
-	Status			bool	`bson:"status" json:"status"`
+	MinedThisMonth    	int     `bson:"mined_this_month" json:"mined_this_month"`
+	RemainingTomine   	int     `bson:"remaining_to_mine" json:"remaining_to_mine"`
+	ImageCount    		int64   `bson:"image_count" json:"image_count"`
+	BatchCount    		int64   `bson:"batch_count" json:"batch_count"`
+	Status				bool	`bson:"status" json:"status"`
 }
