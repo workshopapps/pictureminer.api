@@ -126,7 +126,6 @@ func SendMail(from, username, password, receiverEmail string, template string, d
 
 	// Call Send and pass the client
 	err = email.Send(smtpClient)
-	fmt.Println("here", err)
 	if err != nil {
 		return err
 	}
