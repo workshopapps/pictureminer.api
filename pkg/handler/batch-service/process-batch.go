@@ -76,14 +76,14 @@ func (base *Controller) ProcessBatch(c *gin.Context) {
 		return
 	}
 
-	UserIdstr := fmt.Sprintf("%v", userID)
+	// UserIdstr := fmt.Sprintf("%v", userID)
 
-	count, _ := mineservice.GetMonthlylimit(UserIdstr)
-	if count != true {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Monthly limit exceeded", nil , gin.H{"error":" you have exceeded monthly limit of 10 Mine requests"})
-		c.JSON(http.StatusBadRequest, rd)
-		return
-	}
+	// count, _ := mineservice.GetMonthlylimit(UserIdstr)
+	// if count != true {
+	// 	rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Monthly limit exceeded", nil , gin.H{"error":" you have exceeded monthly limit of 10 Mine requests"})
+	// 	c.JSON(http.StatusBadRequest, rd)
+	// 	return
+	// }
 
 	if c.ContentType() != "multipart/form-data" {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "failed", "invalid request", gin.H{"error": "file is not present"}, nil)

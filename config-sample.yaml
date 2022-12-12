@@ -19,7 +19,7 @@ ImaggaAPI:
 NotifyEmail:
   Email: "hng9.discripto@gmail.com"
   Username: "AKIAVI6UXVQWQAAUDS7M"
-  Password: "BFovKb3UZ8bEAZ7kqm2AqwdksAdq6n84N1ObLCtB80Vz"
+  Password: "pzajnkgwvsrnxhdj"
 python: 
   microservicehost: "http://178.128.242.94/caption-generator"
 WordsAPIConfig:

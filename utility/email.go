@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"net/smtp"
 	"os"
 	"path/filepath"
 	"time"
@@ -44,6 +45,52 @@ func init() {
 	tmpl = template.Must(template.ParseGlob(mailConfig.templatePath))
 }
 
+func SendMailNaked(from, username, password, receiverEmail string, template string, data *EmailData) error {
+	host, port := "smtp.gmail.com", "465"
+	serverName := host + ":" + port
+
+	body, err := parseTemplate(template, data)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	auth := smtp.PlainAuth("", from, password, host)
+
+	tlsconfig := &tls.Config{
+		InsecureSkipVerify: false,
+		ServerName:         host,
+	}
+	conn, err := tls.Dial("tcp", serverName, tlsconfig)
+	if err != nil {
+		fmt.Println(2, err)
+		return err
+	}
+
+	client, err := smtp.NewClient(conn, host)
+	if err != nil {
+		fmt.Println(3, err)
+	}
+	client.Auth(auth)
+
+	client.Mail(from)
+	client.Rcpt(receiverEmail)
+
+	w, err := client.Data()
+	if err != nil {
+		return err
+	}
+
+	w.Write([]byte("subject:" + data.Subject + "\n"))
+	w.Write([]byte("Content-type: text/html; charset=\"UTF-8\"\n"))
+	w.Write([]byte(body))
+	w.Close()
+
+	client.Quit()
+
+	return nil
+}
+
 func SendMail(from, username, password, receiverEmail string, template string, data *EmailData) error {
 	// SMTP Server
 	server := mail.SMTPServer{
@@ -79,6 +126,7 @@ func SendMail(from, username, password, receiverEmail string, template string, d
 
 	// Call Send and pass the client
 	err = email.Send(smtpClient)
+	fmt.Println("here", err)
 	if err != nil {
 		return err
 	}
