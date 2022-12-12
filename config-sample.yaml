@@ -15,7 +15,7 @@ s3:
   ProfilePictureBucketName : "miner-profile-pic"
 ImaggaAPI:
   URL: "https://api.imagga.com/v2/tags"
-  Auth: "Basic YWNjXzRjODM4N2MxZGM5YWNkOTowODNjNTk5YmMwMTlmYjFlMjJjNTM4NWIzMTJiZjkxYg=="
+  Auth: "Basic YWNjX2E3YTk5NzM1YjE3NTE5MToyMmQwYjRhN2UzYmI2N2U2Mjc2MjU5ZDgzMmMzZGIyOQ=="
 NotifyEmail:
   Email: "hng9.discripto@gmail.com"
   Username: "AKIAVI6UXVQWQAAUDS7M"
