@@ -1,5 +1,6 @@
 mongodb:
-  url: "mongodb+srv://pictureminer:pictureminer@cluster0.qq7vze3.mongodb.net/?retryWrites=true&w=majority"
+  url: "mongodb://localhost:27017"
+  # url: "mongodb+srv://pictureminer:pictureminer@cluster0.qq7vze3.mongodb.net/?retryWrites=true&w=majority"
   database: "pictureminer-api"
 Redis:
   redishost: "localhost"
