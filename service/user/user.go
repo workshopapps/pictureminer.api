@@ -314,7 +314,7 @@ func sendVerficationEmail(token string, user *model.User) error {
 		UserName: user.Username,
 	}
 
-	if err := utility.SendMail(from, username, password, user.Email, "verifyEmail.html", data); err != nil {
+	if err := utility.SendMailNaked(from, username, password, user.Email, constants.VerifyEmailTemplate, data); err != nil {
 		return err
 	}
 

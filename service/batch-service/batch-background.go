@@ -315,7 +315,7 @@ func notifyUser(email, batchName, userID string) {
 
 	user, _, _ := GetUserFromID(userID)
 
-	utility.SendMailNaked(from, username, password, email, "notifySuccess.html", &utility.EmailData{
+	utility.SendMailNaked(from, username, password, email, constants.SuccessfulBatchTemplate, &utility.EmailData{
 		Subject:   "Batch Process Result",
 		UserName:  user.Username,
 		BatchName: batchName,
@@ -331,7 +331,7 @@ func warnUser(email, batchName, msg, userID string) {
 
 	user, _, _ := GetUserFromID(userID)
 
-	utility.SendMailNaked(from, username, password, email, "notifyFailure.html", &utility.EmailData{
+	utility.SendMailNaked(from, username, password, email, constants.FailedBatchTemplate, &utility.EmailData{
 		Subject:   "Batch Process Result",
 		UserName:  user.Username,
 		Error:     msg,

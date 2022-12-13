@@ -134,13 +134,8 @@ func SendMail(from, username, password, receiverEmail string, template string, d
 }
 
 func parseTemplate(template string, data *EmailData) (string, error) {
-	tmpl, err := tmpl.ParseGlob(mailConfig.templatePath)
-	if err != nil {
-		return "", err
-	}
-
 	body := new(bytes.Buffer)
-	err = tmpl.ExecuteTemplate(body, template, data)
+	err := tmpl.ExecuteTemplate(body, template, data)
 	if err != nil {
 		return "", err
 	}
