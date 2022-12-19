@@ -21,7 +21,7 @@ NotifyEmail:
   Username: "AKIAVI6UXVQWQAAUDS7M"
   Password: "pzajnkgwvsrnxhdj"
 python: 
-  microservicehost: "https://discripto.hng.tech/api2/caption-generator"
+  microservicehost: "https://discripto.io/api2/caption-generator"
 WordsAPIConfig:
   URL: "https://www.wordsapi.com/mashape/words/"
   Trailer: "?when=2022-12-07T20:39:47.672Z&encrypted=8cfdb188e723919bea9607bdef58bdb0aeb42a0936f895b8"

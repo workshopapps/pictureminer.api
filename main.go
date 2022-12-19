@@ -26,7 +26,7 @@ func init() {
 // @version         1.0
 // @description     A picture mining service API in Go using Gin framework.
 
-// @host      discripto.hng.tech/api1
+// @host      discripto.io/api1
 // @BasePath  /api/v1/
 // @schemes https
 // @securityDefinitions.apikey BearerAuth
